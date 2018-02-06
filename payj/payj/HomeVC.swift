@@ -79,6 +79,7 @@ class HomeVC: UIViewController {
     cameraButton = UIButton(type: .system)
     cameraButton.translatesAutoresizingMaskIntoConstraints = false
     cameraButton.setTitle("Camera", for: .normal)
+    cameraButton.addTarget(self, action: #selector(camera), for: .touchUpInside)
     view.addSubview(cameraButton)
     NSLayoutConstraint.activate([
       cameraButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -89,5 +90,10 @@ class HomeVC: UIViewController {
   @objc func send() {
     let sendVC = SendAmountVC()
     self.show(sendVC, sender: self)
+  }
+
+  @objc func camera() {
+    let cameraVC = CameraVC()
+    self.show(cameraVC, sender: self)
   }
 }

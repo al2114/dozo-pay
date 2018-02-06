@@ -15,6 +15,7 @@
 		2B4777B5202A32130077415A /* SendAmountVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777B4202A32130077415A /* SendAmountVC.swift */; };
 		2B4777B7202A363D0077415A /* SendContactVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777B6202A363D0077415A /* SendContactVC.swift */; };
 		2B4777B9202A367C0077415A /* ConfirmationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777B8202A367C0077415A /* ConfirmationVC.swift */; };
+		2B4777BB202A3D0F0077415A /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777BA202A3D0F0077415A /* Util.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		2B4777B4202A32130077415A /* SendAmountVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendAmountVC.swift; sourceTree = "<group>"; };
 		2B4777B6202A363D0077415A /* SendContactVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendContactVC.swift; sourceTree = "<group>"; };
 		2B4777B8202A367C0077415A /* ConfirmationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationVC.swift; sourceTree = "<group>"; };
+		2B4777BA202A3D0F0077415A /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				2B4777B6202A363D0077415A /* SendContactVC.swift */,
 				2B4777B4202A32130077415A /* SendAmountVC.swift */,
 				2B4777B0202A32040077415A /* CameraVC.swift */,
+				2B4777BA202A3D0F0077415A /* Util.swift */,
 				2B4777A3202A0F0F0077415A /* Assets.xcassets */,
 				2B4777A5202A0F0F0077415A /* LaunchScreen.storyboard */,
 				2B4777A8202A0F0F0077415A /* Info.plist */,
@@ -148,6 +151,7 @@
 				2B4777B7202A363D0077415A /* SendContactVC.swift in Sources */,
 				2B4777B1202A32040077415A /* CameraVC.swift in Sources */,
 				2B4777B9202A367C0077415A /* ConfirmationVC.swift in Sources */,
+				2B4777BB202A3D0F0077415A /* Util.swift in Sources */,
 				2B4777AF202A29110077415A /* HomeVC.swift in Sources */,
 				2B4777B5202A32130077415A /* SendAmountVC.swift in Sources */,
 			);

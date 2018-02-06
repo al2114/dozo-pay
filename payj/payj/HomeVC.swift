@@ -13,6 +13,8 @@ class HomeVC: UIViewController {
   var sendButton: UIButton!
   var settingsButton: UIButton!
   var cameraButton: UIButton!
+  var qrCodeImageView: UIImageView!
+  let qrCodeSize: CGFloat = 100
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -40,11 +42,20 @@ class HomeVC: UIViewController {
       ])
     view.addSubview(balanceView)
     NSLayoutConstraint.activate([
-      balanceView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      balanceView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      balanceView.topAnchor.constraint(equalTo: viewTopAnchor),
-      balanceView.bottomAnchor.constraint(equalTo: viewBottomAnchor)
+      balanceView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      balanceView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
       ])
+
+    qrCodeImageView = UIImageView()
+    qrCodeImageView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(qrCodeImageView)
+    NSLayoutConstraint.activate([
+      qrCodeImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      qrCodeImageView.widthAnchor.constraint(equalToConstant: qrCodeSize),
+      qrCodeImageView.heightAnchor.constraint(equalToConstant: qrCodeSize),
+      qrCodeImageView.bottomAnchor.constraint(equalTo: balanceView.topAnchor, constant: -50)
+      ])
+    qrCodeImageView.image = Util.qrCode(from: "Kill Yourself", withSize: CGSize(width: qrCodeSize, height: qrCodeSize))
 
     sendButton = UIButton(type: .system)
     sendButton.translatesAutoresizingMaskIntoConstraints = false

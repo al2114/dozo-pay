@@ -1,0 +1,10 @@
+/register -> [#, *]
+/register/verify -> [verif_code]
+/register/complete
+/login/{#/@}/{*}
+/balances|transactions
+/contacts(/verified?)
+/pay
+/users/me
+/room/create
+/room/join

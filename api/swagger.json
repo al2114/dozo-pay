@@ -3,7 +3,7 @@
    "info":{  
       "description":"This is the service API specification for Project Pesto's mobile/web frontend services",
       "version":"1.0.0",
-      "title":"Swagger Pesto",
+      "title":"Pesto Swagger",
       "termsOfService":"http://swagger.io/terms/",
       "contact":{  
          "email":"apiteam@swagger.io"

@@ -1,7 +1,6 @@
 [[package]]
 name = "api-server"
 version = "0.1.0"
-
 dependencies = [
  "rocket 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket_codegen 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",

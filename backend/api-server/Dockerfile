@@ -1,6 +1,7 @@
 FROM rustlang/rust:nightly
-RUN cargo install diesel_cli --no-default-features --features postgres
+#RUN cargo install diesel_cli --no-default-features --features postgres
 RUN cargo install cargo-watch
+RUN cargo install Rocket
 WORKDIR /usr/src/app
 EXPOSE 3001
 VOLUME ["/usr/local/cargo"]

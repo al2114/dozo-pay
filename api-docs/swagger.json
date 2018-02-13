@@ -3,7 +3,7 @@
    "info":{  
       "description":"This is the service API specification for Project Pesto's mobile/web frontend services",
       "version":"1.0.0",
-      "title":"Swagger Pesto",
+      "title":"Pesto Swagger",
       "termsOfService":"http://swagger.io/terms/",
       "contact":{  
          "email":"apiteam@swagger.io"
@@ -48,7 +48,7 @@
             ],
             "summary":"Register new user account",
             "description":"",
-            "operationId":"userRegister",
+            "operationId":"registerUser",
             "consumes":[
                "application/json",
                "application/xml"
@@ -61,7 +61,7 @@
                {  
                   "in":"body",
                   "name":"body",
-                  "description":"Pet object that needs to be added to the store",
+                  "description":"",
                   "required":true,
                   "schema":{  
                      "$ref":"#/definitions/User"
@@ -76,6 +76,43 @@
          }
       },
 
+
+      "/register/verify":{
+         "post":{
+            "tags":[
+               "user"
+            ],
+            "summary":"Register new user account",
+            "description":"",
+            "operationId":"verifyUser",
+            "consumes":[
+               "application/json",
+               "application/xml"
+            ],
+            "produces":[  
+               "application/xml",
+               "application/json"
+            ],
+            "parameters":[  
+               {  
+                  "in":"body",
+                  "name":"body",
+                  "description":"",
+                  "required":true,
+                  "schema":{  
+                     "$ref":"#/definitions/VerifyCode"
+                  }
+               }
+            ],
+            "responses":{  
+               "default":{  
+                  "description":"successful operation"
+               }
+            }
+         }
+      },
+
+
       "/login":{
          "post":{
             "tags":[
@@ -83,7 +120,7 @@
             ],
             "summary":"Login to user account",
             "description":"",
-            "operationId":"userLogin",
+            "operationId":"loginUser",
             "consumes":[
                "application/json",
                "application/xml"
@@ -154,149 +191,27 @@
                "type":"string"
             },
             "password":{
-               "type":"string"
+               "type":"string",
+               "format":"password"
             }
          },
          "xml":{  
             "name":"User"
          }
       },
-
-
-
-      "Order":{  
+      "VerifyCode":{
          "type":"object",
-         "properties":{  
-            "id":{  
-               "type":"integer",
-               "format":"int64"
-            },
-            "petId":{  
-               "type":"integer",
-               "format":"int64"
-            },
-            "quantity":{  
-               "type":"integer",
-               "format":"int32"
-            },
-            "shipDate":{  
-               "type":"string",
-               "format":"date-time"
-            },
-            "status":{  
-               "type":"string",
-               "description":"Order Status",
-               "enum":[  
-                  "placed",
-                  "approved",
-                  "delivered"
-               ]
-            },
-            "complete":{  
-               "type":"boolean",
-               "default":false
-            }
-         },
-         "xml":{  
-            "name":"Order"
-         }
-      },
-
-      "Category":{  
-         "type":"object",
-         "properties":{  
-            "id":{  
-               "type":"integer",
-               "format":"int64"
-            },
-            "name":{  
-               "type":"string"
-            }
-         },
-         "xml":{  
-            "name":"Category"
-         }
-      },
-      "Tag":{  
-         "type":"object",
-         "properties":{  
-            "id":{  
-               "type":"integer",
-               "format":"int64"
-            },
-            "name":{  
-               "type":"string"
-            }
-         },
-         "xml":{  
-            "name":"Tag"
-         }
-      },
-      "Pet":{  
-         "type":"object",
-         "required":[  
-            "name",
-            "photoUrls"
-         ],
-         "properties":{  
-            "id":{  
-               "type":"integer",
-               "format":"int64"
-            },
-            "category":{  
-               "$ref":"#/definitions/Category"
-            },
-            "name":{  
-               "type":"string",
-               "example":"doggie"
-            },
-            "photoUrls":{  
-               "type":"array",
-               "xml":{  
-                  "name":"photoUrl",
-                  "wrapped":true
-               },
-               "items":{  
-                  "type":"string"
-               }
-            },
-            "tags":{  
-               "type":"array",
-               "xml":{  
-                  "name":"tag",
-                  "wrapped":true
-               },
-               "items":{  
-                  "$ref":"#/definitions/Tag"
-               }
-            },
-            "status":{  
-               "type":"string",
-               "description":"pet status in the store",
-               "enum":[  
-                  "available",
-                  "pending",
-                  "sold"
-               ]
-            }
-         },
-         "xml":{  
-            "name":"Pet"
-         }
-      },
-      "ApiResponse":{  
-         "type":"object",
-         "properties":{  
-            "code":{  
-               "type":"integer",
-               "format":"int32"
-            },
-            "type":{  
+         "properties":{
+            "userid":{
                "type":"string"
             },
-            "message":{  
-               "type":"string"
+            "code":{
+               "type":"string",
+               "pattern":"^[0-9]{4}$"
             }
+         },
+         "xml":{
+            "name":"VerifyCode"
          }
       }
    },

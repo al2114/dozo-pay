@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Swagger Pesto</title>
+  <title>Pesto Swagger</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8" />
@@ -696,129 +696,6 @@ margin-bottom: 20px;
   <script>
     // Script section to load models into a JS Var
     var defs = {}
-            defs.ApiResponse = {
-  "type" : "object",
-  "properties" : {
-    "code" : {
-      "type" : "integer",
-      "format" : "int32"
-    },
-    "type" : {
-      "type" : "string"
-    },
-    "message" : {
-      "type" : "string"
-    }
-  }
-};
-            defs.Category = {
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "integer",
-      "format" : "int64"
-    },
-    "name" : {
-      "type" : "string"
-    }
-  },
-  "xml" : {
-    "name" : "Category"
-  }
-};
-            defs.Order = {
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "integer",
-      "format" : "int64"
-    },
-    "petId" : {
-      "type" : "integer",
-      "format" : "int64"
-    },
-    "quantity" : {
-      "type" : "integer",
-      "format" : "int32"
-    },
-    "shipDate" : {
-      "type" : "string",
-      "format" : "date-time"
-    },
-    "status" : {
-      "type" : "string",
-      "description" : "Order Status",
-      "enum" : [ "placed", "approved", "delivered" ]
-    },
-    "complete" : {
-      "type" : "boolean",
-      "default" : false
-    }
-  },
-  "xml" : {
-    "name" : "Order"
-  }
-};
-            defs.Pet = {
-  "type" : "object",
-  "required" : [ "name", "photoUrls" ],
-  "properties" : {
-    "id" : {
-      "type" : "integer",
-      "format" : "int64"
-    },
-    "category" : {
-      "$ref" : "#/definitions/Category"
-    },
-    "name" : {
-      "type" : "string",
-      "example" : "doggie"
-    },
-    "photoUrls" : {
-      "type" : "array",
-      "xml" : {
-        "name" : "photoUrl",
-        "wrapped" : true
-      },
-      "items" : {
-        "type" : "string"
-      }
-    },
-    "tags" : {
-      "type" : "array",
-      "xml" : {
-        "name" : "tag",
-        "wrapped" : true
-      },
-      "items" : {
-        "$ref" : "#/definitions/Tag"
-      }
-    },
-    "status" : {
-      "type" : "string",
-      "description" : "pet status in the store",
-      "enum" : [ "available", "pending", "sold" ]
-    }
-  },
-  "xml" : {
-    "name" : "Pet"
-  }
-};
-            defs.Tag = {
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "integer",
-      "format" : "int64"
-    },
-    "name" : {
-      "type" : "string"
-    }
-  },
-  "xml" : {
-    "name" : "Tag"
-  }
-};
             defs.User = {
   "type" : "object",
   "properties" : {
@@ -826,11 +703,27 @@ margin-bottom: 20px;
       "type" : "string"
     },
     "password" : {
-      "type" : "string"
+      "type" : "string",
+      "format" : "password"
     }
   },
   "xml" : {
     "name" : "User"
+  }
+};
+            defs.VerifyCode = {
+  "type" : "object",
+  "properties" : {
+    "userid" : {
+      "type" : "string"
+    },
+    "code" : {
+      "type" : "string",
+      "pattern" : "^[0-9]{4}$"
+    }
+  },
+  "xml" : {
+    "name" : "VerifyCode"
   }
 };
   </script>
@@ -850,11 +743,14 @@ margin-bottom: 20px;
             <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">API Summary</a></li>
 
                   <li class="nav-header" data-group="User"><a href="#api-User">API Methods - User</a></li>
-                    <li data-group="User" data-name="userLogin" class="">
-                      <a href="#api-User-userLogin">userLogin</a>
+                    <li data-group="User" data-name="loginUser" class="">
+                      <a href="#api-User-loginUser">loginUser</a>
                     </li>
-                    <li data-group="User" data-name="userRegister" class="">
-                      <a href="#api-User-userRegister">userRegister</a>
+                    <li data-group="User" data-name="registerUser" class="">
+                      <a href="#api-User-registerUser">registerUser</a>
+                    </li>
+                    <li data-group="User" data-name="verifyUser" class="">
+                      <a href="#api-User-verifyUser">verifyUser</a>
                     </li>
           </ul>
         </nav>
@@ -862,7 +758,7 @@ margin-bottom: 20px;
       <div id="content">
         <div id="project">
           <div class="pull-left">
-            <h1>Swagger Pesto</h1>
+            <h1>Pesto Swagger</h1>
           </div>
           <div class="clearfix"></div>
         </div>
@@ -877,10 +773,10 @@ margin-bottom: 20px;
         <div id="sections">
                 <section id="api-User">
                   <h1>User</h1>
-                    <div id="api-User-userLogin">
-                      <article id="api-User-userLogin-0" data-group="User" data-name="userLogin" data-version="0">
+                    <div id="api-User-loginUser">
+                      <article id="api-User-loginUser-0" data-group="User" data-name="loginUser" data-version="0">
                         <div class="pull-left">
-                          <h1>userLogin</h1>
+                          <h1>loginUser</h1>
                           <p>Login to user account</p>
                         </div>
                         <div class="pull-right"></div>
@@ -894,24 +790,24 @@ margin-bottom: 20px;
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-User-userLogin-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-User-userLogin-0-java">Java</a></li>
-                          <li class=""><a href="#examples-User-userLogin-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-User-userLogin-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-User-userLogin-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-User-userLogin-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-User-userLogin-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-User-userLogin-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-User-userLogin-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-User-userLogin-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-User-userLogin-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-User-loginUser-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-User-loginUser-0-java">Java</a></li>
+                          <li class=""><a href="#examples-User-loginUser-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-User-loginUser-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-User-loginUser-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-User-loginUser-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-User-loginUser-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-User-loginUser-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-User-loginUser-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-User-loginUser-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-User-loginUser-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-User-userLogin-0-curl">
+                          <div class="tab-pane active" id="examples-User-loginUser-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X POST "http://localhost/login"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-User-userLogin-0-java">
+                          <div class="tab-pane" id="examples-User-loginUser-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -927,17 +823,17 @@ public class UserApiExample {
         UserApi apiInstance = new UserApi();
         User body = ; // User | Pet object that needs to be added to the store
         try {
-            'String' result = apiInstance.userLogin(body);
+            'String' result = apiInstance.loginUser(body);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling UserApi#userLogin");
+            System.err.println("Exception when calling UserApi#loginUser");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-User-userLogin-0-android">
+                          <div class="tab-pane" id="examples-User-loginUser-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.UserApi;
 
 public class UserApiExample {
@@ -946,26 +842,26 @@ public class UserApiExample {
         UserApi apiInstance = new UserApi();
         User body = ; // User | Pet object that needs to be added to the store
         try {
-            'String' result = apiInstance.userLogin(body);
+            'String' result = apiInstance.loginUser(body);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling UserApi#userLogin");
+            System.err.println("Exception when calling UserApi#loginUser");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-User-userLogin-0-groovy">
+  <div class="tab-pane" id="examples-User-loginUser-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-User-userLogin-0-objc">
+                            <div class="tab-pane" id="examples-User-loginUser-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">User *body = ; // Pet object that needs to be added to the store
 
 UserApi *apiInstance = [[UserApi alloc] init];
 
 // Login to user account
-[apiInstance userLoginWith:body
+[apiInstance loginUserWith:body
               completionHandler: ^('String' output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -977,10 +873,10 @@ UserApi *apiInstance = [[UserApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-User-userLogin-0-javascript">
-                              <pre class="prettyprint"><code class="language-js">var SwaggerPesto = require('swagger_pesto');
+                            <div class="tab-pane" id="examples-User-loginUser-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var PestoSwagger = require('pesto_swagger');
 
-var api = new SwaggerPesto.UserApi()
+var api = new PestoSwagger.UserApi()
 
 var body = ; // {User} Pet object that needs to be added to the store
 
@@ -992,14 +888,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.userLogin(body, callback);
+api.loginUser(body, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-User-userLogin-0-angular">
+                            <!--<div class="tab-pane" id="examples-User-loginUser-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-User-userLogin-0-csharp">
+                            <div class="tab-pane" id="examples-User-loginUser-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -1008,7 +904,7 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class userLoginExample
+    public class loginUserExample
     {
         public void main()
         {
@@ -1019,12 +915,12 @@ namespace Example
             try
             {
                 // Login to user account
-                'String' result = apiInstance.userLogin(body);
+                'String' result = apiInstance.loginUser(body);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling UserApi.userLogin: " + e.Message );
+                Debug.Print("Exception when calling UserApi.loginUser: " + e.Message );
             }
         }
     }
@@ -1032,7 +928,7 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-User-userLogin-0-php">
+                            <div class="tab-pane" id="examples-User-loginUser-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -1040,15 +936,15 @@ $api_instance = new Swagger\Client\Api\UserApi();
 $body = ; // User | Pet object that needs to be added to the store
 
 try {
-    $result = $api_instance->userLogin($body);
+    $result = $api_instance->loginUser($body);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling UserApi->userLogin: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling UserApi->loginUser: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-User-userLogin-0-perl">
+                            <div class="tab-pane" id="examples-User-loginUser-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::UserApi;
@@ -1057,15 +953,15 @@ my $api_instance = WWW::SwaggerClient::UserApi->new();
 my $body = WWW::SwaggerClient::Object::User->new(); # User | Pet object that needs to be added to the store
 
 eval { 
-    my $result = $api_instance->userLogin(body => $body);
+    my $result = $api_instance->loginUser(body => $body);
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling UserApi->userLogin: $@\n";
+    warn "Exception when calling UserApi->loginUser: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-User-userLogin-0-python">
+                            <div class="tab-pane" id="examples-User-loginUser-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -1078,10 +974,10 @@ body =  # User | Pet object that needs to be added to the store
 
 try: 
     # Login to user account
-    api_response = api_instance.user_login(body)
+    api_response = api_instance.login_user(body)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling UserApi->userLogin: %s\n" % e)</code></pre>
+    print("Exception when calling UserApi->loginUser: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -1121,12 +1017,12 @@ $(document).ready(function() {
   }
 
   var view = new JSONSchemaView(schema,2,{isBodyParam: true});
-  var result = $('#d2e199_userLogin_body');
+  var result = $('#d2e199_loginUser_body');
   result.empty();
   result.append(view.render());
 });
 </script>
-<div id="d2e199_userLogin_body"></div>
+<div id="d2e199_loginUser_body"></div>
 </td>
 </tr>
 
@@ -1139,17 +1035,17 @@ $(document).ready(function() {
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-userLogin-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-loginUser-200-schema">Schema</a>
                                 </li>
 
                                 <li class="">
-                                  <a data-toggle="tab" href="#responses-userLogin-200-headers">Headers</a>
+                                  <a data-toggle="tab" href="#responses-loginUser-200-headers">Headers</a>
                                 </li>
                             </ul>
 
                             <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-userLogin-200-schema">
-                                  <div id='responses-userLogin-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                <div class="tab-pane active" id="responses-loginUser-200-schema">
+                                  <div id='responses-loginUser-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -1182,16 +1078,16 @@ $(document).ready(function() {
 
                                         //console.log(JSON.stringify(schema));
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-userLogin-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-userLogin-200-schema-200');
+                                        $('#responses-loginUser-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-loginUser-200-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-userLogin-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-loginUser-200-schema-data' type='hidden' value=''></input>
                                 </div>
-                                <div class="tab-pane" id="responses-userLogin-200-headers">
+                                <div class="tab-pane" id="responses-loginUser-200-headers">
                                     <table>
                                         <tr>
                                             <th width="150px">Name</th>
@@ -1226,10 +1122,10 @@ $(document).ready(function() {
                         </article>
                       </div>
                       <hr>
-                    <div id="api-User-userRegister">
-                      <article id="api-User-userRegister-0" data-group="User" data-name="userRegister" data-version="0">
+                    <div id="api-User-registerUser">
+                      <article id="api-User-registerUser-0" data-group="User" data-name="registerUser" data-version="0">
                         <div class="pull-left">
-                          <h1>userRegister</h1>
+                          <h1>registerUser</h1>
                           <p>Register new user account</p>
                         </div>
                         <div class="pull-right"></div>
@@ -1243,24 +1139,24 @@ $(document).ready(function() {
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-User-userRegister-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-User-userRegister-0-java">Java</a></li>
-                          <li class=""><a href="#examples-User-userRegister-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-User-userRegister-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-User-userRegister-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-User-userRegister-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-User-userRegister-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-User-userRegister-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-User-userRegister-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-User-userRegister-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-User-userRegister-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-User-registerUser-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-User-registerUser-0-java">Java</a></li>
+                          <li class=""><a href="#examples-User-registerUser-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-User-registerUser-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-User-registerUser-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-User-registerUser-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-User-registerUser-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-User-registerUser-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-User-registerUser-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-User-registerUser-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-User-registerUser-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-User-userRegister-0-curl">
+                          <div class="tab-pane active" id="examples-User-registerUser-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X POST "http://localhost/register"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-User-userRegister-0-java">
+                          <div class="tab-pane" id="examples-User-registerUser-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -1274,45 +1170,45 @@ public class UserApiExample {
     public static void main(String[] args) {
         
         UserApi apiInstance = new UserApi();
-        User body = ; // User | Pet object that needs to be added to the store
+        User body = ; // User | 
         try {
-            apiInstance.userRegister(body);
+            apiInstance.registerUser(body);
         } catch (ApiException e) {
-            System.err.println("Exception when calling UserApi#userRegister");
+            System.err.println("Exception when calling UserApi#registerUser");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-User-userRegister-0-android">
+                          <div class="tab-pane" id="examples-User-registerUser-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.UserApi;
 
 public class UserApiExample {
 
     public static void main(String[] args) {
         UserApi apiInstance = new UserApi();
-        User body = ; // User | Pet object that needs to be added to the store
+        User body = ; // User | 
         try {
-            apiInstance.userRegister(body);
+            apiInstance.registerUser(body);
         } catch (ApiException e) {
-            System.err.println("Exception when calling UserApi#userRegister");
+            System.err.println("Exception when calling UserApi#registerUser");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-User-userRegister-0-groovy">
+  <div class="tab-pane" id="examples-User-registerUser-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-User-userRegister-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">User *body = ; // Pet object that needs to be added to the store
+                            <div class="tab-pane" id="examples-User-registerUser-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">User *body = ; // 
 
 UserApi *apiInstance = [[UserApi alloc] init];
 
 // Register new user account
-[apiInstance userRegisterWith:body
+[apiInstance registerUserWith:body
               completionHandler: ^(NSError* error) {
                             if (error) {
                                 NSLog(@"Error: %@", error);
@@ -1321,12 +1217,12 @@ UserApi *apiInstance = [[UserApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-User-userRegister-0-javascript">
-                              <pre class="prettyprint"><code class="language-js">var SwaggerPesto = require('swagger_pesto');
+                            <div class="tab-pane" id="examples-User-registerUser-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var PestoSwagger = require('pesto_swagger');
 
-var api = new SwaggerPesto.UserApi()
+var api = new PestoSwagger.UserApi()
 
-var body = ; // {User} Pet object that needs to be added to the store
+var body = ; // {User} 
 
 
 var callback = function(error, data, response) {
@@ -1336,14 +1232,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-api.userRegister(body, callback);
+api.registerUser(body, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-User-userRegister-0-angular">
+                            <!--<div class="tab-pane" id="examples-User-registerUser-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-User-userRegister-0-csharp">
+                            <div class="tab-pane" id="examples-User-registerUser-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -1352,22 +1248,22 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class userRegisterExample
+    public class registerUserExample
     {
         public void main()
         {
             
             var apiInstance = new UserApi();
-            var body = new User(); // User | Pet object that needs to be added to the store
+            var body = new User(); // User | 
 
             try
             {
                 // Register new user account
-                apiInstance.userRegister(body);
+                apiInstance.registerUser(body);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling UserApi.userRegister: " + e.Message );
+                Debug.Print("Exception when calling UserApi.registerUser: " + e.Message );
             }
         }
     }
@@ -1375,38 +1271,38 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-User-userRegister-0-php">
+                            <div class="tab-pane" id="examples-User-registerUser-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Swagger\Client\Api\UserApi();
-$body = ; // User | Pet object that needs to be added to the store
+$body = ; // User | 
 
 try {
-    $api_instance->userRegister($body);
+    $api_instance->registerUser($body);
 } catch (Exception $e) {
-    echo 'Exception when calling UserApi->userRegister: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling UserApi->registerUser: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-User-userRegister-0-perl">
+                            <div class="tab-pane" id="examples-User-registerUser-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::UserApi;
 
 my $api_instance = WWW::SwaggerClient::UserApi->new();
-my $body = WWW::SwaggerClient::Object::User->new(); # User | Pet object that needs to be added to the store
+my $body = WWW::SwaggerClient::Object::User->new(); # User | 
 
 eval { 
-    $api_instance->userRegister(body => $body);
+    $api_instance->registerUser(body => $body);
 };
 if ($@) {
-    warn "Exception when calling UserApi->userRegister: $@\n";
+    warn "Exception when calling UserApi->registerUser: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-User-userRegister-0-python">
+                            <div class="tab-pane" id="examples-User-registerUser-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -1415,13 +1311,13 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.UserApi()
-body =  # User | Pet object that needs to be added to the store
+body =  # User | 
 
 try: 
     # Register new user account
-    api_instance.user_register(body)
+    api_instance.register_user(body)
 except ApiException as e:
-    print("Exception when calling UserApi->userRegister: %s\n" % e)</code></pre>
+    print("Exception when calling UserApi->registerUser: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -1444,7 +1340,7 @@ $(document).ready(function() {
   var schemaWrapper = {
   "in" : "body",
   "name" : "body",
-  "description" : "Pet object that needs to be added to the store",
+  "description" : "",
   "required" : true,
   "schema" : {
     "$ref" : "#/definitions/User"
@@ -1461,12 +1357,272 @@ $(document).ready(function() {
   }
 
   var view = new JSONSchemaView(schema,2,{isBodyParam: true});
-  var result = $('#d2e199_userRegister_body');
+  var result = $('#d2e199_registerUser_body');
   result.empty();
   result.append(view.render());
 });
 </script>
-<div id="d2e199_userRegister_body"></div>
+<div id="d2e199_registerUser_body"></div>
+</td>
+</tr>
+
+                            </table>
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: default - successful operation </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-User-verifyUser">
+                      <article id="api-User-verifyUser-0" data-group="User" data-name="verifyUser" data-version="0">
+                        <div class="pull-left">
+                          <h1>verifyUser</h1>
+                          <p>Register new user account</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/register/verify</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-User-verifyUser-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-User-verifyUser-0-java">Java</a></li>
+                          <li class=""><a href="#examples-User-verifyUser-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-User-verifyUser-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-User-verifyUser-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-User-verifyUser-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-User-verifyUser-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-User-verifyUser-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-User-verifyUser-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-User-verifyUser-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-User-verifyUser-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-User-verifyUser-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X POST "http://localhost/register/verify"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-User-verifyUser-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.UserApi;
+
+import java.io.File;
+import java.util.*;
+
+public class UserApiExample {
+
+    public static void main(String[] args) {
+        
+        UserApi apiInstance = new UserApi();
+        VerifyCode body = ; // VerifyCode | 
+        try {
+            apiInstance.verifyUser(body);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UserApi#verifyUser");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-User-verifyUser-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.UserApi;
+
+public class UserApiExample {
+
+    public static void main(String[] args) {
+        UserApi apiInstance = new UserApi();
+        VerifyCode body = ; // VerifyCode | 
+        try {
+            apiInstance.verifyUser(body);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UserApi#verifyUser");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-User-verifyUser-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-User-verifyUser-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">VerifyCode *body = ; // 
+
+UserApi *apiInstance = [[UserApi alloc] init];
+
+// Register new user account
+[apiInstance verifyUserWith:body
+              completionHandler: ^(NSError* error) {
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-User-verifyUser-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var PestoSwagger = require('pesto_swagger');
+
+var api = new PestoSwagger.UserApi()
+
+var body = ; // {VerifyCode} 
+
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+api.verifyUser(body, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-User-verifyUser-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-User-verifyUser-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class verifyUserExample
+    {
+        public void main()
+        {
+            
+            var apiInstance = new UserApi();
+            var body = new VerifyCode(); // VerifyCode | 
+
+            try
+            {
+                // Register new user account
+                apiInstance.verifyUser(body);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling UserApi.verifyUser: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-User-verifyUser-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\Api\UserApi();
+$body = ; // VerifyCode | 
+
+try {
+    $api_instance->verifyUser($body);
+} catch (Exception $e) {
+    echo 'Exception when calling UserApi->verifyUser: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-User-verifyUser-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::UserApi;
+
+my $api_instance = WWW::SwaggerClient::UserApi->new();
+my $body = WWW::SwaggerClient::Object::VerifyCode->new(); # VerifyCode | 
+
+eval { 
+    $api_instance->verifyUser(body => $body);
+};
+if ($@) {
+    warn "Exception when calling UserApi->verifyUser: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-User-verifyUser-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.UserApi()
+body =  # VerifyCode | 
+
+try: 
+    # Register new user account
+    api_instance.verify_user(body)
+except ApiException as e:
+    print("Exception when calling UserApi->verifyUser: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+
+
+                            <div class="methodsubtabletitle">Body parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">body <span style="color:red;">*</span></td>
+<td>
+
+
+<script>
+$(document).ready(function() {
+  var schemaWrapper = {
+  "in" : "body",
+  "name" : "body",
+  "description" : "",
+  "required" : true,
+  "schema" : {
+    "$ref" : "#/definitions/VerifyCode"
+  }
+};
+  var schema = schemaWrapper.schema;
+  if (schema.$ref != null) {
+    schema = defsParser.$refs.get(schema.$ref);
+  } else {
+    schemaWrapper.definitions = Object.assign({}, defs);
+    $RefParser.dereference(schemaWrapper).catch(function(err) {
+      console.log(err);
+    });
+  }
+
+  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+  var result = $('#d2e199_verifyUser_body');
+  result.empty();
+  result.append(view.render());
+});
+</script>
+<div id="d2e199_verifyUser_body"></div>
 </td>
 </tr>
 
@@ -1500,7 +1656,7 @@ $(document).ready(function() {
           </div>
           <div id="generator">
             <div class="content">
-              Generated 2018-02-07T15:04:13.369Z
+              Generated 2018-02-07T22:07:45.512Z
             </div>
           </div>
       </div>

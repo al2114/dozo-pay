@@ -1,0 +1,5 @@
+[llvm]
+ninja = true
+targets = "X86"
+[rust]
+codegen-units = 0

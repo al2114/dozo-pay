@@ -1,17 +1,14 @@
 version: "3"
 
-
 services:
-  api-server:
-    build: ./api-server
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./api-server:/usr/src/app
+  web:
+    build: ./web
     links:
       - db
-    # command: bash -c "cargo watch -x run"
-    command: bash -c "./wait-for-it.sh db:5432 -q -- diesel setup && cargo watch -x run"
+    ports:
+      - "3000:3000"
+    env_file:
+      - "./web/.env"
   db:
     image: "postgres:9"
     ports:
@@ -19,10 +16,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data/pgdata
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: pestodev
+      POSTGRES_USER: pesto
+      POSTGRES_PASSWORD: temp_password
       PGDATA: /var/lib/postgresql/data/pgdata
-# cargo will try to redownload packages @ docker-compose up so store them here.
 volumes:
-  pgdata: {}
+  pgdata: {} 

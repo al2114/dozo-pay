@@ -26,4 +26,12 @@ extension API {
   static func completeRegistration(withAlias alias: String, completion: @escaping () -> Void) {
     
   }
+
+  static func addContacts(withPhoneNumbers phoneNumbers: [String], completion: @escaping () -> Void) {
+
+  }
+
+  static func searchForUser(withAlias alias: String, completion: @escaping () -> Void) {
+
+  }
 }

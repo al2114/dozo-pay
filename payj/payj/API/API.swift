@@ -6,9 +6,15 @@
 //  Copyright © 2018 PayJ. All rights reserved.
 //
 
-struct API {
-  static func pay(user: User, completion: @escaping () -> Void) {
+typealias Id = String
 
+struct API {
+  static func pay(userId: Id, amount: UInt64, completion: @escaping () -> Void) {
+    User.getMe { me in
+      var user = me
+      user.balance += amount
+      return user
+    }
   }
 
   static func getTransactions(completion: @escaping () -> Void) {

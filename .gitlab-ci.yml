@@ -12,3 +12,9 @@ test:
   script: "cd backend/api-server && cargo test --release"
   dependencies:
   - build_release
+
+deploy:
+  stage: deploy
+  script: "echo"
+  dependencies:
+  - build_release

@@ -1,6 +1,7 @@
+image: rustlang/rust:nightly
 build:
   stage: build
-  script: "echo HI | tee out.test"
+  script: "cargo --version | tee out.test"
   artifacts:
     paths:
       - out.test

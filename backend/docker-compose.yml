@@ -11,6 +11,7 @@ services:
     links:
       - db
     # command: bash -c "cargo watch -x run"
+    # command: bash -c "./wait-for-it.sh db:5432 -q -- diesel setup && cargo watch -x run"
     command: bash -c "./wait-for-it.sh db:5432 -q -- diesel setup"
   db:
     image: "postgres:9"

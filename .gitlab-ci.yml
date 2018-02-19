@@ -1,13 +1,14 @@
 image: rustlang/rust:nightly
-build:
+
+build_release:
   stage: build
-  script: "cargo --version | tee out.test"
+  script: "cd backend/api-server && cargo build --release"
   artifacts:
     paths:
-      - out.test
+      - backend/api-server/target
 
 test:
   stage: test
-  script: "cat out.test"
+  script: "cd backend/api-server && cargo test --release"
   dependencies:
-  - build
+  - build_release

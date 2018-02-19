@@ -1,0 +1,12 @@
+build:
+  stage: build
+  script: "echo HI | tee out.test"
+  artifacts:
+    paths:
+      - out.test
+
+test:
+  stage: test
+  script: "cat out.test"
+  dependencies:
+  - build

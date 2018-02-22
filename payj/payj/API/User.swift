@@ -7,24 +7,33 @@
 //
 
 extension API {
-  static func register(completion: @escaping (User) -> Void) {
-    
+  static func register(user: User, completion: @escaping (User) -> Void) {
+    completion(user)
   }
   
   static func getMe(completion: @escaping (User) -> Void) {
-    
+    var testUser = User()
+    testUser.username = "tester"
+    testUser.phoneNo = "9999"
+    completion(testUser)
   }
   
-  static func login(completion: @escaping () -> Void) {
-    
+  static func login(withUsername username: String, password: String, completion: @escaping (User) -> Void) {
+    var testUser = User()
+    testUser.username = "tester"
+    testUser.phoneNo = "9999"
+    completion(testUser)
   }
   
-  static func verify(completion: @escaping () -> Void) {
-    
+  static func verify(user: User, completion: @escaping (Bool) -> Void) {
+    completion(true)
   }
   
-  static func completeRegistration(withAlias alias: String, completion: @escaping () -> Void) {
-    
+  static func completeRegistration(ofUser user: User, withAlias alias: String, completion: @escaping (User) -> Void) {
+    var user = user
+    user.username = alias
+    User.updateMe(withUser: user)
+    completion(user)
   }
 
   static func addContacts(withPhoneNumbers phoneNumbers: [String], completion: @escaping () -> Void) {

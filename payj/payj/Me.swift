@@ -25,9 +25,11 @@ extension User {
     }
   }
 
-  static func updateMe(withUser user: User, handler: @escaping (User) -> User?) {
-    if let newMe = handler(user) {
+  static func updateMe(withUser user: User, handler: ((User) -> User?)? = nil) {
+    if let newMe = handler?(user) {
       me = newMe
+    } else {
+      me = user
     }
   }
 }

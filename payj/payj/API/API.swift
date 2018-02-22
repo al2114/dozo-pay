@@ -29,7 +29,10 @@ struct API {
 
   }
 
-  static func getBalance(completion: @escaping (Float) -> Void) {
-
+  static func getBalance(completion: @escaping (UInt64) -> Void) {
+    User.getMe { me in
+      completion(me.balance)
+      return nil
+    }
   }
 }

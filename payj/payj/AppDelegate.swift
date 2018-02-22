@@ -14,12 +14,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    UIApplication.shared.statusBarStyle = .lightContent
     window = UIWindow(frame: UIScreen.main.bounds)
     let homeVC = HomeVC()
     let loginVC = LoginVC()
     let navVC = UINavigationController(rootViewController: homeVC)
     window?.rootViewController = navVC
-    window?.backgroundColor = .white
+    window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()
     return true
   }

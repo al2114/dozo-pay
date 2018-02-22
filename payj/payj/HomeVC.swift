@@ -51,7 +51,7 @@ class HomeVC: UIViewController {
       infoView.topAnchor.constraint(equalTo: backgroundView.bottomAnchor),
       infoView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
       ])
-    let border = UIView()
+    var border = UIView()
     border.translatesAutoresizingMaskIntoConstraints = false
     border.backgroundColor = .subdued
     infoView.addSubview(border)
@@ -122,34 +122,72 @@ class HomeVC: UIViewController {
       balanceLabel.bottomAnchor.constraint(equalTo: balanceView.bottomAnchor)
       ])
 
-    sendButton = UIButton(type: .system)
+    sendButton = UIButton(type: .custom)
     sendButton.translatesAutoresizingMaskIntoConstraints = false
-    sendButton.setTitle("Send", for: .normal)
+    sendButton.setImage(#imageLiteral(resourceName: "sendIcon"), for: .normal)
     sendButton.addTarget(self, action: #selector(send), for: .touchUpInside)
     view.addSubview(sendButton)
     NSLayoutConstraint.activate([
-      sendButton.rightAnchor.constraint(equalTo: view.rightAnchor),
-      sendButton.topAnchor.constraint(equalTo: viewTopAnchor)
+      sendButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+      sendButton.topAnchor.constraint(equalTo: viewTopAnchor, constant: 20),
+      sendButton.widthAnchor.constraint(equalToConstant: 22),
+      sendButton.heightAnchor.constraint(equalToConstant: 22),
       ])
 
-    settingsButton = UIButton(type: .system)
+    settingsButton = UIButton(type: .custom)
     settingsButton.translatesAutoresizingMaskIntoConstraints = false
-    settingsButton.setTitle("Settings", for: .normal)
+    settingsButton.setImage(#imageLiteral(resourceName: "menuIcon"), for: .normal)
     view.addSubview(settingsButton)
     NSLayoutConstraint.activate([
-      settingsButton.leftAnchor.constraint(equalTo: view.leftAnchor),
-      settingsButton.topAnchor.constraint(equalTo: viewTopAnchor)
+      settingsButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+      settingsButton.topAnchor.constraint(equalTo: viewTopAnchor, constant: 20),
+      settingsButton.widthAnchor.constraint(equalToConstant: 22),
+      settingsButton.heightAnchor.constraint(equalToConstant: 22),
       ])
 
-    cameraButton = UIButton(type: .system)
+    cameraButton = UIButton(type: .custom)
     cameraButton.translatesAutoresizingMaskIntoConstraints = false
-    cameraButton.setTitle("Camera", for: .normal)
     cameraButton.addTarget(self, action: #selector(camera), for: .touchUpInside)
     view.addSubview(cameraButton)
     NSLayoutConstraint.activate([
-      cameraButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      cameraButton.bottomAnchor.constraint(equalTo: viewBottomAnchor)
+      cameraButton.centerXAnchor.constraint(equalTo: infoView.centerXAnchor),
+      cameraButton.bottomAnchor.constraint(equalTo: viewBottomAnchor),
+      cameraButton.widthAnchor.constraint(equalTo: infoView.widthAnchor),
+      cameraButton.heightAnchor.constraint(equalToConstant: 80),
       ])
+
+    border = UIView()
+    border.translatesAutoresizingMaskIntoConstraints = false
+    border.backgroundColor = .subdued
+    cameraButton.addSubview(border)
+    NSLayoutConstraint.activate([
+      border.leftAnchor.constraint(equalTo: cameraButton.leftAnchor),
+      border.rightAnchor.constraint(equalTo: cameraButton.rightAnchor),
+      border.bottomAnchor.constraint(equalTo: cameraButton.topAnchor),
+      border.heightAnchor.constraint(equalToConstant: 3),
+      ])
+
+    let cameraImageView = UIImageView()
+    cameraImageView.translatesAutoresizingMaskIntoConstraints = false
+    cameraImageView.tintColor = .text
+    cameraImageView.image = #imageLiteral(resourceName: "cameraIcon").withRenderingMode(.alwaysTemplate)
+    cameraImageView.contentMode = .scaleAspectFill
+    cameraButton.addSubview(cameraImageView)
+    NSLayoutConstraint.activate([
+      cameraImageView.centerXAnchor.constraint(equalTo: cameraButton.centerXAnchor),
+      cameraImageView.centerYAnchor.constraint(equalTo: cameraButton.centerYAnchor),
+      cameraImageView.widthAnchor.constraint(equalToConstant: 36),
+      cameraImageView.heightAnchor.constraint(equalTo: cameraImageView.widthAnchor),
+      ])
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    navigationController?.isNavigationBarHidden = true
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    navigationController?.isNavigationBarHidden = false
   }
 
   @objc func send() {

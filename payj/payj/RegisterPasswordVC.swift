@@ -68,6 +68,10 @@ class RegisterPasswordVC: UIViewController {
   @objc func nextVC() {
     let registerAliasVC = RegisterAliasVC()
     registerAliasVC.phoneNumber = phoneNumber
+
+    let password = passwordField.text ?? ""
+    let encryptedPassword = Crypto.encrypt(text: password)
+    registerAliasVC.encryptedPassword = encryptedPassword
     self.show(registerAliasVC, sender: self)
   }
 

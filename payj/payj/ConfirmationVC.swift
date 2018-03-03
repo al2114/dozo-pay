@@ -24,6 +24,8 @@ class ConfirmationVC: UIViewController {
       viewBottomAnchor = bottomLayoutGuide.bottomAnchor
       viewTopAnchor = topLayoutGuide.topAnchor
     }
+    
+    view.backgroundColor = .white
 
     let amountLabel = UILabel()
     amountLabel.translatesAutoresizingMaskIntoConstraints = false

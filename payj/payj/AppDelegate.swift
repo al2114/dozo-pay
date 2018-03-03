@@ -18,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
     let homeVC = HomeVC()
     let loginVC = LoginVC()
+    let sendVC = SendAmountVC()
     let navVC = UINavigationController(rootViewController: homeVC)
     window?.rootViewController = navVC
     window?.backgroundColor = .primaryBackground

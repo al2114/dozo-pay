@@ -28,6 +28,7 @@ extension UIColor {
 
 extension UIColor {
   static var pestoGreen: UIColor { return UIColor(hex: "#46a716") }
+  static var washed: UIColor { return UIColor(hex: "#86c568") }
 
   static var secondaryTitle: UIColor { return .pestoGreen }
   static var primaryBackground: UIColor { return .pestoGreen }
@@ -42,6 +43,8 @@ extension UIColor {
 }
 
 extension UIFont {
+  static var bold: UIFont { return UIFont(name: "GillSans-Bold", size: UIFont.labelFontSize)! }
+  static var semibold: UIFont { return UIFont(name: "GillSans-SemiBold", size: UIFont.labelFontSize)! }
   static var regular: UIFont { return UIFont(name: "GillSans", size: UIFont.labelFontSize)! }
   static var light: UIFont { return UIFont(name: "GillSans-Light", size: UIFont.labelFontSize)! }
 }

@@ -32,6 +32,8 @@
 		2BCBE3CA2041E3A900AA7D30 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCBE3C92041E3A900AA7D30 /* Crypto.swift */; };
 		2BCBE3CF2041E87200AA7D30 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BCBE3CE2041E87200AA7D30 /* Security.framework */; };
 		9ECA5631EB794013F270C56A /* Pods_payj.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB91596D7F08C2490FDD999D /* Pods_payj.framework */; };
+		CB046909204349C100DF284F /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB046908204349C100DF284F /* CircleButton.swift */; };
+		CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB49D95520472B6E00A33C4A /* Preferences.swift */; };
 		CBE78F46202A8A8F00AE1EA5 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */; };
 		CBE78F6A202A8AAF00AE1EA5 /* dataapp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CBE78F68202A8AAF00AE1EA5 /* dataapp.xcdatamodeld */; };
 		CBE78F6C202A8B0A00AE1EA5 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */; };
@@ -65,6 +67,8 @@
 		2BCBE3C92041E3A900AA7D30 /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		2BCBE3CB2041E41400AA7D30 /* payj-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "payj-Bridging-Header.h"; sourceTree = "<group>"; };
 		2BCBE3CE2041E87200AA7D30 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		CB046908204349C100DF284F /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
+		CB49D95520472B6E00A33C4A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		CB91596D7F08C2490FDD999D /* Pods_payj.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_payj.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		CBE78F69202A8AAF00AE1EA5 /* dataapp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = dataapp.xcdatamodel; sourceTree = "<group>"; };
@@ -117,6 +121,7 @@
 		2B47779B202A0F0F0077415A /* payj */ = {
 			isa = PBXGroup;
 			children = (
+				CB046906204349A800DF284F /* Utils */,
 				2B47779C202A0F0F0077415A /* AppDelegate.swift */,
 				CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */,
 				2B4777AE202A29110077415A /* HomeVC.swift */,
@@ -137,6 +142,7 @@
 				2B4777A5202A0F0F0077415A /* LaunchScreen.storyboard */,
 				2B4777A8202A0F0F0077415A /* Info.plist */,
 				CBE78F68202A8AAF00AE1EA5 /* dataapp.xcdatamodeld */,
+				CB49D95520472B6E00A33C4A /* Preferences.swift */,
 				2B90927A203E349400077DC1 /* Design.swift */,
 				2B90929D203E50E400077DC1 /* Configuration.swift */,
 				2BCBE3C92041E3A900AA7D30 /* Crypto.swift */,
@@ -154,6 +160,14 @@
 				2B4CE3BC2034FDCC006408DC /* User.swift */,
 			);
 			path = API;
+			sourceTree = "<group>";
+		};
+		CB046906204349A800DF284F /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				CB046908204349C100DF284F /* CircleButton.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		D4F43DD4DAA79E1D365C6F3A /* Frameworks */ = {
@@ -298,9 +312,11 @@
 				2B47779D202A0F0F0077415A /* AppDelegate.swift in Sources */,
 				2B4777B7202A363D0077415A /* SendContactVC.swift in Sources */,
 				2B4CE3B92034FD19006408DC /* Room.swift in Sources */,
+				CB046909204349C100DF284F /* CircleButton.swift in Sources */,
 				2B4777B1202A32040077415A /* CameraVC.swift in Sources */,
 				2B4CE3BD2034FDCC006408DC /* User.swift in Sources */,
 				2B4CE3B32033ACFC006408DC /* API.swift in Sources */,
+				CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */,
 				2B4CE3BB2034FD5B006408DC /* Claim.swift in Sources */,
 				2B4777B9202A367C0077415A /* ConfirmationVC.swift in Sources */,
 				2B4CE3BF20350188006408DC /* Me.swift in Sources */,
@@ -450,7 +466,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = ZFFBRZM5F4;
+				DEVELOPMENT_TEAM = CB6DHSUPD9;
 				INFOPLIST_FILE = payj/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -471,7 +487,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = ZFFBRZM5F4;
+				DEVELOPMENT_TEAM = CB6DHSUPD9;
 				INFOPLIST_FILE = payj/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

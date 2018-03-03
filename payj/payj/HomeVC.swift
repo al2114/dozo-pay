@@ -29,7 +29,9 @@ class HomeVC: UIViewController {
       viewBottomAnchor = bottomLayoutGuide.bottomAnchor
       viewTopAnchor = topLayoutGuide.topAnchor
     }
-
+    
+    UIApplication.shared.statusBarStyle = .lightContent
+    
     let backgroundView = UIView()
     backgroundView.backgroundColor = .primaryBackground
     backgroundView.translatesAutoresizingMaskIntoConstraints = false
@@ -137,6 +139,7 @@ class HomeVC: UIViewController {
     settingsButton = UIButton(type: .custom)
     settingsButton.translatesAutoresizingMaskIntoConstraints = false
     settingsButton.setImage(#imageLiteral(resourceName: "menuIcon"), for: .normal)
+    settingsButton.addTarget(self, action: #selector(menu), for: .touchUpInside)
     view.addSubview(settingsButton)
     NSLayoutConstraint.activate([
       settingsButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
@@ -190,6 +193,13 @@ class HomeVC: UIViewController {
     navigationController?.isNavigationBarHidden = false
   }
 
+  @objc func menu() {
+    // TODO: Change to proper menu action once implemented
+//    let menuVC = LoginVC()
+//    self.show(menuVC, sender: self)
+    navigationController?.popViewController(animated: true)
+  }
+  
   @objc func send() {
     let sendVC = SendAmountVC()
     self.show(sendVC, sender: self)

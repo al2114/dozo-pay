@@ -27,6 +27,8 @@
 		2B7FD800203CEA180076EB74 /* VerifyNumberVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */; };
 		2B7FD802203CEA230076EB74 /* RegisterAliasVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD801203CEA230076EB74 /* RegisterAliasVC.swift */; };
 		2B7FD804203CEA5D0076EB74 /* RegisterPasswordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */; };
+		2B84DFDC204AEFF600691EAA /* QRReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B84DFDB204AEFF600691EAA /* QRReader.swift */; };
+		2B84DFDE204AFFF200691EAA /* RoomVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B84DFDD204AFFF200691EAA /* RoomVC.swift */; };
 		2B90927B203E349400077DC1 /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B90927A203E349400077DC1 /* Design.swift */; };
 		2B90929E203E50E400077DC1 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B90929D203E50E400077DC1 /* Configuration.swift */; };
 		2BCBE3CA2041E3A900AA7D30 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCBE3C92041E3A900AA7D30 /* Crypto.swift */; };
@@ -62,6 +64,8 @@
 		2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyNumberVC.swift; sourceTree = "<group>"; };
 		2B7FD801203CEA230076EB74 /* RegisterAliasVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterAliasVC.swift; sourceTree = "<group>"; };
 		2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterPasswordVC.swift; sourceTree = "<group>"; };
+		2B84DFDB204AEFF600691EAA /* QRReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReader.swift; sourceTree = "<group>"; };
+		2B84DFDD204AFFF200691EAA /* RoomVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomVC.swift; sourceTree = "<group>"; };
 		2B90927A203E349400077DC1 /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
 		2B90929D203E50E400077DC1 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		2BCBE3C92041E3A900AA7D30 /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
@@ -129,6 +133,8 @@
 				2B4777B6202A363D0077415A /* SendContactVC.swift */,
 				2B4777B4202A32130077415A /* SendAmountVC.swift */,
 				2B4777B0202A32040077415A /* CameraVC.swift */,
+				2B84DFDB204AEFF600691EAA /* QRReader.swift */,
+				2B84DFDD204AFFF200691EAA /* RoomVC.swift */,
 				2B4777BA202A3D0F0077415A /* Util.swift */,
 				2B4CE3BE20350188006408DC /* Me.swift */,
 				2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */,
@@ -318,6 +324,7 @@
 				2B4CE3B32033ACFC006408DC /* API.swift in Sources */,
 				CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */,
 				2B4CE3BB2034FD5B006408DC /* Claim.swift in Sources */,
+				2B84DFDC204AEFF600691EAA /* QRReader.swift in Sources */,
 				2B4777B9202A367C0077415A /* ConfirmationVC.swift in Sources */,
 				2B4CE3BF20350188006408DC /* Me.swift in Sources */,
 				2B4777BB202A3D0F0077415A /* Util.swift in Sources */,
@@ -334,6 +341,7 @@
 				2B4CE3B52034F907006408DC /* models.pb.swift in Sources */,
 				2B7FD7FC203CE9F40076EB74 /* LoginVC.swift in Sources */,
 				2B7FD7FE203CEA090076EB74 /* RegisterNumberVC.swift in Sources */,
+				2B84DFDE204AFFF200691EAA /* RoomVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

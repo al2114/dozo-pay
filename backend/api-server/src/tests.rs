@@ -1,9 +1,15 @@
 use super::rocket;
 use rocket::local::Client;
 use rocket::http::Status;
+use rocket::http::ContentType;
+
+use protobuf::Message;
+use protobuf::{CodedOutputStream};
+
+use std::io::{BufWriter, Cursor};
 
 fn client() -> Client {
-    Client::new(rocket::ignite().mount("/", routes![super::hello, super::hi])).unwrap()
+    Client::new(rocket::ignite().mount("/", routes![super::hello_route])).unwrap()
 }
 
 fn test(uri: &str, expected: String) {
@@ -17,11 +23,31 @@ fn test_404(uri: &str) {
 }
 
 #[test]
-fn test_hello() {
-    for &(name, age) in &[("Mike", 22), ("Michael", 80), ("A", 0), ("a", 127)] {
-        test(&format!("/hello/{}/{}", name, age),
-            format!("Hello, {} year old named {}!", age, name));
+fn test_register_user() {
+    let client = client();
+    let mut request = super::protos::user_messages::RegisterRequest::new();
+    request.set_phone_no("012387213".to_string());
+    request.set_username("username".to_string());
+    request.set_password("password".to_string());
+
+    let mut request_body = String::new();
+
+    {
+        let mut buf = Cursor::new(unsafe { request_body.as_mut_vec() });
+        let mut cos = CodedOutputStream::new(&mut buf);
+        request.write_to(&mut cos);
+        cos.flush();
     }
+
+    let mut response = client
+        .post("/register")
+        .body(request_body)
+        .header(ContentType::Form)
+        .dispatch();
+
+    assert_eq!(
+        response.body_string(),
+        Some(format!("hello there {}", request.phone_no)))
 }
 
 #[test]
@@ -29,11 +55,4 @@ fn test_failing_hello() {
     test_404("/hello/Mike/1000");
     test_404("/hello/Mike/-129");
     test_404("/hello/Mike/-1");
-}
-
-#[test]
-fn test_hi() {
-    for name in &["Mike", "A", "123", "hi", "c"] {
-        test(&format!("/hello/{}", name), name.to_string());
-    }
 }

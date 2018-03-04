@@ -3,7 +3,7 @@ use diesel::pg::PgConnection;
 use r2d2_diesel::ConnectionManager;
 
 type ManagedPgConn = ConnectionManager<PgConnection>;
-type Pool = r2d2::Pool<ManagedPgConn>;
+pub type Pool = r2d2::Pool<ManagedPgConn>;
 
 use std::ops::Deref;
 use rocket::http::Status;

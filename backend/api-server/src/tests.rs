@@ -3,13 +3,23 @@ use rocket::local::Client;
 use rocket::http::Status;
 use rocket::http::ContentType;
 
+use std::io::{BufWriter, Cursor};
+use std::env;
+
+use dotenv::dotenv;
 use protobuf::Message;
 use protobuf::{CodedOutputStream};
 
-use std::io::{BufWriter, Cursor};
 
 fn client() -> Client {
-    Client::new(rocket::ignite().mount("/", routes![super::hello_route])).unwrap()
+    dotenv().ok();
+
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set");
+    Client::new(rocket::ignite()
+        .manage(super::pg_pool::init(&database_url))
+        .mount("/", routes![super::hello_route]))
+        .unwrap()
 }
 
 fn test(uri: &str, expected: String) {

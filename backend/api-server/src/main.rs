@@ -31,8 +31,9 @@ mod schema;
 use dotenv::dotenv;
 use std::env;
 
+
 #[post("/register", data="<input>")]
-fn hello_route(input: String) -> String {
+fn hello_route(pool: rocket::State<pg_pool::Pool>, input: String) -> String {
 
     let mut request = protos::user_messages::RegisterRequest::new();
     let request_bytes = input.into_bytes();

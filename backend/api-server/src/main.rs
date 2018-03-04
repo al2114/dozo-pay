@@ -26,14 +26,9 @@ mod schema;
 use dotenv::dotenv;
 use std::env;
 
-#[get("/hello/<name>/<age>")]
-fn hello(name: String, age: u8) -> String {
+#[post("/register", data="<input>")]
+fn hello(input: String) -> String {
     format!("Hello, {} year old named {}!", age, name)
-}
-
-#[get("/hello/<name>")]
-fn hi(name: String) -> String {
-    name
 }
 
 fn main() {

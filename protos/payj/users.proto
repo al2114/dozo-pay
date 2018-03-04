@@ -1,0 +1,14 @@
+import "payj/models.proto"
+
+syntax = "proto3"
+
+message RegisterRequest {
+  string phone_no = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message RegisterResponse {
+  User user = 1;
+  bool successful = 2;
+}

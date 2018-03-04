@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package payj.models;
+
 message Claim {
   string identifier = 2;
   string name = 3;

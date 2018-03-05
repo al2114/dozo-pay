@@ -6,7 +6,7 @@ extern crate rocket;
 extern crate rocket_contrib;
 
 // #[macro_use]
-extern crate serde_derive;
+// extern crate serde_derive;
 
 extern crate protobuf;
 
@@ -22,13 +22,15 @@ use protobuf::{CodedInputStream};
 
 use dotenv::dotenv;
 use std::env;
-use r2d2_diesel::ConnectionManager;
 use self::diesel::prelude::*;
 
 mod models;
 mod pg_pool;
 mod protos;
 mod schema;
+
+#[cfg(test)]
+mod route_tests;
 
 
 #[post("/register", data="<input>")]
@@ -38,6 +40,7 @@ fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
     let request_bytes = input.into_bytes();
     let mut cis = CodedInputStream::from_bytes(&request_bytes);
     request.merge_from(&mut cis);
+
     let new_user = models::NewUser {
         phone_no:    request.get_phone_no(),
         picture_url: "",
@@ -49,7 +52,8 @@ fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
 
     diesel::insert_into(users::table)
         .values(&new_user)
-        .execute(&*db_connection_pool.get().expect("a"));
+        .execute(&*db_connection_pool.get().expect(
+                "failed to obtain database connection"));
 
     format!("hello there {}", request.phone_no)
 }
@@ -66,5 +70,3 @@ fn main() {
         .mount("/", routes![hello_route])
         .launch();
 }
-
-mod tests;

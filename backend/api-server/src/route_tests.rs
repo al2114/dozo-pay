@@ -3,7 +3,7 @@ use rocket::local::Client;
 use rocket::http::Status;
 use rocket::http::ContentType;
 
-use std::io::{Cursor};
+use std::io::Cursor;
 use std::env;
 
 use dotenv::dotenv;

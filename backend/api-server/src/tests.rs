@@ -3,21 +3,24 @@ use rocket::local::Client;
 use rocket::http::Status;
 use rocket::http::ContentType;
 
-use std::io::{BufWriter, Cursor};
+use std::io::{Cursor};
 use std::env;
 
 use dotenv::dotenv;
 use protobuf::Message;
 use protobuf::{CodedOutputStream};
 
+pub type PgConnection = super::diesel::pg::PgConnection;
 
 fn client() -> Client {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URL must be set");
+    let database_connection = super::pg_pool::init(&database_url);
+
     Client::new(rocket::ignite()
-        .manage(super::pg_pool::init(&database_url))
+        .manage(database_connection)
         .mount("/", routes![super::hello_route]))
         .unwrap()
 }

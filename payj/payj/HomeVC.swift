@@ -186,11 +186,12 @@ class HomeVC: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    navigationController?.isNavigationBarHidden = true
+//    navigationController?.isNavigationBarHidden = true
   }
 
   override func viewWillDisappear(_ animated: Bool) {
-    navigationController?.isNavigationBarHidden = false
+    super.viewWillDisappear(true)
+//    navigationController?.isNavigationBarHidden = false
   }
 
   @objc func menu() {

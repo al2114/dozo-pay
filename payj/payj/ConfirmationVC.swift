@@ -9,11 +9,13 @@
 import UIKit
 
 class ConfirmationVC: UIViewController {
-  var amount: Float!
+  var amount: Double!
   var name: String!
 
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    self.edgesForExtendedLayout = []
 
     let viewBottomAnchor: NSLayoutYAxisAnchor
     let viewTopAnchor: NSLayoutYAxisAnchor
@@ -28,8 +30,9 @@ class ConfirmationVC: UIViewController {
     view.backgroundColor = .white
 
     let amountLabel = UILabel()
+    let amountString = Util.amountToCurrencyString(amount)
     amountLabel.translatesAutoresizingMaskIntoConstraints = false
-    amountLabel.text = "Payment Sent: $\(amount!)"
+    amountLabel.text = "Payment Sent: \(amountString)"
     view.addSubview(amountLabel)
     NSLayoutConstraint.activate([
       amountLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B0F9B6A204E022400C56461 /* CircularImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0F9B69204E022400C56461 /* CircularImageView.swift */; };
+		2B0F9B6C204F101F00C56461 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0F9B6B204F101F00C56461 /* TextField.swift */; };
+		2B0F9B6E204F19D400C56461 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0F9B6D204F19D400C56461 /* String.swift */; };
 		2B47779D202A0F0F0077415A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B47779C202A0F0F0077415A /* AppDelegate.swift */; };
 		2B4777A4202A0F0F0077415A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2B4777A3202A0F0F0077415A /* Assets.xcassets */; };
 		2B4777A7202A0F0F0077415A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B4777A5202A0F0F0077415A /* LaunchScreen.storyboard */; };
@@ -42,7 +45,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2B477799202A0F0F0077415A /* payj.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = payj.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2B0F9B69204E022400C56461 /* CircularImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularImageView.swift; sourceTree = "<group>"; };
+		2B0F9B6B204F101F00C56461 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
+		2B0F9B6D204F19D400C56461 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		2B477799202A0F0F0077415A /* Pesto Pay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pesto Pay.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B47779C202A0F0F0077415A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B4777A3202A0F0F0077415A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2B4777A6202A0F0F0077415A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -117,7 +123,7 @@
 		2B47779A202A0F0F0077415A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2B477799202A0F0F0077415A /* payj.app */,
+				2B477799202A0F0F0077415A /* Pesto Pay.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,7 +131,10 @@
 		2B47779B202A0F0F0077415A /* payj */ = {
 			isa = PBXGroup;
 			children = (
-				CB046906204349A800DF284F /* Utils */,
+				CB046908204349C100DF284F /* CircleButton.swift */,
+				2B0F9B6D204F19D400C56461 /* String.swift */,
+				2B0F9B69204E022400C56461 /* CircularImageView.swift */,
+				2B0F9B6B204F101F00C56461 /* TextField.swift */,
 				2B47779C202A0F0F0077415A /* AppDelegate.swift */,
 				CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */,
 				2B4777AE202A29110077415A /* HomeVC.swift */,
@@ -168,14 +177,6 @@
 			path = API;
 			sourceTree = "<group>";
 		};
-		CB046906204349A800DF284F /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				CB046908204349C100DF284F /* CircleButton.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
 		D4F43DD4DAA79E1D365C6F3A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -189,9 +190,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2B477798202A0F0F0077415A /* payj */ = {
+		2B477798202A0F0F0077415A /* Pesto Pay */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2B4777AB202A0F0F0077415A /* Build configuration list for PBXNativeTarget "payj" */;
+			buildConfigurationList = 2B4777AB202A0F0F0077415A /* Build configuration list for PBXNativeTarget "Pesto Pay" */;
 			buildPhases = (
 				4664397206137AE131EB2580 /* [CP] Check Pods Manifest.lock */,
 				2B477795202A0F0F0077415A /* Sources */,
@@ -204,9 +205,9 @@
 			);
 			dependencies = (
 			);
-			name = payj;
+			name = "Pesto Pay";
 			productName = payj;
-			productReference = 2B477799202A0F0F0077415A /* payj.app */;
+			productReference = 2B477799202A0F0F0077415A /* Pesto Pay.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -239,7 +240,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2B477798202A0F0F0077415A /* payj */,
+				2B477798202A0F0F0077415A /* Pesto Pay */,
 			);
 		};
 /* End PBXProject section */
@@ -324,8 +325,10 @@
 				2B4CE3B32033ACFC006408DC /* API.swift in Sources */,
 				CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */,
 				2B4CE3BB2034FD5B006408DC /* Claim.swift in Sources */,
+				2B0F9B6A204E022400C56461 /* CircularImageView.swift in Sources */,
 				2B84DFDC204AEFF600691EAA /* QRReader.swift in Sources */,
 				2B4777B9202A367C0077415A /* ConfirmationVC.swift in Sources */,
+				2B0F9B6E204F19D400C56461 /* String.swift in Sources */,
 				2B4CE3BF20350188006408DC /* Me.swift in Sources */,
 				2B4777BB202A3D0F0077415A /* Util.swift in Sources */,
 				2B90929E203E50E400077DC1 /* Configuration.swift in Sources */,
@@ -336,6 +339,7 @@
 				2B7FD800203CEA180076EB74 /* VerifyNumberVC.swift in Sources */,
 				2B7FD802203CEA230076EB74 /* RegisterAliasVC.swift in Sources */,
 				CBE78F6C202A8B0A00AE1EA5 /* PersistenceService.swift in Sources */,
+				2B0F9B6C204F101F00C56461 /* TextField.swift in Sources */,
 				CBE78F6A202A8AAF00AE1EA5 /* dataapp.xcdatamodeld in Sources */,
 				2B7FD804203CEA5D0076EB74 /* RegisterPasswordVC.swift in Sources */,
 				2B4CE3B52034F907006408DC /* models.pb.swift in Sources */,
@@ -474,7 +478,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CB6DHSUPD9;
+				DEVELOPMENT_TEAM = ZFFBRZM5F4;
 				INFOPLIST_FILE = payj/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -495,7 +499,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CB6DHSUPD9;
+				DEVELOPMENT_TEAM = ZFFBRZM5F4;
 				INFOPLIST_FILE = payj/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -519,7 +523,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2B4777AB202A0F0F0077415A /* Build configuration list for PBXNativeTarget "payj" */ = {
+		2B4777AB202A0F0F0077415A /* Build configuration list for PBXNativeTarget "Pesto Pay" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2B4777AC202A0F0F0077415A /* Debug */,

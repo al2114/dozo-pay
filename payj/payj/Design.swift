@@ -28,7 +28,7 @@ extension UIColor {
 
 extension UIColor {
   static var pestoGreen: UIColor { return UIColor(hex: "#46a716") }
-  static var washed: UIColor { return UIColor(hex: "#86c568") }
+  static var washed: UIColor { return UIColor.white.withAlphaComponent(0.4) }
 
   static var secondaryTitle: UIColor { return .pestoGreen }
   static var primaryBackground: UIColor { return .pestoGreen }
@@ -38,7 +38,7 @@ extension UIColor {
   static var secondaryBackground: UIColor = UIColor(hex: "#ffffff")
   static var subdued: UIColor = UIColor(hex: "#f2f2f2")
   static var text: UIColor = UIColor(hex: "#404040")
-  static var red: UIColor = UIColor(hex: "#c54747")
+  static var red: UIColor = UIColor(hex: "#d70000")
   static var green: UIColor { return .pestoGreen }
 }
 

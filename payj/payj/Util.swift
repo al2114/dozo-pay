@@ -27,3 +27,17 @@ struct Util {
     return nil
   }
 }
+
+extension Util {
+  static func amountToCurrencyString(_ amount: Double) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    formatter.maximumFractionDigits = 2
+    formatter.locale = Locale.defaultLocale
+    return formatter.string(from: amount as NSNumber) ?? "\(Locale.defaultCurrencySymbol)0.00"
+  }
+
+  static func currencyStringToAmount(_ string: String) -> Double {
+    return Double(string.replacingOccurrences(of: Locale.defaultCurrencySymbol, with: "").replacingOccurrences(of: ",", with: "")) ?? 0
+  }
+}

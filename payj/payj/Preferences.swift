@@ -8,6 +8,8 @@
 
 import Foundation
 
-extension NSLocale {
-  static var geolocal: Locale { return Locale(identifier: "en_GB") }
+extension Locale {
+  static var defaultLocale: Locale { return Locale(identifier: "en_GB") }
+  static var defaultCurrencySymbol: String { return defaultLocale.currencySymbol ?? "" }
 }
+

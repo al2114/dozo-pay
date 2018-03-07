@@ -15,6 +15,8 @@ class RegisterNumberVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    self.edgesForExtendedLayout = []
+
     let viewBottomAnchor: NSLayoutYAxisAnchor
     let viewTopAnchor: NSLayoutYAxisAnchor
     if #available(iOS 11.0, *) {

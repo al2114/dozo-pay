@@ -14,11 +14,27 @@ class CameraVC: UIViewController {
 
   var captureReceiptButton: UIButton!
 
+  var processingQRCode: Bool = false
+
   override func viewDidLoad() {
+    super.viewDidLoad()
+
+    self.edgesForExtendedLayout = []
+    
     // Get the back-facing camera for capturing videos
     view.backgroundColor = .primaryBackground
 
-    qrReader = QRReader(frame: .zero)
+    qrReader = QRReader {
+      code in
+      if !self.processingQRCode {
+        self.processingQRCode = true
+        let sendAmountVC = SendAmountVC()
+        var user = User()
+        user.username = code
+        sendAmountVC.payee = user
+        self.show(sendAmountVC, sender: self)
+      }
+    }
     qrReader.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(qrReader)
     NSLayoutConstraint.activate([
@@ -37,5 +53,10 @@ class CameraVC: UIViewController {
       captureReceiptButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       captureReceiptButton.topAnchor.constraint(equalTo: qrReader.bottomAnchor, constant: 10)
       ])
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(true)
+    processingQRCode = false
   }
 }

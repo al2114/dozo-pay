@@ -8,16 +8,26 @@
 
 import UIKit
 
+class AmountField: TextField {
+  override func closestPosition(to point: CGPoint) -> UITextPosition? {
+    let beginning = self.beginningOfDocument
+    let end = self.position(from: beginning, offset: (self.text?.count)!)
+    return end
+  }
+}
+
 class SendAmountVC: UIViewController, UITextFieldDelegate {
-  
   var amountLabel: UILabel!
-  var amountField: UITextField!
+  var amountField: AmountField!
   var separatorView: UIView!
   var sendButton: UIButton!
   var shareButton: UIButton!
+  var payee: User? = nil
   
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    self.edgesForExtendedLayout = []
 
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
     
@@ -34,37 +44,24 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     }
     
     UIApplication.shared.statusBarStyle = .lightContent
-
-    self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-    self.navigationController?.navigationBar.shadowImage = UIImage()
-    self.navigationController?.navigationBar.isTranslucent = true
-    self.navigationController?.navigationBar.tintColor = .white
     
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     self.view.addGestureRecognizer(tapGesture)
     
     view.backgroundColor = UIColor.pestoGreen
     
-    let currencyLabel: UILabel = UILabel()
-    currencyLabel.text = "£"
-    
-    amountField = UITextField()
+    amountField = AmountField(fontSize: 36)
     amountField.delegate = self
     amountField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-//    amountField.placeholder = "0.00"
     
-    let defaultText = NSLocale.geolocal.currencySymbol! + "0.00"
+    let defaultText = "\(Locale.defaultCurrencySymbol)0.00"
     let amountText: NSMutableAttributedString = NSMutableAttributedString(string: defaultText)
     amountText.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(0, 1))
     amountText.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1, defaultText.count-1))
 
-    
     amountField.attributedText = amountText
-    amountField.textAlignment = .center
-    amountField.font = UIFont.regular.withSize(36)
     amountField.keyboardType = .numberPad
     amountField.translatesAutoresizingMaskIntoConstraints = false
-    amountField.tintColor = .clear
     view.addSubview(amountField)
     NSLayoutConstraint.activate([
       amountField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -74,8 +71,12 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     
     
     amountLabel = UILabel()
-    amountLabel.text = "send amount"
-    amountLabel.textColor = .white
+    if let payee = payee {
+      amountLabel.attributedText = "send to ".colored(with: .primaryTitle) + "@\(payee.username)".colored(with: .highlight)
+    } else {
+      amountLabel.textColor = .white
+      amountLabel.text = "send amount"
+    }
     amountLabel.font = UIFont.light.withSize(28)
     amountLabel.textAlignment = .center
     amountLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -97,9 +98,10 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       ])
 
     sendButton = UIButton(type: .system)
+    sendButton.translatesAutoresizingMaskIntoConstraints = false
+    sendButton.isEnabled = false
     sendButton.setImage(#imageLiteral(resourceName: "circleRightArrow").withRenderingMode(.alwaysTemplate), for: .normal)
     sendButton.tintColor = .white
-    sendButton.translatesAutoresizingMaskIntoConstraints = false
     sendButton.addTarget(self, action: #selector(send), for: .touchUpInside)
     view.addSubview(sendButton)
     NSLayoutConstraint.activate([
@@ -111,9 +113,9 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
 
     shareButton = UIButton(type: .system)
     shareButton.translatesAutoresizingMaskIntoConstraints = false
-    shareButton.setImage(#imageLiteral(resourceName: "circleShare").withRenderingMode(.alwaysTemplate), for: .normal)
+    shareButton.isEnabled = false
     shareButton.tintColor = .white
-//    shareButton.setTitle("Share", for: .normal)
+    shareButton.setImage(#imageLiteral(resourceName: "circleShare").withRenderingMode(.alwaysTemplate), for: .normal)
     view.addSubview(shareButton)
     NSLayoutConstraint.activate([
       shareButton.rightAnchor.constraint(equalTo: view.centerXAnchor, constant: -40),
@@ -134,23 +136,26 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
   }
   
   @objc func keyboardWillShow(sender: NSNotification) {
-    self.view.frame.origin.y = -150 // Move view 150 points upward
-    UIView.animate(withDuration: 0.5) {
-      self.amountLabel.transform = CGAffineTransform(scaleX: 0.7, y: 0.7).translatedBy(x: 0, y: 10) //Scale label area
-    }
+    self.view.frame.origin.y = -150
+    self.amountLabel.transform = CGAffineTransform(scaleX: 0.7, y: 0.7).translatedBy(x: 0, y: 10) //Scale label area
   }
   
   @objc func keyboardWillHide(sender: NSNotification) {
     self.view.frame.origin.y = 0 // Move view to original position
-    UIView.animate(withDuration: 0.5) {
-      self.amountLabel.transform = CGAffineTransform(scaleX: 1.0, y: 1.0) //Scale label area
-    }
+    self.amountLabel.transform = CGAffineTransform(scaleX: 1.0, y: 1.0) //Scale label area
   }
 
   @objc func send() {
-    let sendVC = SendContactVC()
-    sendVC.amount = Float(amountField.text!.replacingOccurrences(of: NSLocale.geolocal.currencySymbol!, with: ""))
-    self.show(sendVC, sender: self)
+    let amount = Util.currencyStringToAmount(amountField.text!)
+    if let _ = payee {
+      let confirmationVC = ConfirmationVC()
+      confirmationVC.amount = amount
+      self.show(confirmationVC, sender: self)
+    } else {
+      let sendVC = SendContactVC()
+      sendVC.amount = amount
+      self.show(sendVC, sender: self)
+    }
   }
   
   @objc func dismissKeyboard (_ sender: UITapGestureRecognizer) {
@@ -162,25 +167,22 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       var amount: Double = 0
       var filledLength = 0
       if let text = textField.text {
-        let formattedText = text.replacingOccurrences(of: NSLocale.geolocal.currencySymbol!, with: "").replacingOccurrences(of: ".", with: "")
+        var formattedText = text.replacingOccurrences(of: Locale.defaultCurrencySymbol, with: "").replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: "")
+        let index = String.Index.init(encodedOffset: min(formattedText.count, 6))
+        formattedText = String(formattedText[..<index])
         if let val = Int(formattedText){
           amount = Double(val)/100.0
           filledLength = String(val).count
         }
       }
-      let formatter = NumberFormatter()
-      formatter.numberStyle = .currency
-      formatter.maximumFractionDigits = 2
-      formatter.locale = NSLocale.geolocal
-      let result = formatter.string(from: amount as NSNumber)
-//      textField.text = result
-//      let attributedResult = NSMutableAttributedString(string: result!)
-      let attributedResult: NSMutableAttributedString = NSMutableAttributedString(string: result!)
+      let result = Util.amountToCurrencyString(amount)
+      let attributedResult: NSMutableAttributedString = NSMutableAttributedString(string: result)
       if(filledLength < 3) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(0, 1))
       }
+      sendButton.isEnabled = amount != 0
       if(amount == 0) {
-        attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1,(result!.count)-1))
+        attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1,(result.count)-1))
       }
       else if(filledLength == 1) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1,3))
@@ -188,16 +190,12 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       }
       else if (filledLength == 2) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1,1))
-        attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.white ], range: NSMakeRange(2,(result!.count)-2))
+        attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.white ], range: NSMakeRange(2,(result.count)-2))
       }
       else {
-        attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.white ], range: NSMakeRange(0,(result!.count)))
+        attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.white ], range: NSMakeRange(0,(result.count)))
       }
       textField.attributedText = attributedResult
-////        textField.text = result
-//
-//      }
-//      else
     }
 
   }

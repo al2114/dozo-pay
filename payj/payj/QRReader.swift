@@ -25,12 +25,16 @@ class QRReader: UIView {
 
   var captureReceiptButton: UIButton!
 
+  let processQRCode: (String) -> Void
+
   override public class var layerClass: Swift.AnyClass {
     return AVCaptureVideoPreviewLayer.self
   }
 
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  init(processQRCode: @escaping (String) -> Void) {
+    self.processQRCode = processQRCode
+    super.init(frame: .zero)
+
     // Get the back-facing camera for capturing videos
     let deviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInWideAngleCamera], mediaType: AVMediaType.video, position: .back)
 
@@ -104,5 +108,8 @@ extension QRReader: AVCaptureMetadataOutputObjectsDelegate {
 
     label.backgroundColor = .black
     label.text = metadataObj.stringValue
+    if let qrCode = metadataObj.stringValue {
+      processQRCode(qrCode)
+    }
   }
 }

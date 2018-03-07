@@ -12,6 +12,6 @@ class RoomVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    
+    self.edgesForExtendedLayout = []
   }
 }

@@ -196,9 +196,8 @@ class HomeVC: UIViewController {
 
   @objc func menu() {
     // TODO: Change to proper menu action once implemented
-//    let menuVC = LoginVC()
-//    self.show(menuVC, sender: self)
-    navigationController?.popViewController(animated: true)
+    let loginVC = LoginVC()
+    Util.switchTo(viewController: loginVC, presentingController: self)
   }
 
   @objc func send() {

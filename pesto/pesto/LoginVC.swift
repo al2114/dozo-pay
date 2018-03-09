@@ -19,6 +19,8 @@ class LoginVC: UIViewController {
 
     self.edgesForExtendedLayout = []
 
+    view.backgroundColor = .primaryBackground
+
     let viewBottomAnchor: NSLayoutYAxisAnchor
     let viewTopAnchor: NSLayoutYAxisAnchor
     if #available(iOS 11.0, *) {
@@ -97,8 +99,8 @@ class LoginVC: UIViewController {
     navigationController?.isNavigationBarHidden = true
   }
 
-  override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(true)
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(true)
     navigationController?.isNavigationBarHidden = false
     self.view.endEditing(true)
   }
@@ -125,7 +127,7 @@ class LoginVC: UIViewController {
       user in
       User.updateMe(withUser: user)
       let homeVC = HomeVC()
-      self.show(homeVC, sender: self)
+      Util.switchTo(viewController: homeVC, presentingController: self)
     }
   }
 

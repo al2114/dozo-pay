@@ -18,14 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
     let homeVC = HomeVC()
     let loginVC = LoginVC()
-    let navVC = UINavigationController(rootViewController: loginVC)
-    navVC.navigationBar.setBackgroundImage(UIImage(), for: .default)
-    navVC.navigationBar.shadowImage = UIImage()
-    navVC.navigationItem.backBarButtonItem = UIBarButtonItem(title: "<", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
-    navVC.navigationBar.backIndicatorImage = UIImage()
-//    navVC.navigationBar.isTranslucent = true
-    navVC.navigationBar.tintColor = .primaryTitle
-    window?.rootViewController = navVC
+    Util.switchTo(viewController: loginVC, window: window)
     window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()
     return true

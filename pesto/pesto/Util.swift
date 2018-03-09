@@ -41,3 +41,17 @@ extension Util {
     return Double(string.replacingOccurrences(of: Locale.defaultCurrencySymbol, with: "").replacingOccurrences(of: ",", with: "")) ?? 0
   }
 }
+
+extension Util {
+  static func switchTo(viewController: UIViewController, presentingController: UIViewController? = nil, window: UIWindow? = UIApplication.shared.keyWindow) {
+    let navVC = UINavigationController(rootViewController: viewController)
+    navVC.configure()
+    if let presentingController = presentingController {
+      presentingController.present(navVC, animated: true) {
+        window?.rootViewController = navVC
+      }
+    } else {
+      window?.rootViewController = navVC
+    }
+  }
+}

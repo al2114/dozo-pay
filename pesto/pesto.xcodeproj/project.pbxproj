@@ -27,6 +27,7 @@
 		2B4CE3BF20350188006408DC /* Me.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4CE3BE20350188006408DC /* Me.swift */; };
 		2B501622205213D000B35EB0 /* asdf.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B501621205213D000B35EB0 /* asdf.m */; };
 		2B501624205227AF00B35EB0 /* NiceTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B501623205227AF00B35EB0 /* NiceTextField.swift */; };
+		2B50162620532BEB00B35EB0 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B50162520532BEB00B35EB0 /* NavigationController.swift */; };
 		2B7FD7FC203CE9F40076EB74 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */; };
 		2B7FD7FE203CEA090076EB74 /* RegisterNumberVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */; };
 		2B7FD800203CEA180076EB74 /* VerifyNumberVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */; };
@@ -71,6 +72,7 @@
 		2B501620205213D000B35EB0 /* pesto-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pesto-Bridging-Header.h"; sourceTree = "<group>"; };
 		2B501621205213D000B35EB0 /* asdf.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = asdf.m; sourceTree = "<group>"; };
 		2B501623205227AF00B35EB0 /* NiceTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NiceTextField.swift; sourceTree = "<group>"; };
+		2B50162520532BEB00B35EB0 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterNumberVC.swift; sourceTree = "<group>"; };
 		2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyNumberVC.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				2B0F9B6D204F19D400C56461 /* String.swift */,
 				2B0F9B69204E022400C56461 /* CircularImageView.swift */,
 				2B0F9B6B204F101F00C56461 /* TextField.swift */,
+				2B50162520532BEB00B35EB0 /* NavigationController.swift */,
 				2B501623205227AF00B35EB0 /* NiceTextField.swift */,
 				2B47779C202A0F0F0077415A /* AppDelegate.swift */,
 				CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */,
@@ -344,6 +347,7 @@
 				2B4777B5202A32130077415A /* SendAmountVC.swift in Sources */,
 				2B7FD800203CEA180076EB74 /* VerifyNumberVC.swift in Sources */,
 				2B7FD802203CEA230076EB74 /* RegisterAliasVC.swift in Sources */,
+				2B50162620532BEB00B35EB0 /* NavigationController.swift in Sources */,
 				2B501624205227AF00B35EB0 /* NiceTextField.swift in Sources */,
 				CBE78F6C202A8B0A00AE1EA5 /* PersistenceService.swift in Sources */,
 				2B0F9B6C204F101F00C56461 /* TextField.swift in Sources */,

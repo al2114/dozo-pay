@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package payj.models;
+package pesto.models;
 
 message Claim {
   string identifier = 2;

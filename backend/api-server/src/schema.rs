@@ -5,5 +5,6 @@ table! {
         picture_url -> Nullable<Varchar>,
         account_id -> Nullable<Int4>,
         username -> Nullable<Varchar>,
+        password -> Nullable<Varchar>,
     }
 }

@@ -15,6 +15,7 @@ pub struct User {
 pub struct NewUser<'a> {
     pub phone_no: &'a str,
     pub picture_url: &'a str,
+    pub account_id: &'a i32,
     pub username: &'a str,
     pub password: &'a str
 }

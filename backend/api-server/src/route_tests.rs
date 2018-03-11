@@ -9,6 +9,7 @@ use std::env;
 use dotenv::dotenv;
 use protobuf::Message;
 use protobuf::{CodedOutputStream};
+use protobuf::{CodedInputStream};
 
 pub type PgConnection = super::diesel::pg::PgConnection;
 
@@ -58,9 +59,16 @@ fn test_register_user() {
         .header(ContentType::Form)
         .dispatch();
 
+    let mut proto_response = super::protos::user_messages::RegisterResponse::new();
+    let response_bytes = response.body_bytes().unwrap();
+
+    let mut cis = CodedInputStream::from_bytes(&response_bytes);
+    proto_response.merge_from(&mut cis);
+
     assert_eq!(
-        response.body_string(),
-        Some(format!("hello there {}", request.phone_no)))
+        proto_response.get_successful(),
+        true
+    )
 }
 
 #[test]

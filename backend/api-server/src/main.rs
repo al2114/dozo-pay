@@ -47,9 +47,10 @@ fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
     let new_user = models::NewUser {
         phone_no:    request.get_phone_no(),
         picture_url: "",
+        account_id: &0,
         username:    request.get_username(),
         password:    request.get_password()
-   };
+    };
     let db_connection_pool = &*db_connection;
 
     use schema::users;
@@ -61,10 +62,15 @@ fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
                 "failed to obtain database connection"))
         .expect("Error inserting new user");
 
-    let proto_user = protos::models::User::new();
+    let mut proto_user = protos::models::User::new();
     proto_user.set_uid(user.uid);
     proto_user.set_phone_no(user.phone_no);
-    proto_user.set_picture_url(user.picture_url);
+
+    match user.picture_url {
+        Some(picture_url) => proto_user.set_picture_url(picture_url),
+        None              => proto_user.set_picture_url("".to_string())
+    }
+
     proto_user.set_balance(0); 
     proto_user.set_username(user.username);
 
@@ -95,7 +101,7 @@ fn register_alias_route(db_connection: rocket::State<pg_pool::Pool>, input: Stri
     let mut cis = CodedInputStream::from_bytes(&request_bytes);
     request.merge_from(&mut cis);
 
-    let userid = request.get_uid().parse::<u64>().unwrap();
+    let userid = request.get_uid().parse::<i32>().unwrap();
     let new_username = request.get_new_username();
 
     let db_connection_pool = &*db_connection;

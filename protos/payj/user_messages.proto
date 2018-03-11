@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package payj.user_messages;
+
+import "payj/models.proto";
+
+message RegisterRequest {
+  string phone_no = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message RegisterResponse {
+  models.User user = 1;
+  bool successful = 2;
+}

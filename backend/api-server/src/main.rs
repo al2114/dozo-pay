@@ -45,6 +45,7 @@ fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
         phone_no:    request.get_phone_no(),
         picture_url: "",
         username:    request.get_username(),
+        password:    request.get_password()
     };
     let db_connection_pool = &*db_connection;
 

@@ -7,6 +7,7 @@ pub struct User {
     pub picture_url: String,
     pub account_id: i64,
     pub username: String,
+    pub password: String
 }
 
 #[derive(Insertable)]
@@ -15,4 +16,5 @@ pub struct NewUser<'a> {
     pub phone_no: &'a str,
     pub picture_url: &'a str,
     pub username: &'a str,
+    pub password: &'a str
 }

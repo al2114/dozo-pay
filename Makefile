@@ -8,7 +8,7 @@ rust: protos/models.proto protos/user_messages.proto
 
 swift: protos/models.proto protos/user_messages.proto
 	mkdir -p iOS/pesto/protos/
-	protoc --proto_path protos/ --swift_out=iOS/pesto/protos/ $^
+	protoc --proto_path protos/ --swift_out iOS/pesto/protos/ $^
 
 clean:
 		rm -r backend/api-server/src/protos/

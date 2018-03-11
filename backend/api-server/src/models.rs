@@ -2,10 +2,10 @@ use super::schema::users;
 
 #[derive(Queryable)]
 pub struct User {
-    pub uid: i32,
+    pub uid: u64,
     pub phone_no: String,
     pub picture_url: String,
-    pub account_id: i64,
+    pub account_id: u64,
     pub username: String,
     pub password: String
 }

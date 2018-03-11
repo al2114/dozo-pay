@@ -4,8 +4,8 @@ use super::schema::users;
 pub struct User {
     pub uid: i32,
     pub phone_no: String,
-    pub picture_url: String,
-    pub account_id: i64,
+    pub picture_url: Option<String>,
+    pub account_id: i32,
     pub username: String,
     pub password: String
 }
@@ -15,6 +15,7 @@ pub struct User {
 pub struct NewUser<'a> {
     pub phone_no: &'a str,
     pub picture_url: &'a str,
+    pub account_id: &'a i32,
     pub username: &'a str,
     pub password: &'a str
 }

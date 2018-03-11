@@ -14,3 +14,10 @@ message RegisterResponse {
   models.User user = 1;
   bool successful = 2;
 }
+
+message UpdateUserRequest {
+  string uid = 1;
+  string new_phone_no = 2;
+  string new_username = 3;
+  string new_password = 4;
+}

@@ -8,6 +8,8 @@
 
 import UIKit
 
+let server = "http://localhost:3001"
+
 struct Util {
   static var filter = CIFilter(name: "CIQRCodeGenerator")!
 

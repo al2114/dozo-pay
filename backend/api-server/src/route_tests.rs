@@ -64,6 +64,33 @@ fn test_register_user() {
 }
 
 #[test]
+fn test_update_username() {
+    let client = client();
+    let mut request = super::protos::user_messages::UpdateUserRequest::new();
+    request.set_uid("1".to_string());
+    request.set_new_username("pesto".to_string());
+
+    let mut request_body = String::new();
+
+    {
+        let mut buf = Cursor::new(unsafe { request_body.as_mut_vec() });
+        let mut cos = CodedOutputStream::new(&mut buf);
+        request.write_to(&mut cos);
+        cos.flush();
+    }
+
+    let mut response = client
+        .post("/update/alias")
+        .body(request_body)
+        .header(ContentType::Form)
+        .dispatch();
+
+    assert_eq!(
+        response.body_string(),
+        Some(format!("updated there {}", request.new_username)))
+}
+
+#[test]
 fn test_failing_hello() {
     test_404("/hello/Mike/1000");
     test_404("/hello/Mike/-129");

@@ -9,15 +9,15 @@ message Claim {
 }
 
 message User {
-  uint64 uid = 1;
+  int32 uid = 1;
   string phone_no = 2;
   string picture_url = 3;
-  uint64 balance = 4;
+  int32 balance = 4;
   string username = 5;
 }
 
 message Room {
-  uint64 uid = 1;
+  int32 uid = 1;
   User owner = 2;
   string name = 3;
   repeated RoomItem item = 4;
@@ -25,8 +25,8 @@ message Room {
 }
 
 message RoomItem {
-  uint64 uid = 1;
+  int32 uid = 1;
   string name = 2;
-  uint64 value = 3;
+  int32 value = 3;
   User locked_by = 4;
 }

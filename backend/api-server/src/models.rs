@@ -4,7 +4,7 @@ use super::schema::users;
 pub struct User {
     pub uid: u64,
     pub phone_no: String,
-    pub picture_url: String,
+    pub picture_url: Option<String>,
     pub account_id: u64,
     pub username: String,
     pub password: String

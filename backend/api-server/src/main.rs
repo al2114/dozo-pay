@@ -56,14 +56,14 @@ fn serialize<T: ::protobuf::MessageStatic>(proto: T) -> String {
     data
 }
 
+#[get("/")]
+fn hello_route() -> String {
+    let response = "Hello, world!".to_string();
+    response
+}
+
 #[post("/register", data="<input>")]
-fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
-
-    //let mut request = protos::user_messages::RegisterRequest::new();
-    //let request_bytes = input.into_bytes();
-    //let mut cis = CodedInputStream::from_bytes(&request_bytes);
-    //request.merge_from(&mut cis);
-
+fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
     let mut request = deserialize::<protos::user_messages::RegisterRequest>(input);
 
     let new_user = models::NewUser {
@@ -105,9 +105,53 @@ fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
     //format!("hello there {}", request.phone_no)
 }
 
+#[post("/login", data="<input>")]
+fn login_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
+    let mut request = deserialize::<protos::user_messages::LoginRequest>(input);
+
+    let username = request.get_username();
+    let password = request.get_password();
+
+    let db_connection_pool = &*db_connection;
+
+    use schema::users;
+
+    let user = users::table
+        .filter(users::username.eq(username))
+        .first::<models::User>(&*db_connection_pool.get().expect(
+                "failed to obtain database connection"));
+
+    let mut response = protos::user_messages::LoginResponse::new();
+    match user {
+        Ok(user) => {
+            let mut proto_user = protos::models::User::new();
+            proto_user.set_uid(user.uid);
+            proto_user.set_phone_no(user.phone_no);
+
+            match user.picture_url {
+                Some(picture_url) => proto_user.set_picture_url(picture_url),
+                None              => proto_user.set_picture_url("".to_string())
+            }
+
+            proto_user.set_balance(0); 
+            proto_user.set_username(user.username);
+
+            if user.password == password {
+                response.set_user(proto_user);
+                response.set_successful(true);
+            } else {
+                response.set_successful(false);
+            }
+        },
+        Err(e) => response.set_successful(false)
+    }
+   
+    serialize(response) 
+}
+
+
 #[post("/update/alias", data="<input>")]
 fn register_alias_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
-
     let mut request = protos::user_messages::UpdateUserRequest::new();
     let request_bytes = input.into_bytes();
     let mut cis = CodedInputStream::from_bytes(&request_bytes);
@@ -143,6 +187,6 @@ fn main() {
 
     rocket::ignite()
         .manage(database_connection)
-        .mount("/", routes![hello_route])
+        .mount("/", routes![hello_route, register_route])
         .launch();
 }

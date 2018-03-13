@@ -36,13 +36,35 @@ mod schema;
 mod route_tests;
 
 
+fn deserialize<T: ::protobuf::MessageStatic>(data: String) -> T {
+    let mut proto = T::new();
+    let data_bytes = data.into_bytes();
+    let mut cis = CodedInputStream::from_bytes(&data_bytes);
+    proto.merge_from(&mut cis);
+    proto
+}
+
+
+fn serialize<T: ::protobuf::MessageStatic>(proto: T) -> String {
+    let mut data = String::new();
+    {
+        let mut buf = Cursor::new(unsafe { data.as_mut_vec() });
+        let mut cos = CodedOutputStream::new(&mut buf);
+        proto.write_to(&mut cos);
+        cos.flush();
+    }
+    data
+}
+
 #[post("/register", data="<input>")]
 fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
 
-    let mut request = protos::user_messages::RegisterRequest::new();
-    let request_bytes = input.into_bytes();
-    let mut cis = CodedInputStream::from_bytes(&request_bytes);
-    request.merge_from(&mut cis);
+    //let mut request = protos::user_messages::RegisterRequest::new();
+    //let request_bytes = input.into_bytes();
+    //let mut cis = CodedInputStream::from_bytes(&request_bytes);
+    //request.merge_from(&mut cis);
+
+    let mut request = deserialize::<protos::user_messages::RegisterRequest>(input);
 
     let new_user = models::NewUser {
         phone_no:    request.get_phone_no(),
@@ -77,18 +99,8 @@ fn hello_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
     let mut response = protos::user_messages::RegisterResponse::new();
     response.set_user(proto_user);
     response.set_successful(true);
-
-
-    let mut response_body = String::new();
-
-    {
-        let mut buf = Cursor::new(unsafe { response_body.as_mut_vec() });
-        let mut cos = CodedOutputStream::new(&mut buf);
-        response.write_to(&mut cos);
-        cos.flush();
-    }
-
-    response_body
+    
+    serialize(response)
     //format!("{}",response_body)
     //format!("hello there {}", request.phone_no)
 }

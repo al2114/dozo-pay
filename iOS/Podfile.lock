@@ -1,0 +1,12 @@
+PODS:
+  - SwiftProtobuf (1.0.2)
+
+DEPENDENCIES:
+  - SwiftProtobuf (~> 1.0.2)
+
+SPEC CHECKSUMS:
+  SwiftProtobuf: e41d205c91eac0fb46823f2561712407fefdaf4e
+
+PODFILE CHECKSUM: 8542cdc5e2a64a370f53d0b852fb61f41a77f1fb
+
+COCOAPODS: 1.4.0

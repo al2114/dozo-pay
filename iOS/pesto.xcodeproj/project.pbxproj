@@ -1,0 +1,587 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2B0F9B6A204E022400C56461 /* CircularImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0F9B69204E022400C56461 /* CircularImageView.swift */; };
+		2B0F9B6C204F101F00C56461 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0F9B6B204F101F00C56461 /* TextField.swift */; };
+		2B0F9B6E204F19D400C56461 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0F9B6D204F19D400C56461 /* String.swift */; };
+		2B47779D202A0F0F0077415A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B47779C202A0F0F0077415A /* AppDelegate.swift */; };
+		2B4777A4202A0F0F0077415A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2B4777A3202A0F0F0077415A /* Assets.xcassets */; };
+		2B4777A7202A0F0F0077415A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B4777A5202A0F0F0077415A /* LaunchScreen.storyboard */; };
+		2B4777AF202A29110077415A /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777AE202A29110077415A /* HomeVC.swift */; };
+		2B4777B1202A32040077415A /* CameraVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777B0202A32040077415A /* CameraVC.swift */; };
+		2B4777B5202A32130077415A /* SendAmountVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777B4202A32130077415A /* SendAmountVC.swift */; };
+		2B4777B7202A363D0077415A /* SendContactVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777B6202A363D0077415A /* SendContactVC.swift */; };
+		2B4777B9202A367C0077415A /* ConfirmationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777B8202A367C0077415A /* ConfirmationVC.swift */; };
+		2B4777BB202A3D0F0077415A /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4777BA202A3D0F0077415A /* Util.swift */; };
+		2B4CE3B32033ACFC006408DC /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4CE3B22033ACFC006408DC /* API.swift */; };
+		2B4CE3B52034F907006408DC /* models.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4CE3B42034F907006408DC /* models.pb.swift */; };
+		2B4CE3B92034FD19006408DC /* Room.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4CE3B82034FD19006408DC /* Room.swift */; };
+		2B4CE3BB2034FD5B006408DC /* Claim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4CE3BA2034FD5B006408DC /* Claim.swift */; };
+		2B4CE3BD2034FDCC006408DC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4CE3BC2034FDCC006408DC /* User.swift */; };
+		2B4CE3BF20350188006408DC /* Me.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4CE3BE20350188006408DC /* Me.swift */; };
+		2B501624205227AF00B35EB0 /* NiceTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B501623205227AF00B35EB0 /* NiceTextField.swift */; };
+		2B50162620532BEB00B35EB0 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B50162520532BEB00B35EB0 /* NavigationController.swift */; };
+		2B6250ED2055D2B80054D0C5 /* user_messages.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6250EC2055D2B80054D0C5 /* user_messages.pb.swift */; };
+		2B7FD7FC203CE9F40076EB74 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */; };
+		2B7FD7FE203CEA090076EB74 /* RegisterNumberVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */; };
+		2B7FD800203CEA180076EB74 /* VerifyNumberVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */; };
+		2B7FD802203CEA230076EB74 /* RegisterAliasVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD801203CEA230076EB74 /* RegisterAliasVC.swift */; };
+		2B7FD804203CEA5D0076EB74 /* RegisterPasswordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */; };
+		2B84DFDC204AEFF600691EAA /* QRReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B84DFDB204AEFF600691EAA /* QRReader.swift */; };
+		2B84DFDE204AFFF200691EAA /* RoomVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B84DFDD204AFFF200691EAA /* RoomVC.swift */; };
+		2B90927B203E349400077DC1 /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B90927A203E349400077DC1 /* Design.swift */; };
+		2B90929E203E50E400077DC1 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B90929D203E50E400077DC1 /* Configuration.swift */; };
+		2BCBE3CA2041E3A900AA7D30 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCBE3C92041E3A900AA7D30 /* Crypto.swift */; };
+		2BCBE3CF2041E87200AA7D30 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BCBE3CE2041E87200AA7D30 /* Security.framework */; };
+		3787C5763444638857844FD6 /* Pods_Pesto_Pay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */; };
+		CB046909204349C100DF284F /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB046908204349C100DF284F /* CircleButton.swift */; };
+		CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB49D95520472B6E00A33C4A /* Preferences.swift */; };
+		CBE78F46202A8A8F00AE1EA5 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */; };
+		CBE78F6A202A8AAF00AE1EA5 /* dataapp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CBE78F68202A8AAF00AE1EA5 /* dataapp.xcdatamodeld */; };
+		CBE78F6C202A8B0A00AE1EA5 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2621A56BF3AD5E50901EFEAE /* Pods-Pesto Pay.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pesto Pay.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay.debug.xcconfig"; sourceTree = "<group>"; };
+		2B0F9B69204E022400C56461 /* CircularImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularImageView.swift; sourceTree = "<group>"; };
+		2B0F9B6B204F101F00C56461 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
+		2B0F9B6D204F19D400C56461 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		2B477799202A0F0F0077415A /* Pesto Pay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pesto Pay.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2B47779C202A0F0F0077415A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2B4777A3202A0F0F0077415A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2B4777A6202A0F0F0077415A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		2B4777A8202A0F0F0077415A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2B4777AE202A29110077415A /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
+		2B4777B0202A32040077415A /* CameraVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraVC.swift; sourceTree = "<group>"; };
+		2B4777B4202A32130077415A /* SendAmountVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendAmountVC.swift; sourceTree = "<group>"; };
+		2B4777B6202A363D0077415A /* SendContactVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendContactVC.swift; sourceTree = "<group>"; };
+		2B4777B8202A367C0077415A /* ConfirmationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationVC.swift; sourceTree = "<group>"; };
+		2B4777BA202A3D0F0077415A /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
+		2B4CE3B22033ACFC006408DC /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		2B4CE3B42034F907006408DC /* models.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = models.pb.swift; path = protos/models.pb.swift; sourceTree = "<group>"; };
+		2B4CE3B82034FD19006408DC /* Room.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Room.swift; sourceTree = "<group>"; };
+		2B4CE3BA2034FD5B006408DC /* Claim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Claim.swift; sourceTree = "<group>"; };
+		2B4CE3BC2034FDCC006408DC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		2B4CE3BE20350188006408DC /* Me.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Me.swift; sourceTree = "<group>"; };
+		2B501620205213D000B35EB0 /* pesto-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pesto-Bridging-Header.h"; sourceTree = "<group>"; };
+		2B501623205227AF00B35EB0 /* NiceTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NiceTextField.swift; sourceTree = "<group>"; };
+		2B50162520532BEB00B35EB0 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
+		2B6250EC2055D2B80054D0C5 /* user_messages.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = user_messages.pb.swift; path = protos/user_messages.pb.swift; sourceTree = "<group>"; };
+		2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
+		2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterNumberVC.swift; sourceTree = "<group>"; };
+		2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyNumberVC.swift; sourceTree = "<group>"; };
+		2B7FD801203CEA230076EB74 /* RegisterAliasVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterAliasVC.swift; sourceTree = "<group>"; };
+		2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterPasswordVC.swift; sourceTree = "<group>"; };
+		2B84DFDB204AEFF600691EAA /* QRReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReader.swift; sourceTree = "<group>"; };
+		2B84DFDD204AFFF200691EAA /* RoomVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomVC.swift; sourceTree = "<group>"; };
+		2B90927A203E349400077DC1 /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
+		2B90929D203E50E400077DC1 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		2BCBE3C92041E3A900AA7D30 /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
+		2BCBE3CE2041E87200AA7D30 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		39B21EBB56EB792421D7B33A /* Pods-Pesto Pay.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pesto Pay.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay.release.xcconfig"; sourceTree = "<group>"; };
+		B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pesto_Pay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CB046908204349C100DF284F /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
+		CB49D95520472B6E00A33C4A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		CBE78F69202A8AAF00AE1EA5 /* dataapp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = dataapp.xcdatamodel; sourceTree = "<group>"; };
+		CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2B477796202A0F0F0077415A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2BCBE3CF2041E87200AA7D30 /* Security.framework in Frameworks */,
+				CBE78F46202A8A8F00AE1EA5 /* CoreData.framework in Frameworks */,
+				3787C5763444638857844FD6 /* Pods_Pesto_Pay.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2B477790202A0F0F0077415A = {
+			isa = PBXGroup;
+			children = (
+				2B47779B202A0F0F0077415A /* pesto */,
+				2B47779A202A0F0F0077415A /* Products */,
+				D4F43DD4DAA79E1D365C6F3A /* Frameworks */,
+				A72FDDD3C8D07A8253B61065 /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		2B47779A202A0F0F0077415A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2B477799202A0F0F0077415A /* Pesto Pay.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2B47779B202A0F0F0077415A /* pesto */ = {
+			isa = PBXGroup;
+			children = (
+				2B47779C202A0F0F0077415A /* AppDelegate.swift */,
+				2B0F9B6D204F19D400C56461 /* String.swift */,
+				2B50162520532BEB00B35EB0 /* NavigationController.swift */,
+				CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */,
+				2B4777BA202A3D0F0077415A /* Util.swift */,
+				2B84DFDB204AEFF600691EAA /* QRReader.swift */,
+				2B4CE3BE20350188006408DC /* Me.swift */,
+				CBA67C43205875BF00BCF7DB /* Config */,
+				CBA67C44205875C800BCF7DB /* Components */,
+				CBA67C45205875CB00BCF7DB /* ViewControllers */,
+				2B4CE3B72034FD01006408DC /* API */,
+				2B4CE3B42034F907006408DC /* models.pb.swift */,
+				2B6250EC2055D2B80054D0C5 /* user_messages.pb.swift */,
+				2B4777A3202A0F0F0077415A /* Assets.xcassets */,
+				2B4777A5202A0F0F0077415A /* LaunchScreen.storyboard */,
+				2B4777A8202A0F0F0077415A /* Info.plist */,
+				CBE78F68202A8AAF00AE1EA5 /* dataapp.xcdatamodeld */,
+				2BCBE3C92041E3A900AA7D30 /* Crypto.swift */,
+				2B501620205213D000B35EB0 /* pesto-Bridging-Header.h */,
+			);
+			path = pesto;
+			sourceTree = "<group>";
+		};
+		2B4CE3B72034FD01006408DC /* API */ = {
+			isa = PBXGroup;
+			children = (
+				2B4CE3B22033ACFC006408DC /* API.swift */,
+				2B4CE3B82034FD19006408DC /* Room.swift */,
+				2B4CE3BA2034FD5B006408DC /* Claim.swift */,
+				2B4CE3BC2034FDCC006408DC /* User.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		A72FDDD3C8D07A8253B61065 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2621A56BF3AD5E50901EFEAE /* Pods-Pesto Pay.debug.xcconfig */,
+				39B21EBB56EB792421D7B33A /* Pods-Pesto Pay.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		CBA67C43205875BF00BCF7DB /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				CB49D95520472B6E00A33C4A /* Preferences.swift */,
+				2B90927A203E349400077DC1 /* Design.swift */,
+				2B90929D203E50E400077DC1 /* Configuration.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		CBA67C44205875C800BCF7DB /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				CB046908204349C100DF284F /* CircleButton.swift */,
+				2B0F9B69204E022400C56461 /* CircularImageView.swift */,
+				2B0F9B6B204F101F00C56461 /* TextField.swift */,
+				2B501623205227AF00B35EB0 /* NiceTextField.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		CBA67C45205875CB00BCF7DB /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				2B4777AE202A29110077415A /* HomeVC.swift */,
+				2B4777B8202A367C0077415A /* ConfirmationVC.swift */,
+				2B4777B6202A363D0077415A /* SendContactVC.swift */,
+				2B4777B4202A32130077415A /* SendAmountVC.swift */,
+				2B4777B0202A32040077415A /* CameraVC.swift */,
+				2B84DFDD204AFFF200691EAA /* RoomVC.swift */,
+				2B7FD801203CEA230076EB74 /* RegisterAliasVC.swift */,
+				2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */,
+				2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */,
+				2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */,
+				2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		D4F43DD4DAA79E1D365C6F3A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2BCBE3CE2041E87200AA7D30 /* Security.framework */,
+				CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */,
+				B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2B477798202A0F0F0077415A /* Pesto Pay */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2B4777AB202A0F0F0077415A /* Build configuration list for PBXNativeTarget "Pesto Pay" */;
+			buildPhases = (
+				2249E900A9FB12909F025E2E /* [CP] Check Pods Manifest.lock */,
+				2B477795202A0F0F0077415A /* Sources */,
+				2B477796202A0F0F0077415A /* Frameworks */,
+				2B477797202A0F0F0077415A /* Resources */,
+				59687C297C53CE36F0A12C88 /* [CP] Embed Pods Frameworks */,
+				BCF2EE85992639D14574541A /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pesto Pay";
+			productName = dozo;
+			productReference = 2B477799202A0F0F0077415A /* Pesto Pay.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2B477791202A0F0F0077415A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0920;
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = "Pesto Techonologies Ltd";
+				TargetAttributes = {
+					2B477798202A0F0F0077415A = {
+						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 2B477794202A0F0F0077415A /* Build configuration list for PBXProject "pesto" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2B477790202A0F0F0077415A;
+			productRefGroup = 2B47779A202A0F0F0077415A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2B477798202A0F0F0077415A /* Pesto Pay */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2B477797202A0F0F0077415A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2B4777A7202A0F0F0077415A /* LaunchScreen.storyboard in Resources */,
+				2B4777A4202A0F0F0077415A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2249E900A9FB12909F025E2E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Pesto Pay-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		59687C297C53CE36F0A12C88 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/SwiftProtobuf/SwiftProtobuf.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftProtobuf.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BCF2EE85992639D14574541A /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2B477795202A0F0F0077415A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2B47779D202A0F0F0077415A /* AppDelegate.swift in Sources */,
+				2B4777B7202A363D0077415A /* SendContactVC.swift in Sources */,
+				2B4CE3B92034FD19006408DC /* Room.swift in Sources */,
+				CB046909204349C100DF284F /* CircleButton.swift in Sources */,
+				2B4777B1202A32040077415A /* CameraVC.swift in Sources */,
+				2B4CE3BD2034FDCC006408DC /* User.swift in Sources */,
+				2B4CE3B32033ACFC006408DC /* API.swift in Sources */,
+				CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */,
+				2B4CE3BB2034FD5B006408DC /* Claim.swift in Sources */,
+				2B0F9B6A204E022400C56461 /* CircularImageView.swift in Sources */,
+				2B84DFDC204AEFF600691EAA /* QRReader.swift in Sources */,
+				2B4777B9202A367C0077415A /* ConfirmationVC.swift in Sources */,
+				2B0F9B6E204F19D400C56461 /* String.swift in Sources */,
+				2B4CE3BF20350188006408DC /* Me.swift in Sources */,
+				2B4777BB202A3D0F0077415A /* Util.swift in Sources */,
+				2B90929E203E50E400077DC1 /* Configuration.swift in Sources */,
+				2B90927B203E349400077DC1 /* Design.swift in Sources */,
+				2B4777AF202A29110077415A /* HomeVC.swift in Sources */,
+				2BCBE3CA2041E3A900AA7D30 /* Crypto.swift in Sources */,
+				2B4777B5202A32130077415A /* SendAmountVC.swift in Sources */,
+				2B7FD800203CEA180076EB74 /* VerifyNumberVC.swift in Sources */,
+				2B7FD802203CEA230076EB74 /* RegisterAliasVC.swift in Sources */,
+				2B50162620532BEB00B35EB0 /* NavigationController.swift in Sources */,
+				2B501624205227AF00B35EB0 /* NiceTextField.swift in Sources */,
+				CBE78F6C202A8B0A00AE1EA5 /* PersistenceService.swift in Sources */,
+				2B0F9B6C204F101F00C56461 /* TextField.swift in Sources */,
+				CBE78F6A202A8AAF00AE1EA5 /* dataapp.xcdatamodeld in Sources */,
+				2B7FD804203CEA5D0076EB74 /* RegisterPasswordVC.swift in Sources */,
+				2B6250ED2055D2B80054D0C5 /* user_messages.pb.swift in Sources */,
+				2B4CE3B52034F907006408DC /* models.pb.swift in Sources */,
+				2B7FD7FC203CE9F40076EB74 /* LoginVC.swift in Sources */,
+				2B7FD7FE203CEA090076EB74 /* RegisterNumberVC.swift in Sources */,
+				2B84DFDE204AFFF200691EAA /* RoomVC.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		2B4777A5202A0F0F0077415A /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2B4777A6202A0F0F0077415A /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		2B4777A9202A0F0F0077415A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		2B4777AA202A0F0F0077415A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2B4777AC202A0F0F0077415A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2621A56BF3AD5E50901EFEAE /* Pods-Pesto Pay.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = ZFFBRZM5F4;
+				INFOPLIST_FILE = pesto/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = pay.pesto.dozo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "pesto/pesto-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2B4777AD202A0F0F0077415A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 39B21EBB56EB792421D7B33A /* Pods-Pesto Pay.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = ZFFBRZM5F4;
+				INFOPLIST_FILE = pesto/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = pay.pesto.dozo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "pesto/pesto-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2B477794202A0F0F0077415A /* Build configuration list for PBXProject "pesto" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2B4777A9202A0F0F0077415A /* Debug */,
+				2B4777AA202A0F0F0077415A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2B4777AB202A0F0F0077415A /* Build configuration list for PBXNativeTarget "Pesto Pay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2B4777AC202A0F0F0077415A /* Debug */,
+				2B4777AD202A0F0F0077415A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		CBE78F68202A8AAF00AE1EA5 /* dataapp.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				CBE78F69202A8AAF00AE1EA5 /* dataapp.xcdatamodel */,
+			);
+			currentVersion = CBE78F69202A8AAF00AE1EA5 /* dataapp.xcdatamodel */;
+			path = dataapp.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 2B477791202A0F0F0077415A /* Project object */;
+}

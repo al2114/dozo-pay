@@ -128,28 +128,16 @@
 		2B47779B202A0F0F0077415A /* pesto */ = {
 			isa = PBXGroup;
 			children = (
-				CB046908204349C100DF284F /* CircleButton.swift */,
-				2B0F9B6D204F19D400C56461 /* String.swift */,
-				2B0F9B69204E022400C56461 /* CircularImageView.swift */,
-				2B0F9B6B204F101F00C56461 /* TextField.swift */,
-				2B50162520532BEB00B35EB0 /* NavigationController.swift */,
-				2B501623205227AF00B35EB0 /* NiceTextField.swift */,
 				2B47779C202A0F0F0077415A /* AppDelegate.swift */,
+				2B0F9B6D204F19D400C56461 /* String.swift */,
+				2B50162520532BEB00B35EB0 /* NavigationController.swift */,
 				CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */,
-				2B4777AE202A29110077415A /* HomeVC.swift */,
-				2B4777B8202A367C0077415A /* ConfirmationVC.swift */,
-				2B4777B6202A363D0077415A /* SendContactVC.swift */,
-				2B4777B4202A32130077415A /* SendAmountVC.swift */,
-				2B4777B0202A32040077415A /* CameraVC.swift */,
-				2B84DFDB204AEFF600691EAA /* QRReader.swift */,
-				2B84DFDD204AFFF200691EAA /* RoomVC.swift */,
 				2B4777BA202A3D0F0077415A /* Util.swift */,
+				2B84DFDB204AEFF600691EAA /* QRReader.swift */,
 				2B4CE3BE20350188006408DC /* Me.swift */,
-				2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */,
-				2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */,
-				2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */,
-				2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */,
-				2B7FD801203CEA230076EB74 /* RegisterAliasVC.swift */,
+				CBA67C43205875BF00BCF7DB /* Config */,
+				CBA67C44205875C800BCF7DB /* Components */,
+				CBA67C45205875CB00BCF7DB /* ViewControllers */,
 				2B4CE3B72034FD01006408DC /* API */,
 				2B4CE3B42034F907006408DC /* models.pb.swift */,
 				2B6250EC2055D2B80054D0C5 /* user_messages.pb.swift */,
@@ -157,9 +145,6 @@
 				2B4777A5202A0F0F0077415A /* LaunchScreen.storyboard */,
 				2B4777A8202A0F0F0077415A /* Info.plist */,
 				CBE78F68202A8AAF00AE1EA5 /* dataapp.xcdatamodeld */,
-				CB49D95520472B6E00A33C4A /* Preferences.swift */,
-				2B90927A203E349400077DC1 /* Design.swift */,
-				2B90929D203E50E400077DC1 /* Configuration.swift */,
 				2BCBE3C92041E3A900AA7D30 /* Crypto.swift */,
 				2B501620205213D000B35EB0 /* pesto-Bridging-Header.h */,
 			);
@@ -184,6 +169,45 @@
 				39B21EBB56EB792421D7B33A /* Pods-Pesto Pay.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		CBA67C43205875BF00BCF7DB /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				CB49D95520472B6E00A33C4A /* Preferences.swift */,
+				2B90927A203E349400077DC1 /* Design.swift */,
+				2B90929D203E50E400077DC1 /* Configuration.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		CBA67C44205875C800BCF7DB /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				CB046908204349C100DF284F /* CircleButton.swift */,
+				2B0F9B69204E022400C56461 /* CircularImageView.swift */,
+				2B0F9B6B204F101F00C56461 /* TextField.swift */,
+				2B501623205227AF00B35EB0 /* NiceTextField.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		CBA67C45205875CB00BCF7DB /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				2B4777AE202A29110077415A /* HomeVC.swift */,
+				2B4777B8202A367C0077415A /* ConfirmationVC.swift */,
+				2B4777B6202A363D0077415A /* SendContactVC.swift */,
+				2B4777B4202A32130077415A /* SendAmountVC.swift */,
+				2B4777B0202A32040077415A /* CameraVC.swift */,
+				2B84DFDD204AFFF200691EAA /* RoomVC.swift */,
+				2B7FD801203CEA230076EB74 /* RegisterAliasVC.swift */,
+				2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */,
+				2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */,
+				2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */,
+				2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */,
+			);
+			path = ViewControllers;
 			sourceTree = "<group>";
 		};
 		D4F43DD4DAA79E1D365C6F3A /* Frameworks */ = {

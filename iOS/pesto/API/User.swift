@@ -12,6 +12,8 @@ typealias Claim = Pesto_Models_Claim
 typealias RoomItem = Pesto_Models_RoomItem
 typealias RegisterRequest = Pesto_UserMessages_RegisterRequest
 typealias RegisterResponse = Pesto_UserMessages_RegisterResponse
+typealias LoginRequest = Pesto_UserMessages_LoginRequest
+typealias LoginResponse = Pesto_UserMessages_LoginResponse
 
 import Foundation
 
@@ -19,8 +21,8 @@ extension API {
   static func register(user: User, completion: @escaping (User) -> Void) {
     var registerRequest = RegisterRequest()
     registerRequest.password = "password"
-    registerRequest.phoneNo = "07482365000"
-    registerRequest.username = "test_user"
+    registerRequest.phoneNo = user.phoneNo
+    registerRequest.username = user.username
 
     let route = "register"
     Util.post(toRoute: route, withProtoMessage: registerRequest) {
@@ -31,14 +33,21 @@ extension API {
     completion(user)
   }
 
-  static func getMe(completion: @escaping (User) -> Void) {
-    var testUser = User()
-    testUser.username = "tester"
-    testUser.phoneNo = "9999"
-    completion(testUser)
+  static func login(withUsername username: String, password: String, completion: @escaping (Bool) -> Void) {
+    var loginRequest = LoginRequest()
+    loginRequest.username = username
+    loginRequest.password = password
+
+    let route = "login"
+    Util.post(toRoute: route, withProtoMessage: loginRequest) {
+      loginResponse in
+      loginResponse.map { User.updateMe(withUser: $0.user) }
+      print(loginResponse?.successful)
+      completion(loginResponse?.successful ?? false)
+    }
   }
 
-  static func login(withUsername username: String, password: String, completion: @escaping (User) -> Void) {
+  static func getMe(completion: @escaping (User) -> Void) {
     var testUser = User()
     testUser.username = "tester"
     testUser.phoneNo = "9999"

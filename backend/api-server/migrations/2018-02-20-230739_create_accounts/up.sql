@@ -5,5 +5,5 @@ CREATE TABLE users(
   picture_url    VARCHAR,
   account_id     INT NOT NULL,
   username       VARCHAR(24) NOT NULL,
-  password       VARCHAR(24) NOT NULL
+  password       CHAR(32) NOT NULL
 );

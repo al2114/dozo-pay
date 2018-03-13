@@ -11,5 +11,5 @@ swift: protos/models.proto protos/user_messages.proto
 	protoc --proto_path protos/ --swift_out iOS/pesto/protos/ $^
 
 clean:
-		rm -r backend/api-server/src/protos/
-		rm -r iOS/pesto/protos/
+	rm -r backend/api-server/src/protos/
+	rm -r iOS/pesto/protos/

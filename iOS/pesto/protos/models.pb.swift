@@ -55,13 +55,13 @@ struct Pesto_Models_User {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var uid: UInt64 = 0
+  var uid: Int32 = 0
 
   var phoneNo: String = String()
 
   var pictureURL: String = String()
 
-  var balance: UInt64 = 0
+  var balance: Int32 = 0
 
   var username: String = String()
 
@@ -75,7 +75,7 @@ struct Pesto_Models_Room {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var uid: UInt64 {
+  var uid: Int32 {
     get {return _storage._uid}
     set {_uniqueStorage()._uid = newValue}
   }
@@ -116,7 +116,7 @@ struct Pesto_Models_RoomItem {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var uid: UInt64 {
+  var uid: Int32 {
     get {return _storage._uid}
     set {_uniqueStorage()._uid = newValue}
   }
@@ -126,7 +126,7 @@ struct Pesto_Models_RoomItem {
     set {_uniqueStorage()._name = newValue}
   }
 
-  var value: UInt64 {
+  var value: Int32 {
     get {return _storage._value}
     set {_uniqueStorage()._value = newValue}
   }
@@ -241,10 +241,10 @@ extension Pesto_Models_User: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
-      case 1: try decoder.decodeSingularUInt64Field(value: &self.uid)
+      case 1: try decoder.decodeSingularInt32Field(value: &self.uid)
       case 2: try decoder.decodeSingularStringField(value: &self.phoneNo)
       case 3: try decoder.decodeSingularStringField(value: &self.pictureURL)
-      case 4: try decoder.decodeSingularUInt64Field(value: &self.balance)
+      case 4: try decoder.decodeSingularInt32Field(value: &self.balance)
       case 5: try decoder.decodeSingularStringField(value: &self.username)
       default: break
       }
@@ -253,7 +253,7 @@ extension Pesto_Models_User: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.uid != 0 {
-      try visitor.visitSingularUInt64Field(value: self.uid, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.uid, fieldNumber: 1)
     }
     if !self.phoneNo.isEmpty {
       try visitor.visitSingularStringField(value: self.phoneNo, fieldNumber: 2)
@@ -262,7 +262,7 @@ extension Pesto_Models_User: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
       try visitor.visitSingularStringField(value: self.pictureURL, fieldNumber: 3)
     }
     if self.balance != 0 {
-      try visitor.visitSingularUInt64Field(value: self.balance, fieldNumber: 4)
+      try visitor.visitSingularInt32Field(value: self.balance, fieldNumber: 4)
     }
     if !self.username.isEmpty {
       try visitor.visitSingularStringField(value: self.username, fieldNumber: 5)
@@ -292,7 +292,7 @@ extension Pesto_Models_Room: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   ]
 
   fileprivate class _StorageClass {
-    var _uid: UInt64 = 0
+    var _uid: Int32 = 0
     var _owner: Pesto_Models_User? = nil
     var _name: String = String()
     var _item: [Pesto_Models_RoomItem] = []
@@ -323,7 +323,7 @@ extension Pesto_Models_Room: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       while let fieldNumber = try decoder.nextFieldNumber() {
         switch fieldNumber {
-        case 1: try decoder.decodeSingularUInt64Field(value: &_storage._uid)
+        case 1: try decoder.decodeSingularInt32Field(value: &_storage._uid)
         case 2: try decoder.decodeSingularMessageField(value: &_storage._owner)
         case 3: try decoder.decodeSingularStringField(value: &_storage._name)
         case 4: try decoder.decodeRepeatedMessageField(value: &_storage._item)
@@ -337,7 +337,7 @@ extension Pesto_Models_Room: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       if _storage._uid != 0 {
-        try visitor.visitSingularUInt64Field(value: _storage._uid, fieldNumber: 1)
+        try visitor.visitSingularInt32Field(value: _storage._uid, fieldNumber: 1)
       }
       if let v = _storage._owner {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
@@ -384,9 +384,9 @@ extension Pesto_Models_RoomItem: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
   ]
 
   fileprivate class _StorageClass {
-    var _uid: UInt64 = 0
+    var _uid: Int32 = 0
     var _name: String = String()
-    var _value: UInt64 = 0
+    var _value: Int32 = 0
     var _lockedBy: Pesto_Models_User? = nil
 
     static let defaultInstance = _StorageClass()
@@ -413,9 +413,9 @@ extension Pesto_Models_RoomItem: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       while let fieldNumber = try decoder.nextFieldNumber() {
         switch fieldNumber {
-        case 1: try decoder.decodeSingularUInt64Field(value: &_storage._uid)
+        case 1: try decoder.decodeSingularInt32Field(value: &_storage._uid)
         case 2: try decoder.decodeSingularStringField(value: &_storage._name)
-        case 3: try decoder.decodeSingularUInt64Field(value: &_storage._value)
+        case 3: try decoder.decodeSingularInt32Field(value: &_storage._value)
         case 4: try decoder.decodeSingularMessageField(value: &_storage._lockedBy)
         default: break
         }
@@ -426,13 +426,13 @@ extension Pesto_Models_RoomItem: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       if _storage._uid != 0 {
-        try visitor.visitSingularUInt64Field(value: _storage._uid, fieldNumber: 1)
+        try visitor.visitSingularInt32Field(value: _storage._uid, fieldNumber: 1)
       }
       if !_storage._name.isEmpty {
         try visitor.visitSingularStringField(value: _storage._name, fieldNumber: 2)
       }
       if _storage._value != 0 {
-        try visitor.visitSingularUInt64Field(value: _storage._value, fieldNumber: 3)
+        try visitor.visitSingularInt32Field(value: _storage._value, fieldNumber: 3)
       }
       if let v = _storage._lockedBy {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 4)

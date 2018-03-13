@@ -61,6 +61,24 @@ struct Pesto_UserMessages_RegisterResponse {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
+struct Pesto_UserMessages_UpdateUserRequest {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var uid: String = String()
+
+  var newPhoneNo: String = String()
+
+  var newUsername: String = String()
+
+  var newPassword: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate let _protobuf_package = "pesto.user_messages"
@@ -170,6 +188,53 @@ extension Pesto_UserMessages_RegisterResponse: SwiftProtobuf.Message, SwiftProto
       }
       if !storagesAreEqual {return false}
     }
+    if unknownFields != other.unknownFields {return false}
+    return true
+  }
+}
+
+extension Pesto_UserMessages_UpdateUserRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".UpdateUserRequest"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "uid"),
+    2: .standard(proto: "new_phone_no"),
+    3: .standard(proto: "new_username"),
+    4: .standard(proto: "new_password"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeSingularStringField(value: &self.uid)
+      case 2: try decoder.decodeSingularStringField(value: &self.newPhoneNo)
+      case 3: try decoder.decodeSingularStringField(value: &self.newUsername)
+      case 4: try decoder.decodeSingularStringField(value: &self.newPassword)
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.uid.isEmpty {
+      try visitor.visitSingularStringField(value: self.uid, fieldNumber: 1)
+    }
+    if !self.newPhoneNo.isEmpty {
+      try visitor.visitSingularStringField(value: self.newPhoneNo, fieldNumber: 2)
+    }
+    if !self.newUsername.isEmpty {
+      try visitor.visitSingularStringField(value: self.newUsername, fieldNumber: 3)
+    }
+    if !self.newPassword.isEmpty {
+      try visitor.visitSingularStringField(value: self.newPassword, fieldNumber: 4)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  func _protobuf_generated_isEqualTo(other: Pesto_UserMessages_UpdateUserRequest) -> Bool {
+    if self.uid != other.uid {return false}
+    if self.newPhoneNo != other.newPhoneNo {return false}
+    if self.newUsername != other.newUsername {return false}
+    if self.newPassword != other.newPassword {return false}
     if unknownFields != other.unknownFields {return false}
     return true
   }

@@ -22,29 +22,11 @@ extension API {
     registerRequest.phoneNo = "07482365000"
     registerRequest.username = "test_user"
 
-    let url = URL(string: "\(server)/register")!
-    var request = URLRequest(url: url)
-//    request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-    request.httpMethod = "POST"
-    request.httpBody = try! registerRequest.serializedData()
-    let task = URLSession.shared.dataTask(with: request) { data, response, error in
-      guard let data = data, error == nil else {                                                 // check for fundamental networking error
-        print("error=\(error)")
-        return
-      }
-
-      if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
-        print("statusCode should be 200, but is \(httpStatus.statusCode)")
-        print("response = \(response)")
-      }
-
-      let responseString = String(data: data, encoding: .utf8)
-      print("responseString = \(responseString)")
-
-      let registerResponse = try! RegisterResponse(serializedData: data)
-      print(registerResponse.successful)
+    let route = "register"
+    Util.post(toRoute: route, withProtoMessage: registerRequest) {
+      registerResponse in
+      print(registerResponse?.successful)
     }
-    task.resume()
 
     completion(user)
   }

@@ -9,7 +9,7 @@
 typealias Id = String
 
 struct API {
-  static func pay(userId: Id, amount: UInt64, completion: @escaping () -> Void) {
+  static func pay(userId: Id, amount: Int32, completion: @escaping () -> Void) {
     User.getMe { me in
       var user = me
       user.balance += amount
@@ -29,7 +29,7 @@ struct API {
 
   }
 
-  static func getBalance(completion: @escaping (UInt64) -> Void) {
+  static func getBalance(completion: @escaping (Int32) -> Void) {
     User.getMe { me in
       completion(me.balance)
       return nil

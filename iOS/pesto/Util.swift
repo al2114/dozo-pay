@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftProtobuf
 
 let server = "http://localhost:3001"
 
@@ -55,5 +56,38 @@ extension Util {
     } else {
       window?.rootViewController = navVC
     }
+  }
+}
+
+extension Util {
+  static func post(toRoute route: String, withProtoMessage message: SwiftProtobuf.Message, completion: ((RegisterResponse?) -> Void)? = nil) {
+    let url = URL(string: "\(server)/register")!
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.httpBody = try! message.serializedData()
+    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+      guard let data = data, error == nil else {
+        // check for fundamental networking error
+        print("error=\(error)")
+        completion?(nil)
+        return
+      }
+
+      guard let httpStatus = response as? HTTPURLResponse else {
+        completion?(nil)
+        return
+      }
+
+      guard httpStatus.statusCode == 200 else { // check for http errors
+        print("response = \(response)")
+        print("statusCode should be 200, but is \(httpStatus.statusCode)")
+        completion?(nil)
+        return
+      }
+
+      let registerResponse = try! RegisterResponse(serializedData: data)
+      completion?(registerResponse)
+    }
+    task.resume()
   }
 }

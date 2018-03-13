@@ -93,13 +93,13 @@ fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: String) ->
         None              => proto_user.set_picture_url("".to_string())
     }
 
-    proto_user.set_balance(0); 
+    proto_user.set_balance(0);
     proto_user.set_username(user.username);
 
     let mut response = protos::user_messages::RegisterResponse::new();
     response.set_user(proto_user);
     response.set_successful(true);
-    
+
     serialize(response)
     //format!("{}",response_body)
     //format!("hello there {}", request.phone_no)
@@ -133,7 +133,7 @@ fn login_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
                 None              => proto_user.set_picture_url("".to_string())
             }
 
-            proto_user.set_balance(0); 
+            proto_user.set_balance(0);
             proto_user.set_username(user.username);
 
             if user.password == password {
@@ -145,8 +145,8 @@ fn login_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
         },
         Err(e) => response.set_successful(false)
     }
-   
-    serialize(response) 
+
+    serialize(response)
 }
 
 
@@ -174,7 +174,7 @@ fn register_alias_route(db_connection: rocket::State<pg_pool::Pool>, input: Stri
 //        .set(users::username.eq(new_username))
 //        .execute(&*db_connection_pool.get().expect(
 //                "failed to obtain database connection"));
-    
+
     format!("updated {}", new_username)
 }
 
@@ -187,6 +187,6 @@ fn main() {
 
     rocket::ignite()
         .manage(database_connection)
-        .mount("/", routes![hello_route, register_route])
+        .mount("/", routes![hello_route, register_route, login_route])
         .launch();
 }

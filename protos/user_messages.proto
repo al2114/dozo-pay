@@ -15,6 +15,16 @@ message RegisterResponse {
   bool successful = 2;
 }
 
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  models.User user = 1;
+  bool successful = 2;
+}
+
 message UpdateUserRequest {
   string uid = 1;
   string new_phone_no = 2;

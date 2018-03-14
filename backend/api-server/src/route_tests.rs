@@ -22,7 +22,13 @@ fn client() -> Client {
 
     Client::new(rocket::ignite()
         .manage(database_connection)
-        .mount("/", routes![super::hello_route, super::register_route, super::login_route])) .unwrap()
+        .mount("/", routes![
+               super::hello_route,
+               super::register_route,
+               super::login_route,
+               super::topup_route,
+               super::transaction_route
+        ])).unwrap()
 }
 
 fn test(uri: &str, expected: String) {
@@ -68,6 +74,30 @@ fn test_register_user() {
         proto_response.get_successful(),
         true
     )
+}
+
+
+#[test]
+fn test_topup() {
+    let client = client();
+    let mut request = super::protos::user_messages::TopupRequest::new();
+    request.set_uid(2);
+    request.set_amount(500);
+    //let mut request_body = String::new();
+
+    //{
+    //    let mut buf = Cursor::new(unsafe { request_body.as_mut_vec() });
+    //    let mut cos = CodedOutputStream::new(&mut buf);
+    //    request.write_to(&mut cos);
+    //    cos.flush();
+    //}
+
+    let mut response = client
+        .post("/topup")
+        .body(super::serialize(request))
+        .header(ContentType::Form)
+        .dispatch();
+
 }
 
 #[test]

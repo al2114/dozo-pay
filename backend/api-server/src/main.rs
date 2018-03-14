@@ -74,17 +74,23 @@ fn hello_route() -> String {
 }
 
 fn update_balances(transaction: &models::Transaction, db_connection: &rocket::State<pg_pool::Pool>) -> models::Account {
+
+
+
     use schema::accounts;
     // TODO: Flag transaction with update flag on success? Balances need to get updated atomically? Consider
     // http://techblog.net-a-porter.com/2013/08/dbixmultirow-updating-multiple-database-rows-quickly-and-easily/
-
+    let payer_balance = accounts::dsl::accounts.find(transaction.payer_id)
+        .first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection")).unwrap().balance;
+    let payee_balance = accounts::dsl::accounts.find(transaction.payee_id)
+        .first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection")).unwrap().balance;
     let payer = diesel::update(accounts::table)
-        .set(accounts::balance.eq(accounts::balance - transaction.amount))
+        .set(accounts::balance.eq(payer_balance - transaction.amount))
         .filter(accounts::uid.eq(transaction.payer_id))
         .get_result::<models::Account>(&*db_connection.get().expect(
                 "failed to obtain database connection")).unwrap();
     diesel::update(accounts::table)
-        .set(accounts::balance.eq(accounts::balance + transaction.amount))
+        .set(accounts::balance.eq(payee_balance + transaction.amount))
         .filter(accounts::uid.eq(transaction.payer_id))
         .execute(&*db_connection.get().expect(
                 "failed to obtain database connection"));
@@ -106,6 +112,23 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
         .expect("Error inserting new transaction");
     let account = update_balances(&transaction, &db_connection);
     (account, transaction)
+}
+
+
+#[post("/test", data="<input>")]
+fn test_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
+
+
+    let request = deserialize::<protos::user_messages::TopupRequest>(input);
+
+    let master_id = 0;
+    use schema::accounts;
+
+//    diesel::update(accounts::dsl::accounts.find(master_id))
+//        .set(accounts::balance.eq(request.get_amount()))
+//        .execute(&*db_connection.get().expect("failed to obtain database connection"));
+//
+    "".to_string()
 }
 
 #[post("/transaction", data="<input>")]

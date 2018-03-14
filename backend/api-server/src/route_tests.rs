@@ -27,7 +27,8 @@ fn client() -> Client {
                super::register_route,
                super::login_route,
                super::topup_route,
-               super::transaction_route
+               super::transaction_route,
+               super::test_route
         ])).unwrap()
 }
 
@@ -76,25 +77,52 @@ fn test_register_user() {
     )
 }
 
+#[test]
+fn test_master() {
+    let client = client();
+    let mut request = super::protos::user_messages::TopupRequest::new();
+
+    //request.set_uid(0);
+    request.set_amount(129);
+
+    let mut request_body = String::new();
+
+    {
+        let mut buf = Cursor::new(unsafe { request_body.as_mut_vec() });
+        let mut cos = CodedOutputStream::new(&mut buf);
+        request.write_to(&mut cos);
+        cos.flush();
+    }
+
+
+    let mut response = client
+        .post("/test")
+        .body(request_body)
+        .header(ContentType::Form)
+        .dispatch();
+    assert_eq!(
+        response.body_string(),
+        Some("".to_string()))
+}
 
 #[test]
 fn test_topup() {
     let client = client();
     let mut request = super::protos::user_messages::TopupRequest::new();
-    request.set_uid(2);
-    request.set_amount(500);
-    //let mut request_body = String::new();
+    //request.set_uid(2);
+    //request.set_amount(500);
+    let mut request_body = String::new();
 
-    //{
-    //    let mut buf = Cursor::new(unsafe { request_body.as_mut_vec() });
-    //    let mut cos = CodedOutputStream::new(&mut buf);
-    //    request.write_to(&mut cos);
-    //    cos.flush();
-    //}
+    {
+        let mut buf = Cursor::new(unsafe { request_body.as_mut_vec() });
+        let mut cos = CodedOutputStream::new(&mut buf);
+        request.write_to(&mut cos);
+        cos.flush();
+    }
 
     let mut response = client
         .post("/topup")
-        .body(super::serialize(request))
+        .body(request_body)
         .header(ContentType::Form)
         .dispatch();
 

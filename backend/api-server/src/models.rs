@@ -19,3 +19,17 @@ pub struct NewUser<'a> {
     pub username: &'a str,
     pub password: &'a str
 }
+
+use super::schema::accounts;
+
+#[derive(Queryable)]
+pub struct Account {
+    pub uid: i32,
+    pub balance: i32
+}
+
+#[derive(Insertable)]
+#[table_name = "accounts"]
+pub struct NewAccount<'a> {
+    pub balance: &'a i32
+}

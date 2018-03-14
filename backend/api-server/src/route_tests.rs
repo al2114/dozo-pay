@@ -22,8 +22,7 @@ fn client() -> Client {
 
     Client::new(rocket::ignite()
         .manage(database_connection)
-        .mount("/", routes![super::hello_route]))
-        .unwrap()
+        .mount("/", routes![super::hello_route, super::register_route, super::login_route])) .unwrap()
 }
 
 fn test(uri: &str, expected: String) {

@@ -66,14 +66,27 @@ fn hello_route() -> String {
 fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
     let mut request = deserialize::<protos::user_messages::RegisterRequest>(input);
 
+    let db_connection_pool = &*db_connection;
+    let new_account = models::NewAccount {
+        balance:    &0
+    };
+
+    use schema::accounts;
+
+    let account = diesel::insert_into(accounts::table)
+        .values(&new_account)
+        .get_result::<models::Account>(&*db_connection_pool.get().expect(
+                "failed to obtain database connection"))
+        .expect("Error inserting new account");
+
+
     let new_user = models::NewUser {
         phone_no:    request.get_phone_no(),
         picture_url: "",
-        account_id: &0,
+        account_id:  &account.uid,
         username:    request.get_username(),
         password:    request.get_password()
     };
-    let db_connection_pool = &*db_connection;
 
     use schema::users;
 

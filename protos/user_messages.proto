@@ -25,6 +25,16 @@ message LoginResponse {
   bool successful = 2;
 }
 
+message TopupRequest {
+  int32 uid = 1;
+  int32 amount = 2;
+}
+
+message TopupResponse {
+  models.User user = 1;
+  bool successful = 2;
+}
+
 message UpdateUserRequest {
   string uid = 1;
   string new_phone_no = 2;

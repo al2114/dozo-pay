@@ -77,18 +77,16 @@ fn update_balances(transaction: &models::Transaction, db_connection: &rocket::St
     use schema::accounts;
     // TODO: Flag transaction with update flag on success? Balances need to get updated atomically? Consider
     // http://techblog.net-a-porter.com/2013/08/dbixmultirow-updating-multiple-database-rows-quickly-and-easily/
-    let payer_balance = accounts::dsl::accounts.find(transaction.payer_id)
-        .first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection")).unwrap().balance;
-    let payee_balance = accounts::dsl::accounts.find(transaction.payee_id)
-        .first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection")).unwrap().balance;
-    let payer = diesel::update(accounts::table)
-        .set(accounts::balance.eq(payer_balance - transaction.amount))
-        .filter(accounts::uid.eq(transaction.payer_id))
+   // let payer_balance = accounts::dsl::accounts.find(transaction.payer_id)
+     //   .first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection")).unwrap().balance;
+    //let payee_balance = accounts::dsl::accounts.find(transaction.payee_id)
+     //   .first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection")).unwrap().balance;
+    let payer = diesel::update(accounts::dsl::accounts.find(transaction.payer_id))
+        .set(accounts::balance.eq(accounts::balance - transaction.amount))
         .get_result::<models::Account>(&*db_connection.get().expect(
                 "failed to obtain database connection")).unwrap();
-    diesel::update(accounts::table)
-        .set(accounts::balance.eq(payee_balance + transaction.amount))
-        .filter(accounts::uid.eq(transaction.payer_id))
+    diesel::update(accounts::dsl::accounts.find(transaction.payee_id))
+        .set(accounts::balance.eq(accounts::balance + transaction.amount))
         .execute(&*db_connection.get().expect(
                 "failed to obtain database connection"));
     payer
@@ -154,7 +152,7 @@ fn topup_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> V
         use schema::accounts;
 
         let master_account = diesel::update(accounts::dsl::accounts.find(master_id))
-            .set(accounts::balance.eq(request.get_amount()))
+            .set(accounts::balance.eq(accounts::balance + request.get_amount()))
             .get_result::<models::Account>(&*db_connection.get().expect("failed to obtain database connection"))
             .expect("WARNING! SOMETHING WENT WRONG: Master account does not exists");
 

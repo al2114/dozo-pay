@@ -70,67 +70,52 @@ fn hello_route() -> String {
     response
 }
 
-fn update_balances(transaction: &models::Transaction, db_connection: &rocket::State<pg_pool::Pool>) -> models::Account {
-
-
-
+fn update_balances(transaction: &models::NewTransaction, db_connection: &rocket::State<pg_pool::Pool>) -> Result<models::Account, String> {
+    use schema::accounts::dsl::accounts as accounts_sql;
     use schema::accounts;
-    // TODO: Flag transaction with update flag on success? Balances need to get updated atomically? Consider
-    // http://techblog.net-a-porter.com/2013/08/dbixmultirow-updating-multiple-database-rows-quickly-and-easily/
-   // let payer_balance = accounts::dsl::accounts.find(transaction.payer_id)
-     //   .first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection")).unwrap().balance;
-    //let payee_balance = accounts::dsl::accounts.find(transaction.payee_id)
-     //   .first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection")).unwrap().balance;
-    let payer = diesel::update(accounts::dsl::accounts.find(transaction.payer_id))
-        .set(accounts::balance.eq(accounts::balance - transaction.amount))
-        .get_result::<models::Account>(&*db_connection.get().expect(
-                "failed to obtain database connection")).unwrap();
-    diesel::update(accounts::dsl::accounts.find(transaction.payee_id))
-        .set(accounts::balance.eq(accounts::balance + transaction.amount))
-        .execute(&*db_connection.get().expect(
-                "failed to obtain database connection"));
-    payer
+    use models::Account;
+
+    let payer_account_query = accounts_sql.find(transaction.payer_id);
+    let mut payer_account = payer_account_query
+        .first::<Account>(&*db_connection.get().expect("failed to obtain database connection"))
+        .map_err(|_| "Account not found")?;
+    if payer_account.balance >= *transaction.amount {
+        payer_account = diesel::update(payer_account_query)
+            .set(accounts::balance.eq(accounts::balance - *transaction.amount))
+            .get_result::<Account>(&*db_connection.get().expect(
+                    "failed to obtain database connection"))
+            .map_err(|_| "Decrement update failed")?;
+        diesel::update(accounts_sql.find(transaction.payee_id))
+            .set(accounts::balance.eq(accounts::balance + *transaction.amount))
+            .execute(&*db_connection.get().expect(
+                    "failed to obtain database connection"))
+            .map_err(|_| "Increment update failed")?;
+        Ok(payer_account)
+    } else {
+        Err(String::from("Payer has insufficient funds"))
+    }
 }
 
-fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &rocket::State<pg_pool::Pool>) -> (models::Account, models::Transaction) {
-    //TODO: Check if payer has enough balance
+fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &rocket::State<pg_pool::Pool>) -> Result<(models::Account, models::Transaction), String> {
     let new_transaction = models::NewTransaction {
         payer_id: &payer_id,
         payee_id: &payee_id,
         amount: &amount
     };
+    let account = update_balances(&new_transaction, &db_connection)?;
+
     use schema::transactions;
+    use models::Transaction;
+
     let transaction = diesel::insert_into(transactions::table)
         .values(&new_transaction)
-        .get_result::<models::Transaction>(&*db_connection.get().expect(
+        .get_result::<Transaction>(&*db_connection.get().expect(
                 "failed to obtain database connection"))
-        .expect("Error inserting new transaction");
-    let account = update_balances(&transaction, &db_connection);
-    (account, transaction)
+        .map_err(|_| "Error inserting new transaction")?;
+    Ok((account, transaction))
 }
 
 #[post("/pay", data="<input>")]
-fn payment_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Vec<u8> {
-    let mut request = deserialize::<protos::user_messages::PaymentRequest>(input);
-    let payer_id = request.get_payer_id();
-    let payee_id = request.get_payee_id();
-    let amount = request.get_amount();
-
-    use schema::users;
-
-    let Ok(payer) = users::dsl::users.find(payer_id).first::<models::User>(&*db_connection.get().expect("failed to obtain database connection"));
-    let Ok(payee) = users::dsl::users.find(payee_id).first::<models::User>(&*db_connection.get().expect("failed to obtain database connection"));
-
-    use schema::accounts;
-    let payer_account = accounts::dsl::accounts.find(payer.account_id).first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection"));
-    let payee_account = accounts::dsl::accounts.find(payee.account_id).first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection"));
-
-    let mut response = protos::user_messages::PaymentResponse::new();
-    serialize(response)
-}
-
-
-#[post("/transact", data="<input>")]
 fn transaction_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     use protos::user_messages::TransactionRequest;
 
@@ -148,9 +133,9 @@ fn transaction_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>
         .first::<User>(&*db_connection.get().expect("failed to obtain database connection"))
         .map_err(|_| "User not found")?;
 
-    let (account, transaction) = execute_transaction(&user.account_id, &payee.account_id, &request.amount, &db_connection);
+    let (account, transaction) = execute_transaction(&payer.account_id, &payee.account_id, &request.amount, &db_connection)?;
 
-    let proto_user = protoize_user(user, account.balance);
+    let proto_user = protoize_user(payer, account.balance);
     let mut response = protos::user_messages::TransactionResponse::new();
     response.set_user(proto_user);
     response.set_successful(true);

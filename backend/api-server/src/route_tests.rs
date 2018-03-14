@@ -98,12 +98,12 @@ fn test_transact() {
     let client = client();
     let mut request = super::protos::user_messages::TransactionRequest::new();
     request.set_payer_id(2);
-    request.set_payee_id(3);
+    request.set_payee_id(1);
     request.set_amount(200);
     let request_body = super::serialize(request);
 
     let mut response = client
-        .post("/transaction")
+        .post("/pay")
         .body(request_body)
         .header(ContentType::Form)
         .dispatch();

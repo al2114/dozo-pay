@@ -78,34 +78,6 @@ fn test_register_user() {
 }
 
 #[test]
-fn test_master() {
-    let client = client();
-    let mut request = super::protos::user_messages::TopupRequest::new();
-
-    //request.set_uid(0);
-    request.set_amount(129);
-
-    let mut request_body = String::new();
-
-    {
-        let mut buf = Cursor::new(unsafe { request_body.as_mut_vec() });
-        let mut cos = CodedOutputStream::new(&mut buf);
-        request.write_to(&mut cos);
-        cos.flush();
-    }
-
-
-    let mut response = client
-        .post("/test")
-        .body(request_body)
-        .header(ContentType::Form)
-        .dispatch();
-    assert_eq!(
-        response.body_string(),
-        Some("".to_string()))
-}
-
-#[test]
 fn test_topup() {
     let client = client();
     let mut request = super::protos::user_messages::TopupRequest::new();

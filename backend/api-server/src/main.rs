@@ -35,20 +35,17 @@ mod schema;
 #[cfg(test)]
 mod route_tests;
 
-
-fn deserialize<T: ::protobuf::MessageStatic>(data: String) -> T {
+fn deserialize<T: ::protobuf::MessageStatic>(data: Vec<u8>) -> T {
     let mut proto = T::new();
-    let data_bytes = data.into_bytes();
-    let mut cis = CodedInputStream::from_bytes(&data_bytes);
+    let mut cis = CodedInputStream::from_bytes(&data);
     proto.merge_from(&mut cis);
     proto
 }
 
-
-fn serialize<T: ::protobuf::MessageStatic>(proto: T) -> String {
-    let mut data = String::new();
+fn serialize<T: ::protobuf::MessageStatic>(proto: T) -> Vec<u8> {
+    let mut data = Vec::<u8>::new();
     {
-        let mut buf = Cursor::new(unsafe { data.as_mut_vec() });
+        let mut buf = Cursor::new(&mut data);
         let mut cos = CodedOutputStream::new(&mut buf);
         proto.write_to(&mut cos);
         cos.flush();
@@ -114,25 +111,8 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
     (account, transaction)
 }
 
-
-#[post("/test", data="<input>")]
-fn test_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
-
-
-    let request = deserialize::<protos::user_messages::TopupRequest>(input);
-
-    let master_id = 0;
-    use schema::accounts;
-
-//    diesel::update(accounts::dsl::accounts.find(master_id))
-//        .set(accounts::balance.eq(request.get_amount()))
-//        .execute(&*db_connection.get().expect("failed to obtain database connection"));
-//
-    "".to_string()
-}
-
 #[post("/transaction", data="<input>")]
-fn transaction_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
+fn transaction_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Vec<u8> {
     //TODO: Error handling
     let request = deserialize::<protos::user_messages::TransactionRequest>(input);
 
@@ -154,7 +134,7 @@ fn transaction_route(db_connection: rocket::State<pg_pool::Pool>, input: String)
 }
 
 #[post("/topup", data="<input>")]
-fn topup_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
+fn topup_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Vec<u8> {
     let request = deserialize::<protos::user_messages::TopupRequest>(input);
     //let db_connection_pool = &*db_connection;
 
@@ -199,7 +179,7 @@ fn topup_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
 }
 
 #[post("/register", data="<input>")]
-fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
+fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Vec<u8> {
     let request = deserialize::<protos::user_messages::RegisterRequest>(input);
 
     let db_connection_pool = &*db_connection;
@@ -238,14 +218,11 @@ fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: String) ->
     let mut response = protos::user_messages::RegisterResponse::new();
     response.set_user(proto_user);
     response.set_successful(true);
-
     serialize(response)
-    //format!("{}",response_body)
-    //format!("hello there {}", request.phone_no)
 }
 
 #[post("/login", data="<input>")]
-fn login_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
+fn login_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Vec<u8> {
     let request = deserialize::<protos::user_messages::LoginRequest>(input);
 
     let username = request.get_username();
@@ -285,13 +262,29 @@ fn login_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> St
     serialize(response)
 }
 
+//#[post("/pay", data="<input>")]
+//fn payment_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Vec<u8> {
+    //let mut request = deserialize::<protos::user_messages::PaymentRequest>(input);
+    //let payer_id = request.get_payer_id();
+    //let payee_id = request.get_payee_id();
+    //let amount = request.get_amount();
+
+    //use schema::users;
+
+    //let Ok(payer) = users::dsl::users.find(payer_id).first::<models::User>(&*db_connection.get().expect("failed to obtain database connection"));
+    //let Ok(payee) = users::dsl::users.find(payee_id).first::<models::User>(&*db_connection.get().expect("failed to obtain database connection"));
+
+    //use schema::accounts;
+    //let payer_account = accounts::dsl::accounts.find(payer.account_id).first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection"));
+    //let payee_account = accounts::dsl::accounts.find(payee.account_id).first::<models::Account>(&*db_connection.get().expect("failed to obtain database connection"));
+
+    //let mut response = protos::user_messages::PaymentResponse::new();
+    //serialize(response)
+//}
 
 #[post("/update/alias", data="<input>")]
-fn register_alias_route(db_connection: rocket::State<pg_pool::Pool>, input: String) -> String {
-    let mut request = protos::user_messages::UpdateUserRequest::new();
-    let request_bytes = input.into_bytes();
-    let mut cis = CodedInputStream::from_bytes(&request_bytes);
-    request.merge_from(&mut cis);
+fn register_alias_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> String {
+    let request = deserialize::<protos::user_messages::UpdateUserRequest>(input);
 
     let userid = request.get_uid().parse::<i32>().unwrap();
     let new_username = request.get_new_username();

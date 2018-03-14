@@ -47,6 +47,17 @@ message TransactionResponse {
   bool successful = 3;
 }
 
+message PaymentRequest {
+  int32 payer_id = 1;
+  int32 payee_id = 2;
+  int32 amount = 3;
+}
+
+message PaymentResponse {
+  models.User user = 1;
+  bool successful = 2;
+}
+
 message UpdateUserRequest {
   string uid = 1;
   string new_phone_no = 2;

@@ -12,6 +12,7 @@ extern crate protobuf;
 
 #[macro_use]
 extern crate diesel;
+extern crate chrono;
 extern crate lazy_static;
 extern crate dotenv;
 extern crate r2d2;
@@ -72,7 +73,7 @@ fn hello_route() -> String {
     response
 }
 
-fn update_balances(transaction: &models::NewTransaction, db_connection: &rocket::State<pg_pool::Pool>) -> Result<models::Account, String> {
+fn update_balances(transaction: &models::NewTransaction, db_connection: &rocket::State<pg_pool::Pool>) -> Result<(bool, models::Account), String> {
     use schema::accounts::dsl::accounts as accounts_sql;
     use schema::accounts;
     use models::Account;
@@ -92,19 +93,19 @@ fn update_balances(transaction: &models::NewTransaction, db_connection: &rocket:
             .execute(&*db_connection.get().expect(
                     "failed to obtain database connection"))
             .map_err(|_| "Increment update failed")?;
-        Ok(payer_account)
+        Ok((true, payer_account))
     } else {
-        Err(String::from("Payer has insufficient funds"))
+        Ok((false, payer_account))
     }
 }
 
 fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &rocket::State<pg_pool::Pool>) -> Result<(models::Account, models::Transaction), String> {
-    let new_transaction = models::NewTransaction {
+    let mut new_transaction = models::NewTransaction {
         payer_id: &payer_id,
         payee_id: &payee_id,
         amount: &amount
     };
-    let account = update_balances(&new_transaction, &db_connection)?;
+    let (success, account) = update_balances(&new_transaction, &db_connection)?;
 
     use schema::transactions;
     use models::Transaction;
@@ -114,6 +115,16 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
         .get_result::<Transaction>(&*db_connection.get().expect(
                 "failed to obtain database connection"))
         .map_err(|_| "Error inserting new transaction")?;
+
+    if success {
+        use schema::transactions::dsl::transactions as transactions_sql;
+
+            diesel::update(transactions_sql.find(transaction.uid))
+            .set(transactions::successful.eq(true))
+            .execute(&*db_connection.get().expect("failed to obtain database conncetion"))
+            .map_err(|_| "Error updating failed flag")?;
+    }
+
     Ok((account, transaction))
 }
 

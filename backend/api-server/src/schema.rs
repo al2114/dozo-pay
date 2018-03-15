@@ -11,6 +11,8 @@ table! {
         payer_id -> Int4,
         payee_id -> Int4,
         amount -> Int4,
+        successful -> Bool,
+        created_at -> Timestamp,
     }
 }
 

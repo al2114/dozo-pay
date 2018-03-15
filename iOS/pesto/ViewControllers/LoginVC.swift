@@ -123,11 +123,15 @@ class LoginVC: UIViewController {
   }
 
   @objc func login() {
-    API.login(withUsername: "", password: "") {
-      user in
-      User.updateMe(withUser: user)
-      let homeVC = HomeVC()
-      Util.switchTo(viewController: homeVC, presentingController: self)
+    let username = idField.textField.text ?? ""
+    let password = passwordField.textField.text ?? ""
+    let encryptedPassword = Crypto.encrypt(text: password)
+    API.login(withUsername: username, password: encryptedPassword) {
+      success in
+      if success {
+        let homeVC = HomeVC()
+        Util.switchTo(viewController: homeVC, presentingController: self)
+      }
     }
   }
 

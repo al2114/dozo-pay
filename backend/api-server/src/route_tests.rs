@@ -22,8 +22,13 @@ fn client() -> Client {
 
     Client::new(rocket::ignite()
         .manage(database_connection)
-        .mount("/", routes![super::hello_route]))
-        .unwrap()
+        .mount("/", routes![
+               super::hello_route,
+               super::register_route,
+               super::login_route,
+               super::topup_route,
+               super::transaction_route
+        ])).unwrap()
 }
 
 fn test(uri: &str, expected: String) {
@@ -70,6 +75,42 @@ fn test_register_user() {
         true
     )
 }
+
+#[test]
+fn test_topup() {
+    let client = client();
+    let mut request = super::protos::user_messages::TopupRequest::new();
+    request.set_uid(2);
+    request.set_amount(500);
+    let request_body = super::serialize(request);
+
+    let mut response = client
+        .post("/topup")
+        .body(request_body)
+        .header(ContentType::Form)
+        .dispatch();
+
+}
+
+
+#[test]
+fn test_transact() {
+    let client = client();
+    let mut request = super::protos::user_messages::TransactionRequest::new();
+    request.set_payer_id(2);
+    request.set_payee_id(1);
+    request.set_amount(200);
+    let request_body = super::serialize(request);
+
+    let mut response = client
+        .post("/pay")
+        .body(request_body)
+        .header(ContentType::Form)
+        .dispatch();
+
+}
+
+
 
 #[test]
 fn test_update_username() {

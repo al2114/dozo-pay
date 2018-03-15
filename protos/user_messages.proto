@@ -15,9 +15,34 @@ message RegisterResponse {
   bool successful = 2;
 }
 
-message UpdateUserRequest {
-  string uid = 1;
-  string new_phone_no = 2;
-  string new_username = 3;
-  string new_password = 4;
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  models.User user = 1;
+  bool successful = 2;
+}
+
+message TopupRequest {
+  int32 uid = 1;
+  int32 amount = 2;
+}
+
+message TopupResponse {
+  models.User user = 1;
+  bool successful = 2;
+}
+
+message TransactionRequest {
+  int32 payer_id = 1;
+  int32 payee_id = 2;
+  int32 amount = 3;
+}
+
+message TransactionResponse {
+  models.User user = 1;
+  int32 transaction_id = 2;
+  bool successful = 3;
 }

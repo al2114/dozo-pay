@@ -5,5 +5,17 @@ CREATE TABLE users(
   picture_url    VARCHAR,
   account_id     INT NOT NULL,
   username       VARCHAR(24) NOT NULL,
-  password       VARCHAR(24) NOT NULL
+  password       CHAR(32) NOT NULL
+);
+
+CREATE TABLE accounts(
+  uid            SERIAL PRIMARY KEY,
+  balance        INT NOT NULL
+);
+
+CREATE TABLE transactions(
+  uid            SERIAL PRIMARY KEY,
+  payer_id       INT NOT NULL,
+  payee_id       INT NOT NULL,
+  amount         INT NOT NULL
 );

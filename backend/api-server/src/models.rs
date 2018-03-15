@@ -19,3 +19,36 @@ pub struct NewUser<'a> {
     pub username: &'a str,
     pub password: &'a str
 }
+
+use super::schema::accounts;
+
+#[derive(Queryable)]
+pub struct Account {
+    pub uid: i32,
+    pub balance: i32
+}
+
+#[derive(Insertable)]
+#[table_name = "accounts"]
+pub struct NewAccount<'a> {
+    pub balance: &'a i32
+}
+
+
+use super::schema::transactions;
+
+#[derive(Queryable)]
+pub struct Transaction {
+    pub uid: i32,
+    pub payer_id: i32,
+    pub payee_id: i32,
+    pub amount: i32
+}
+
+#[derive(Insertable)]
+#[table_name = "transactions"]
+pub struct NewTransaction<'a> {
+    pub payer_id: &'a i32,
+    pub payee_id: &'a i32,
+    pub amount: &'a i32
+}

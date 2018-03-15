@@ -46,10 +46,3 @@ message TransactionResponse {
   int32 transaction_id = 2;
   bool successful = 3;
 }
-
-message UpdateUserRequest {
-  string uid = 1;
-  string new_phone_no = 2;
-  string new_username = 3;
-  string new_password = 4;
-}

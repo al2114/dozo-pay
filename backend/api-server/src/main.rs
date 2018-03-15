@@ -73,7 +73,7 @@ fn hello_route() -> String {
     response
 }
 
-fn update_balances(transaction: &models::NewTransaction, db_connection: &rocket::State<pg_pool::Pool>) -> Result<(bool, models::Account), String> {
+fn update_balances(transaction: &models::Transaction, db_connection: &rocket::State<pg_pool::Pool>) -> Result<(bool, models::Account), String> {
     use schema::accounts::dsl::accounts as accounts_sql;
     use schema::accounts;
     use models::Account;
@@ -82,14 +82,14 @@ fn update_balances(transaction: &models::NewTransaction, db_connection: &rocket:
     let mut payer_account = payer_account_query
         .first::<Account>(&*db_connection.get().expect("failed to obtain database connection"))
         .map_err(|_| "Account not found")?;
-    if payer_account.balance >= *transaction.amount {
+    if payer_account.balance >= transaction.amount {
         payer_account = diesel::update(payer_account_query)
-            .set(accounts::balance.eq(accounts::balance - *transaction.amount))
+            .set(accounts::balance.eq(accounts::balance - transaction.amount))
             .get_result::<Account>(&*db_connection.get().expect(
                     "failed to obtain database connection"))
             .map_err(|_| "Decrement update failed")?;
         diesel::update(accounts_sql.find(transaction.payee_id))
-            .set(accounts::balance.eq(accounts::balance + *transaction.amount))
+            .set(accounts::balance.eq(accounts::balance + transaction.amount))
             .execute(&*db_connection.get().expect(
                     "failed to obtain database connection"))
             .map_err(|_| "Increment update failed")?;
@@ -100,12 +100,11 @@ fn update_balances(transaction: &models::NewTransaction, db_connection: &rocket:
 }
 
 fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &rocket::State<pg_pool::Pool>) -> Result<(models::Account, models::Transaction), String> {
-    let mut new_transaction = models::NewTransaction {
+    let new_transaction = models::NewTransaction {
         payer_id: &payer_id,
         payee_id: &payee_id,
         amount: &amount
     };
-    let (success, account) = update_balances(&new_transaction, &db_connection)?;
 
     use schema::transactions;
     use models::Transaction;
@@ -115,6 +114,8 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
         .get_result::<Transaction>(&*db_connection.get().expect(
                 "failed to obtain database connection"))
         .map_err(|_| "Error inserting new transaction")?;
+
+    let (success, account) = update_balances(&transaction, &db_connection)?;
 
     if success {
         use schema::transactions::dsl::transactions as transactions_sql;

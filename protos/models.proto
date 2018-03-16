@@ -30,3 +30,9 @@ message RoomItem {
   int32 value = 3;
   User locked_by = 4;
 }
+
+message Contact {
+  int32 uid = 1;
+  string username = 2;
+  bool trusted = 3;
+}

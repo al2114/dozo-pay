@@ -1,17 +1,11 @@
 use super::rocket;
 use rocket::local::Client;
-use rocket::http::Status;
 use rocket::http::ContentType;
 
-use std::io::Cursor;
 use std::env;
 
 use dotenv::dotenv;
-use protobuf::Message;
-use protobuf::{CodedOutputStream};
-use protobuf::{CodedInputStream};
-
-pub type PgConnection = super::diesel::pg::PgConnection;
+use super::protos::user_messages::*;
 
 fn client() -> Client {
     dotenv().ok();
@@ -22,7 +16,7 @@ fn client() -> Client {
         .expect("DATABASE_URL must be set");
     let database_connection = super::pg_pool::init_with_builder(&database_url, builder);
     use diesel::Connection;
-    database_connection.get().unwrap().begin_test_transaction();
+    database_connection.get().unwrap().begin_test_transaction().unwrap();
 
     Client::new(rocket::ignite()
         .manage(database_connection)
@@ -31,28 +25,17 @@ fn client() -> Client {
                super::register_route,
                super::login_route,
                super::topup_route,
-               super::transaction_route
+               super::transaction_route,
+               super::add_contact_route,
+               super::get_contacts_route
         ])).unwrap()
 }
 
-fn test(uri: &str, expected: String) {
-    let client = client();
-    assert_eq!(client.get(uri).dispatch().body_string(), Some(expected));
-}
-
-fn test_404(uri: &str) {
-    let client = client();
-    assert_eq!(client.get(uri).dispatch().status(), Status::NotFound);
-}
-
-#[test]
-fn test_register_user() {
-    let client = client();
-    use super::protos::user_messages::RegisterRequest;
+fn register_user(client: &Client, phone_no: &str, username: &str, password: &str) -> RegisterResponse {
     let mut request = RegisterRequest::new();
-    request.set_phone_no("012387213".to_string());
-    request.set_username("username".to_string());
-    request.set_password("password".to_string());
+    request.set_phone_no(phone_no.to_string());
+    request.set_username(username.to_string());
+    request.set_password(password.to_string());
 
     let mut response = client
         .post("/register")
@@ -60,50 +43,72 @@ fn test_register_user() {
         .header(ContentType::Form)
         .dispatch();
 
-    use super::protos::user_messages::RegisterResponse;
-
-    let proto_response = super::deserialize::<RegisterResponse>(response.body_bytes().unwrap()).unwrap();
-
-    assert_eq!(proto_response.get_successful(), true)
+    super::deserialize::<RegisterResponse>(response.body_bytes().unwrap()).unwrap()
 }
 
 #[test]
-fn test_topup() {
+fn test_register_user() {
     let client = client();
-    let mut request = super::protos::user_messages::TopupRequest::new();
-    request.set_uid(2);
-    request.set_amount(500);
+    let register_response = register_user(&client,"074786381","fred","password");
+    assert_eq!(register_response.get_successful(), true);
+    assert_eq!(register_response.get_user().get_username(), "fred".to_string())
+}
+
+fn add_contact(client: &Client, user_id: i32, contact_username: &str) -> AddContactResponse {
+    let mut request = AddContactRequest::new();
+    request.set_user_id(user_id);
+    request.set_contact_username(contact_username.to_string());
 
     let mut response = client
-        .post("/topup")
+        .post("/contact")
         .body(super::serialize(request).unwrap())
         .header(ContentType::Form)
         .dispatch();
 
-    let topupResponse = super::deserialize::<super::protos::user_messages::TopupResponse>(response.body_bytes().unwrap()).unwrap();
-    assert_eq!(topupResponse.get_successful(), true);
-    assert_eq!(topupResponse.get_user().get_uid(), 2)
+    super::deserialize::<AddContactResponse>(response.body_bytes().unwrap()).unwrap()
 }
 
 #[test]
-fn test_transact() {
+fn test_add_contact(){
     let client = client();
-    let mut request = super::protos::user_messages::TransactionRequest::new();
-    request.set_payer_id(2);
-    request.set_payee_id(1);
-    request.set_amount(200);
-    let request_body = super::serialize(request).unwrap();
+    let register_franklin = register_user(&client,"074787381","franklin","password");
+    let register_dan = register_user(&client,"074783381","dan","password");
 
+    let add_contact_response = add_contact(&client, register_franklin.get_user().get_uid(), register_dan.get_user().get_username());
+    assert_eq!(add_contact_response.get_successful(), true);
+
+}
+
+fn get_contacts(client: &Client, user_id: i32) -> GetContactsResponse {
     let mut response = client
-        .post("/pay")
-        .body(request_body)
+        .get(format!("/contact/{}",user_id))
         .header(ContentType::Form)
         .dispatch();
+
+    super::deserialize::<GetContactsResponse>(response.body_bytes().unwrap()).unwrap()
 }
 
+
 #[test]
-fn test_failing_hello() {
-    test_404("/hello/Mike/1000");
-    test_404("/hello/Mike/-129");
-    test_404("/hello/Mike/-1");
+fn test_get_contacts(){
+    let client = client();
+
+    let franklin = register_user(&client,"074787381","franklin","password");
+    let dan = register_user(&client,"074783381","dan","password");
+
+    let _ = add_contact(&client, franklin.get_user().get_uid(), dan.get_user().get_username());
+
+    let andrew = register_user(&client,"074738381","andrew","password");
+
+    let _ = add_contact(&client, franklin.get_user().get_uid(), andrew.get_user().get_username());
+
+    let contacts_response = get_contacts(&client, franklin.get_user().get_uid());
+
+    contacts_response.get_contacts().iter().for_each(|contact| println!("{}", contact.get_uid()));
+
+    assert_eq!(contacts_response.get_contacts().len(), 2);
+    assert_eq!(contacts_response.get_contacts().iter().any(|contact| contact.get_uid() == dan.get_user().get_uid()), true);
+    assert_eq!(contacts_response.get_contacts().iter().any(|contact| contact.get_uid() == andrew.get_user().get_uid()), true);
+    assert_eq!(contacts_response.get_contacts().iter().any(|contact| contact.get_uid() == franklin.get_user().get_uid()), false)
+
 }

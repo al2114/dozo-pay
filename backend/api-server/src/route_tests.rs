@@ -16,9 +16,13 @@ pub type PgConnection = super::diesel::pg::PgConnection;
 fn client() -> Client {
     dotenv().ok();
 
+    let builder = super::r2d2::Pool::builder().max_size(1);
+
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URL must be set");
-    let database_connection = super::pg_pool::init(&database_url);
+    let database_connection = super::pg_pool::init_with_builder(&database_url, builder);
+    use diesel::Connection;
+    database_connection.get().unwrap().begin_test_transaction();
 
     Client::new(rocket::ignite()
         .manage(database_connection)
@@ -60,10 +64,7 @@ fn test_register_user() {
 
     let proto_response = super::deserialize::<RegisterResponse>(response.body_bytes().unwrap()).unwrap();
 
-    assert_eq!(
-        proto_response.get_successful(),
-        true
-    )
+    assert_eq!(proto_response.get_successful(), true)
 }
 
 #[test]
@@ -78,8 +79,11 @@ fn test_topup() {
         .body(super::serialize(request).unwrap())
         .header(ContentType::Form)
         .dispatch();
-}
 
+    let topupResponse = super::deserialize::<super::protos::user_messages::TopupResponse>(response.body_bytes().unwrap()).unwrap();
+    assert_eq!(topupResponse.get_successful(), true);
+    assert_eq!(topupResponse.get_user().get_uid(), 2)
+}
 
 #[test]
 fn test_transact() {

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   api-server:
-    build: ./api-server
+    image: "registry.gitlab.com/dozo/project/rust-server"
     volumes:
       - ./api-server:/usr/src/app
     links:

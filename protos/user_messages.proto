@@ -46,3 +46,23 @@ message TransactionResponse {
   int32 transaction_id = 2;
   bool successful = 3;
 }
+
+message AddContactRequest {
+  int32 user_id = 1;
+  string contact_username = 2;
+}
+
+message AddContactResponse {
+  bool successful = 1;
+}
+
+message GetContactsRequest {
+  int32 user_id = 1;
+}
+
+message GetContactsResponse {
+  repeated models.Contact contacts = 1;
+}
+
+
+

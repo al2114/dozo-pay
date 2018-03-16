@@ -117,7 +117,7 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
     use models::Transaction;
 
     db_connection.transaction::<_, Err, _>(|| {
-        let transaction = diesel::insert_into(transactions::table)
+        let mut transaction = diesel::insert_into(transactions::table)
             .values(&new_transaction)
             .get_result::<Transaction>(db_connection)
             .map_err(|_| Err { description: "Error inserting new transaction".to_string() })?;
@@ -127,9 +127,9 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
         if success {
             use schema::transactions::dsl::transactions as transactions_sql;
 
-            diesel::update(transactions_sql.find(transaction.uid))
+            transaction = diesel::update(transactions_sql.find(transaction.uid))
                 .set(transactions::is_successful.eq(true))
-                .execute(db_connection)
+                .get_result::<Transaction>(db_connection)
                 .map_err(|_| Err { description: "Error updating failed flag".to_string() })?;
         }
 
@@ -193,7 +193,7 @@ fn topup_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec
         .first::<Account>(&db_connection)
         .map_err(|_| "User does not have an account")?;
 
-    let _ = execute_transaction(&master_account.uid, &user_account.uid, &request.amount, &db_connection)?;
+    let (_, transaction) = execute_transaction(&master_account.uid, &user_account.uid, &request.amount, &db_connection)?;
 
     user_account = accounts_sql.find(user.account_id)
         .first::<Account>(&db_connection)
@@ -205,7 +205,7 @@ fn topup_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec
 
     let mut response = TopupResponse::new();
     response.set_user(proto_user);
-    response.set_successful(true);
+    response.set_successful(transaction.is_successful);
     Ok(serialize(response)?)
 }
 

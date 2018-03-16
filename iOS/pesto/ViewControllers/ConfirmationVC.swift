@@ -17,16 +17,6 @@ class ConfirmationVC: UIViewController {
 
     self.edgesForExtendedLayout = []
 
-    let viewBottomAnchor: NSLayoutYAxisAnchor
-    let viewTopAnchor: NSLayoutYAxisAnchor
-    if #available(iOS 11.0, *) {
-      viewBottomAnchor = view.safeAreaLayoutGuide.bottomAnchor
-      viewTopAnchor = view.safeAreaLayoutGuide.topAnchor
-    } else {
-      viewBottomAnchor = bottomLayoutGuide.bottomAnchor
-      viewTopAnchor = topLayoutGuide.topAnchor
-    }
-
     view.backgroundColor = .white
 
     let amountLabel = UILabel()
@@ -79,7 +69,7 @@ class ConfirmationVC: UIViewController {
     view.addSubview(doneButton)
     NSLayoutConstraint.activate([
       doneButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      doneButton.bottomAnchor.constraint(equalTo: viewBottomAnchor, constant: -60)
+      doneButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -60)
       ])
 
     let balanceView = UIView()

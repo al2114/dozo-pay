@@ -99,6 +99,16 @@ fn update_balances(transaction: &models::Transaction, db_connection: &rocket::St
     }
 }
 
+struct Err {
+    description: String,
+}
+use diesel::result::Error;
+impl From<Error> for Err {
+    fn from(_: Error) -> Err {
+        Err { description: "".to_string() }
+    }
+}
+
 fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &rocket::State<pg_pool::Pool>) -> Result<(models::Account, models::Transaction), String> {
     let new_transaction = models::NewTransaction {
         payer_id: &payer_id,
@@ -109,24 +119,31 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
     use schema::transactions;
     use models::Transaction;
 
-    let transaction = diesel::insert_into(transactions::table)
-        .values(&new_transaction)
-        .get_result::<Transaction>(&*db_connection.get().expect(
-                "failed to obtain database connection"))
-        .map_err(|_| "Error inserting new transaction")?;
+    db_connection.get().unwrap().transaction::<_, Err, _>(|| {
+        let transaction = diesel::insert_into(transactions::table)
+            .values(&new_transaction)
+            .get_result::<Transaction>(&*db_connection.get().expect(
+                    "failed to obtain database connection"))
+            .unwrap();
+//            .map_err(|_| Err { description: "Error inserting new transaction".to_string() })?;
+        println!("HERE");
 
-    let (success, account) = update_balances(&transaction, &db_connection)?;
+        let (success, account) = update_balances(&transaction, &db_connection).map_err(|d| Err { description: d })?;
+        println!("HERE");
 
-    if success {
-        use schema::transactions::dsl::transactions as transactions_sql;
+        if success {
+            use schema::transactions::dsl::transactions as transactions_sql;
 
             diesel::update(transactions_sql.find(transaction.uid))
-            .set(transactions::successful.eq(true))
-            .execute(&*db_connection.get().expect("failed to obtain database conncetion"))
-            .map_err(|_| "Error updating failed flag")?;
-    }
+                .set(transactions::is_successful.eq(true))
+                .execute(&*db_connection.get().expect("failed to obtain database conncetion"))
+                .map_err(|_| Err { description: "Error updating failed flag".to_string() })?;
+            println!("HERE");
+        }
+        println!("HERE");
 
-    Ok((account, transaction))
+        Ok((account, transaction))
+    }).map_err(|e| e.description )
 }
 
 #[post("/pay", data="<input>")]

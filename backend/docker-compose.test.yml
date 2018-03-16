@@ -3,17 +3,12 @@ version: "3"
 services:
   api-server:
     build: ./api-server
-    ports:
-      - "3001:3001"
     volumes:
       - ./api-server:/usr/src/app
     links:
       - db
-    command: bash -c "./wait-for-it.sh db:5432 -q -- diesel setup && cargo watch -x run"
   db:
     image: "postgres:9"
-    ports:
-      - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data/pgdata
     environment:

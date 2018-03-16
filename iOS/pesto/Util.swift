@@ -60,7 +60,7 @@ extension Util {
 }
 
 extension Util {
-  static func post(toRoute route: String, withProtoMessage message: SwiftProtobuf.Message, completion: ((RegisterResponse?) -> Void)? = nil) {
+  static func post<T: RequestResponsePair>(toRoute route: String, withProtoMessage message: T, completion: ((Result<T.ResponseType>?) -> Void)? = nil) {
     let url = URL(string: "\(server)/register")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
@@ -68,7 +68,7 @@ extension Util {
     let task = URLSession.shared.dataTask(with: request) { data, response, error in
       guard let data = data, error == nil else {
         // check for fundamental networking error
-        print("error=\(error)")
+        print("error=\(String(describing: error))")
         completion?(nil)
         return
       }
@@ -79,15 +79,63 @@ extension Util {
       }
 
       guard httpStatus.statusCode == 200 else { // check for http errors
-        print("response = \(response)")
+        print("response = \(String(describing: response))")
         print("statusCode should be 200, but is \(httpStatus.statusCode)")
         completion?(nil)
         return
       }
 
-      let registerResponse = try! RegisterResponse(serializedData: data)
-      completion?(registerResponse)
+      if let response = try? T.ResponseType(serializedData: data) {
+        completion?(.ok(response: response))
+      } else if let string = String.init(data: data, encoding: .utf8) {
+        completion?(.error(description: string))
+      } else {
+        completion?(nil)
+      }
     }
     task.resume()
+  }
+}
+
+enum Result<T> {
+  case ok(response: T)
+  case error(description: String)
+}
+
+protocol RequestResponsePair: SwiftProtobuf.Message {
+  associatedtype ResponseType: SwiftProtobuf.Message
+}
+
+extension Pesto_UserMessages_RegisterRequest: RequestResponsePair {
+  typealias ResponseType = Pesto_UserMessages_RegisterResponse
+}
+
+extension Pesto_UserMessages_LoginRequest: RequestResponsePair {
+  typealias ResponseType = Pesto_UserMessages_LoginResponse
+}
+
+extension Pesto_UserMessages_TransactionRequest: RequestResponsePair {
+  typealias ResponseType = Pesto_UserMessages_TransactionResponse
+}
+
+extension Pesto_UserMessages_TopupRequest: RequestResponsePair {
+  typealias ResponseType = Pesto_UserMessages_TopupResponse
+}
+
+extension UIViewController {
+  var topAnchor: NSLayoutYAxisAnchor {
+    if #available(iOS 11.0, *) {
+      return view.safeAreaLayoutGuide.topAnchor
+    } else {
+      return topLayoutGuide.topAnchor
+    }
+  }
+
+  var bottomAnchor: NSLayoutYAxisAnchor {
+    if #available(iOS 11.0, *) {
+      return view.safeAreaLayoutGuide.bottomAnchor
+    } else {
+      return bottomLayoutGuide.bottomAnchor
+    }
   }
 }

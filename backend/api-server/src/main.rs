@@ -12,13 +12,14 @@ extern crate protobuf;
 
 #[macro_use]
 extern crate diesel;
+extern crate chrono;
 extern crate lazy_static;
 extern crate dotenv;
 extern crate r2d2;
-extern crate r2d2_diesel;
 
 use protobuf::{CodedInputStream};
 use protobuf::{CodedOutputStream};
+use protos::user_messages::*;
 
 use std::io::Cursor;
 
@@ -72,87 +73,175 @@ fn hello_route() -> String {
     response
 }
 
-fn update_balances(transaction: &models::NewTransaction, db_connection: &rocket::State<pg_pool::Pool>) -> Result<models::Account, String> {
+fn update_balances(transaction: &models::Transaction, db_connection: &pg_pool::PooledConnection) -> Result<(bool, models::Account), String> {
     use schema::accounts::dsl::accounts as accounts_sql;
     use schema::accounts;
     use models::Account;
 
     let payer_account_query = accounts_sql.find(transaction.payer_id);
     let mut payer_account = payer_account_query
-        .first::<Account>(&*db_connection.get().expect("failed to obtain database connection"))
+        .first::<Account>(db_connection)
         .map_err(|_| "Account not found")?;
-    if payer_account.balance >= *transaction.amount {
+    if payer_account.balance >= transaction.amount {
         payer_account = diesel::update(payer_account_query)
-            .set(accounts::balance.eq(accounts::balance - *transaction.amount))
-            .get_result::<Account>(&*db_connection.get().expect(
-                    "failed to obtain database connection"))
+            .set(accounts::balance.eq(accounts::balance - transaction.amount))
+            .get_result::<Account>(db_connection)
             .map_err(|_| "Decrement update failed")?;
         diesel::update(accounts_sql.find(transaction.payee_id))
-            .set(accounts::balance.eq(accounts::balance + *transaction.amount))
-            .execute(&*db_connection.get().expect(
-                    "failed to obtain database connection"))
+            .set(accounts::balance.eq(accounts::balance + transaction.amount))
+            .execute(db_connection)
             .map_err(|_| "Increment update failed")?;
-        Ok(payer_account)
+        Ok((true, payer_account))
     } else {
-        Err(String::from("Payer has insufficient funds"))
+        Ok((false, payer_account))
     }
 }
 
-fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &rocket::State<pg_pool::Pool>) -> Result<(models::Account, models::Transaction), String> {
+struct Err {
+    description: String,
+}
+use diesel::result::Error;
+impl From<Error> for Err {
+    fn from(_: Error) -> Err {
+        Err { description: "".to_string() }
+    }
+}
+
+fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &pg_pool::PooledConnection) -> Result<(models::Account, models::Transaction), String> {
     let new_transaction = models::NewTransaction {
         payer_id: &payer_id,
         payee_id: &payee_id,
         amount: &amount
     };
-    let account = update_balances(&new_transaction, &db_connection)?;
 
     use schema::transactions;
     use models::Transaction;
 
-    let transaction = diesel::insert_into(transactions::table)
-        .values(&new_transaction)
-        .get_result::<Transaction>(&*db_connection.get().expect(
-                "failed to obtain database connection"))
-        .map_err(|_| "Error inserting new transaction")?;
-    Ok((account, transaction))
+    db_connection.transaction::<_, Err, _>(|| {
+        let mut transaction = diesel::insert_into(transactions::table)
+            .values(&new_transaction)
+            .get_result::<Transaction>(db_connection)
+            .map_err(|_| Err { description: "Error inserting new transaction".to_string() })?;
+
+        let (success, account) = update_balances(&transaction, db_connection).map_err(|d| Err { description: d })?;
+
+        if success {
+            use schema::transactions::dsl::transactions as transactions_sql;
+
+            transaction = diesel::update(transactions_sql.find(transaction.uid))
+                .set(transactions::is_successful.eq(true))
+                .get_result::<Transaction>(db_connection)
+                .map_err(|_| Err { description: "Error updating failed flag".to_string() })?;
+        }
+
+        Ok((account, transaction))
+    }).map_err(|e| e.description )
+}
+
+#[post("/contact", data="<input>")]
+fn add_contact_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+    let requests = deserialize::<AddContactRequest>(input)?;
+
+    let user_id = requests.get_user_id();
+    let contact_username = requests.get_contact_username();
+
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    use schema::users::dsl::users as users_sql;
+    use schema::users;
+
+    let contact_id = users_sql
+        .filter(users::username.eq(contact_username))
+        .select(users::uid)
+        .first::<i32>(&db_connection)
+        .map_err(|_| "Contact not found")?;
+
+    let new_contact = models::NewContact {
+        user_id: &user_id,
+        contact_id: &contact_id
+    };
+
+    use schema::contacts;
+    diesel::insert_into(contacts::table)
+        .values(&new_contact)
+        .execute(&db_connection)
+        .map_err(|_| "Error inserting new account")?;
+
+    let mut response = AddContactResponse::new();
+    response.set_successful(true);
+    Ok(serialize(response)?)
+}
+
+fn protoize_contact(contact: models::Contact) -> protos::models::Contact {
+    let mut proto_contact = protos::models::Contact::new();
+    proto_contact.set_uid(contact.contact_id);
+    proto_contact.set_username("".to_string()); // TODO: Inner join the users tabel at get contacts
+    proto_contact.set_trusted(true);
+    proto_contact
+}
+
+#[get("/contact/<user_id>")]
+fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec<u8>, String> {
+
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    use schema::contacts::dsl::contacts as contacts_sql;
+    use schema::contacts;
+    use models::Contact;
+
+    let contacts = contacts_sql
+        .filter(contacts::user_id.eq(user_id))
+        .load::<Contact>(&db_connection)
+        .map_err(|_| "Unable to find contacts")?;
+
+    use protobuf::repeated::RepeatedField;
+    let contacts: RepeatedField<_> = contacts.into_iter().map(protoize_contact).collect();
+
+    let mut response = GetContactsResponse::new();
+    response.set_contacts(contacts);
+
+    Ok(serialize(response)?)
 }
 
 #[post("/pay", data="<input>")]
-fn transaction_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    use protos::user_messages::TransactionRequest;
+fn transaction_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<TransactionRequest>(input)?;
     let payer_id = request.get_payer_id();
     let payee_id = request.get_payee_id();
 
-    use schema::users::dsl::users;
+    use schema::users::dsl::users as users_sql;
     use models::User;
 
-    let payer = users.find(payer_id)
-        .first::<User>(&*db_connection.get().expect("failed to obtain database connection"))
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    let payer = users_sql.find(payer_id)
+        .first::<User>(&db_connection)
         .map_err(|_| "User not found")?;
-    let payee = users.find(payee_id)
-        .first::<User>(&*db_connection.get().expect("failed to obtain database connection"))
+    let payee = users_sql.find(payee_id)
+        .first::<User>(&db_connection)
         .map_err(|_| "User not found")?;
 
     let (account, transaction) = execute_transaction(&payer.account_id, &payee.account_id, &request.amount, &db_connection)?;
 
-    let proto_user = protoize_user(payer, account.balance);
-    let mut response = protos::user_messages::TransactionResponse::new();
-    response.set_user(proto_user);
+    let payer = protoize_user(payer, account.balance);
+    let mut response = TransactionResponse::new();
+    response.set_user(payer);
     response.set_transaction_id(transaction.uid);
     response.set_successful(true);
     Ok(serialize(response)?)
 }
 
 #[post("/topup", data="<input>")]
-fn topup_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<protos::user_messages::TopupRequest>(input)?;
+fn topup_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+    let request = deserialize::<TopupRequest>(input)?;
 
     use schema::users::dsl::users as users_sql;
     use models::User;
 
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
     let user = users_sql.find(request.get_uid())
-        .first::<User>(&*db_connection.get().expect("failed to obtain database connection"))
+        .first::<User>(&db_connection)
         .map_err(|_| "User not found")?;
 
     use schema::accounts::dsl::accounts as accounts_sql;
@@ -162,34 +251,32 @@ fn topup_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> R
     let master_id = 0;
     let master_account = diesel::update(accounts_sql.find(master_id))
         .set(accounts::balance.eq(accounts::balance + request.get_amount()))
-        .get_result::<Account>(&*db_connection.get().expect("failed to obtain database connection"))
+        .get_result::<Account>(&db_connection)
         .map_err(|_| "Master account does not exist")?;
 
     let mut user_account = accounts_sql.find(user.account_id)
-        .first::<Account>(&*db_connection.get().expect("failed to obtain database connection"))
+        .first::<Account>(&db_connection)
         .map_err(|_| "User does not have an account")?;
 
-    let _ = execute_transaction(&master_account.uid, &user_account.uid, &request.amount, &db_connection)?;
+    let (_, transaction) = execute_transaction(&master_account.uid, &user_account.uid, &request.amount, &db_connection)?;
 
     user_account = accounts_sql.find(user.account_id)
-        .first::<Account>(&*db_connection.get().expect("failed to obtain database connection"))
+        .first::<Account>(&db_connection)
         .map_err(|_| "User does not have an account after transaction")?;
 
-    let proto_user = protoize_user(user, user_account.balance);
-
-    use protos::user_messages::TopupResponse;
+    let user = protoize_user(user, user_account.balance);
 
     let mut response = TopupResponse::new();
-    response.set_user(proto_user);
-    response.set_successful(true);
+    response.set_user(user);
+    response.set_successful(transaction.is_successful);
     Ok(serialize(response)?)
 }
 
 #[post("/register", data="<input>")]
 fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<protos::user_messages::RegisterRequest>(input)?;
+    let request = deserialize::<RegisterRequest>(input)?;
 
-    let db_connection_pool = &*db_connection;
+    let db_connection_pool = &db_connection;
     let new_account = models::NewAccount {
         balance:    &0
     };
@@ -199,7 +286,7 @@ fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -
 
     let account = diesel::insert_into(accounts::table)
         .values(&new_account)
-        .get_result::<Account>(&*db_connection_pool.get()
+        .get_result::<Account>(&db_connection_pool.get()
                                .expect("failed to obtain database connection"))
         .map_err(|_| "Error inserting new account")?;
 
@@ -217,51 +304,46 @@ fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -
 
     let user = diesel::insert_into(users::table)
         .values(&new_user)
-        .get_result::<User>(&*db_connection_pool.get()
+        .get_result::<User>(&db_connection_pool.get()
                                     .expect("failed to obtain database connection"))
         .map_err(|_| "Error inserting new user")?;
 
-    let proto_user = protoize_user(user, 0);
+    let user = protoize_user(user, 0);
 
-    use protos::user_messages::RegisterResponse;
     let mut response = RegisterResponse::new();
-    response.set_user(proto_user);
+    response.set_user(user);
     response.set_successful(true);
     Ok(serialize(response)?)
 }
 
 #[post("/login", data="<input>")]
-fn login_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    use protos::user_messages::LoginRequest;
+fn login_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<LoginRequest>(input)?;
 
     let username = request.get_username();
     let password = request.get_password();
 
-    let db_connection_pool = &*db_connection;
+    let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::users;
 
     let user = users::table
         .filter(users::username.eq(username))
-        .first::<models::User>(&*db_connection_pool.get()
-                               .expect("failed to obtain database connection"))
+        .first::<models::User>(&db_connection)
         .map_err(|_| "User not found")?;
 
     use schema::accounts::dsl::accounts as accounts_sql;
     use models::Account;
 
     let account = accounts_sql.find(user.account_id)
-        .first::<Account>(&*db_connection_pool.get()
-                          .expect("failed to obtain database connection"))
+        .first::<Account>(&db_connection)
         .map_err(|_| "User has no account")?;
 
-    use protos::user_messages::LoginResponse;
     let mut response = LoginResponse::new();
 
     if user.password == password {
-        let proto_user = protoize_user(user, account.balance);
-        response.set_user(proto_user);
+        let user = protoize_user(user, account.balance);
+        response.set_user(user);
         response.set_successful(true);
     } else {
         response.set_successful(false);

@@ -1,5 +1,5 @@
 use super::schema::users;
-
+use super::chrono::NaiveDateTime;
 #[derive(Queryable)]
 pub struct User {
     pub uid: i32,
@@ -7,7 +7,8 @@ pub struct User {
     pub picture_url: Option<String>,
     pub account_id: i32,
     pub username: String,
-    pub password: String
+    pub password: String,
+    pub created_at: NaiveDateTime
 }
 
 #[derive(Insertable)]
@@ -25,7 +26,8 @@ use super::schema::accounts;
 #[derive(Queryable)]
 pub struct Account {
     pub uid: i32,
-    pub balance: i32
+    pub balance: i32,
+    pub created_at: NaiveDateTime
 }
 
 #[derive(Insertable)]
@@ -42,7 +44,9 @@ pub struct Transaction {
     pub uid: i32,
     pub payer_id: i32,
     pub payee_id: i32,
-    pub amount: i32
+    pub amount: i32,
+    pub is_successful: bool,
+    pub created_at: NaiveDateTime
 }
 
 #[derive(Insertable)]
@@ -51,4 +55,21 @@ pub struct NewTransaction<'a> {
     pub payer_id: &'a i32,
     pub payee_id: &'a i32,
     pub amount: &'a i32
+}
+
+use super::schema::contacts;
+
+#[derive(Queryable)]
+pub struct Contact {
+    pub user_id: i32,
+    pub contact_id: i32,
+    pub is_trusted: bool,
+    pub created_at: NaiveDateTime
+}
+
+#[derive(Insertable)]
+#[table_name = "contacts"]
+pub struct NewContact<'a> {
+    pub user_id: &'a i32,
+    pub contact_id: &'a i32
 }

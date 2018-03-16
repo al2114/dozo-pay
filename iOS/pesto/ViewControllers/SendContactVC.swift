@@ -154,10 +154,15 @@ extension SendContactVC: UITableViewDelegate {
     let alert = UIAlertController(title: "Confirm", message: "Send \(amountString) to \(name)?", preferredStyle: .alert)
     let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in }
     let confirmAction = UIAlertAction(title: "Confirm", style: .default) { _ in
-      let confirmationVC = ConfirmationVC()
-      confirmationVC.amount = self.amount
-      confirmationVC.name = name
-      self.present(confirmationVC, animated: true)
+      let intAmount = Int32(self.amount * 100)
+      API.payUser(withId: 2, amount: intAmount) { success in
+        if success {
+          let confirmationVC = ConfirmationVC()
+          confirmationVC.amount = self.amount
+          confirmationVC.name = name
+          self.present(confirmationVC, animated: true)
+        }
+      }
     }
     alert.addAction(cancelAction)
     alert.addAction(confirmAction)

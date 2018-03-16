@@ -137,10 +137,15 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
 
   @objc func send() {
     let amount = Util.currencyStringToAmount(amountField.text!)
-    if let _ = payee {
-      let confirmationVC = ConfirmationVC()
-      confirmationVC.amount = amount
-      self.present(confirmationVC, animated: true)
+    let intAmount = Int32(amount * 100)
+    if let payee = payee {
+      API.payUser(withId: payee.uid, amount: intAmount) { success in
+        if success {
+          let confirmationVC = ConfirmationVC()
+          confirmationVC.amount = amount
+          self.present(confirmationVC, animated: true)
+        }
+      }
     } else {
       let sendVC = SendContactVC()
       sendVC.amount = amount

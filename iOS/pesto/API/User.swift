@@ -18,7 +18,7 @@ typealias LoginResponse = Pesto_UserMessages_LoginResponse
 import Foundation
 
 extension API {
-  static func register(user: User, completion: @escaping (User) -> Void) {
+  static func register(user: User, completion: @escaping (User?) -> Void) {
     var registerRequest = RegisterRequest()
     registerRequest.password = "password"
     registerRequest.phoneNo = user.phoneNo
@@ -26,8 +26,12 @@ extension API {
 
     let route = "register"
     Util.post(toRoute: route, withProtoMessage: registerRequest) {
-      registerResponse in
-      print(registerResponse?.successful)
+      result in
+      if case let .ok(registerResponse)? = result {
+        completion(registerResponse.user)
+      } else {
+        completion(nil)
+      }
     }
 
     completion(user)
@@ -40,10 +44,14 @@ extension API {
 
     let route = "login"
     Util.post(toRoute: route, withProtoMessage: loginRequest) {
-      loginResponse in
-      loginResponse.map { User.updateMe(withUser: $0.user) }
-      print(loginResponse?.successful)
-      completion(loginResponse?.successful ?? false)
+      result in
+      if case let .ok(loginResponse)? = result {
+        User.updateMe(withUser: loginResponse.user)
+        print(loginResponse.successful)
+        completion(loginResponse.successful)
+      } else {
+        completion(false)
+      }
     }
   }
 

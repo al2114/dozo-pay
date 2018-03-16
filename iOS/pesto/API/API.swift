@@ -6,14 +6,28 @@
 //  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
 //
 
-typealias Id = String
+typealias Id = Int32
+typealias TransactionRequest = Pesto_UserMessages_TransactionRequest
+typealias TransactionResponse = Pesto_UserMessages_TransactionResponse
 
 struct API {
-  static func pay(userId: Id, amount: Int32, completion: @escaping () -> Void) {
+  static func payUser(withId payeeId: Id, amount: Int32, completion: @escaping (Bool) -> Void) {
     User.getMe { me in
-      var user = me
-      user.balance += amount
-      return user
+      var transactionRequest = TransactionRequest()
+      transactionRequest.amount = amount
+      transactionRequest.payerID = me.uid
+      transactionRequest.payeeID = payeeId
+
+      let route = "pay"
+      Util.post(toRoute: route, withProtoMessage: transactionRequest) {
+        result in
+        if case let .ok(transactionResponse)? = result {
+          completion(transactionResponse.successful)
+        } else {
+          completion(false)
+        }
+      }
+      return nil
     }
   }
 

@@ -21,16 +21,6 @@ class LoginVC: UIViewController {
 
     view.backgroundColor = .primaryBackground
 
-    let viewBottomAnchor: NSLayoutYAxisAnchor
-    let viewTopAnchor: NSLayoutYAxisAnchor
-    if #available(iOS 11.0, *) {
-      viewBottomAnchor = view.safeAreaLayoutGuide.bottomAnchor
-      viewTopAnchor = view.safeAreaLayoutGuide.topAnchor
-    } else {
-      viewBottomAnchor = bottomLayoutGuide.bottomAnchor
-      viewTopAnchor = topLayoutGuide.topAnchor
-    }
-
     registerButton = UIButton(type: .system)
     registerButton.translatesAutoresizingMaskIntoConstraints = false
     registerButton.titleLabel?.font = UIFont.regular.withSize(18)
@@ -40,7 +30,7 @@ class LoginVC: UIViewController {
     view.addSubview(registerButton)
     NSLayoutConstraint.activate([
       registerButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      registerButton.topAnchor.constraint(equalTo: viewTopAnchor, constant: 30)
+      registerButton.topAnchor.constraint(equalTo: topAnchor, constant: 30)
       ])
 
     idField = NiceTextField(fontSize: 24, focusColor: .washed)

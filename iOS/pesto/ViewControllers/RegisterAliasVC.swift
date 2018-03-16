@@ -21,16 +21,6 @@ class RegisterAliasVC: UIViewController {
 
     view.backgroundColor = .primaryBackground
 
-    let viewBottomAnchor: NSLayoutYAxisAnchor
-    let viewTopAnchor: NSLayoutYAxisAnchor
-    if #available(iOS 11.0, *) {
-      viewBottomAnchor = view.safeAreaLayoutGuide.bottomAnchor
-      viewTopAnchor = view.safeAreaLayoutGuide.topAnchor
-    } else {
-      viewBottomAnchor = bottomLayoutGuide.bottomAnchor
-      viewTopAnchor = topLayoutGuide.topAnchor
-    }
-
     aliasField = NiceTextField(fontSize: 24, focusColor: .washed)
     aliasField.setPlaceholder("alias")
     aliasField.textField.keyboardType = .asciiCapable
@@ -70,7 +60,7 @@ class RegisterAliasVC: UIViewController {
   @objc func completeRegistration() {
     var newUser = User()
     newUser.phoneNo = phoneNumber
-    let alias = aliasField.textField.text ?? ""
+    let _ = aliasField.textField.text ?? ""
 //    newUser.encryptedPassword = encryptedPassword
     API.register(user: newUser) { user in
     }

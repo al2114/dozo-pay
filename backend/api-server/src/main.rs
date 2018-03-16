@@ -317,28 +317,26 @@ fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -
 }
 
 #[post("/login", data="<input>")]
-fn login_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+fn login_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<LoginRequest>(input)?;
 
     let username = request.get_username();
     let password = request.get_password();
 
-    let db_connection_pool = &db_connection;
+    let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::users;
 
     let user = users::table
         .filter(users::username.eq(username))
-        .first::<models::User>(&db_connection_pool.get()
-                               .expect("failed to obtain database connection"))
+        .first::<models::User>(&db_connection)
         .map_err(|_| "User not found")?;
 
     use schema::accounts::dsl::accounts as accounts_sql;
     use models::Account;
 
     let account = accounts_sql.find(user.account_id)
-        .first::<Account>(&db_connection_pool.get()
-                          .expect("failed to obtain database connection"))
+        .first::<Account>(&db_connection)
         .map_err(|_| "User has no account")?;
 
     let mut response = LoginResponse::new();

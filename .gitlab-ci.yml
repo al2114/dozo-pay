@@ -1,11 +1,11 @@
-build_release:
-  image: registry.gitlab.com/dozo/project/rust-server:latest
-  stage: build
-  script:
-    - cd backend/api-server && cargo build
-  artifacts:
-    paths:
-      - backend/api-server/target
+#build_release:
+  #image: registry.gitlab.com/dozo/project/rust-server:latest
+  #stage: build
+  #script:
+    #- cd backend/api-server && cargo build
+  #artifacts:
+    #paths:
+      #- backend/api-server/target
 
 test:
   image: docker:latest
@@ -19,8 +19,8 @@ test:
     - cd ./.docker-compose
     - python -m compose -f ../backend/docker-compose.test.yml up -d db
     - python -m compose -f ../backend/docker-compose.test.yml run api-server bash -c "DATABASE_URL=$DATABASE_URL ./test_server.sh"
-  dependencies:
-  - build_release
+  #dependencies:
+  #- build_release
 
 deploy:
   stage: deploy

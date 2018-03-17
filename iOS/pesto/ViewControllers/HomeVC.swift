@@ -253,18 +253,16 @@ class HomeVC: UIViewController {
   }
 
   @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
-    print(recognizer.state.rawValue)
-
     switch recognizer.state {
     case .changed:
       let translation  = recognizer.translation(in: self.view).y
-      print(translation)
       let scale: CGFloat = 0.5
-      backgroundViewHeightConstraint.constant = scale * max(translation, 0)
-    case .cancelled: fallthrough
+      backgroundViewHeightConstraint.constant = scale * translation
     case .ended:
-      print("ended")
-      backgroundViewHeightConstraint.constant = 0
+      UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
+        self.backgroundViewHeightConstraint.constant = 0
+        self.view.layoutIfNeeded()
+      }, completion: nil)
     default: break
     }
   }

@@ -16,6 +16,7 @@ extension User {
   }
 
   static func updateMeFromServer(handler: @escaping (User) -> User?) {
+    print("update from server")
     if let oldMe = me {
       API.getMe(withOldMe: oldMe) {
         user in

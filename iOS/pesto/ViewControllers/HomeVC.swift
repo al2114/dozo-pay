@@ -207,7 +207,7 @@ class HomeVC: UIViewController {
   }
 
   func makeUpdates(withUser user: User) {
-    self.balanceLabel.text = Util.amountToCurrencyString(Double(user.balance) / 100)
+    self.balanceLabel.setTitle(Util.amountToCurrencyString(Double(user.balance) / 100), for: .normal)
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -217,7 +217,6 @@ class HomeVC: UIViewController {
   }
 
   @objc func topup() {
-    print("Touch balancet")
     let topupVC = TopupVC()
     self.show(topupVC, sender: self)
   }

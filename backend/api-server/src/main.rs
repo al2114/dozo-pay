@@ -172,10 +172,10 @@ fn add_contact_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Resu
     Ok(serialize(response)?)
 }
 
-fn protoize_contact(contact: models::Contact) -> protos::models::Contact {
+fn protoize_contact(contact: models::Contact, username: String) -> protos::models::Contact {
     let mut proto_contact = protos::models::Contact::new();
     proto_contact.set_uid(contact.contact_id);
-    proto_contact.set_username("".to_string()); // TODO: Inner join the users tabel at get contacts
+    proto_contact.set_username(username);
     proto_contact.set_trusted(true);
     proto_contact
 }
@@ -197,7 +197,18 @@ fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result
     use protobuf::repeated::RepeatedField;
     let contacts: RepeatedField<_> = contacts
         .into_iter()
-        .map(protoize_contact)
+        .map(|contact| {
+            use schema::users::dsl::users as users_sql;
+            use models::User;
+
+            let user = users_sql
+                .find(contact.contact_id)
+                .first::<User>(&db_connection)
+                .unwrap(); //TODO
+
+            let contact = protoize_contact(contact, user.username);
+            contact
+        })
         .collect();
 
     let mut response = GetContactsResponse::new();

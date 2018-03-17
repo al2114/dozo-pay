@@ -18,8 +18,6 @@ class HomeVC: UIViewController {
 
   var backgroundViewHeightConstraint: NSLayoutConstraint!
 
-  var backgroundViewHeightConstraint: NSLayoutConstraint!
-
   override func viewDidLoad() {
     super.viewDidLoad()
 

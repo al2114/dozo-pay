@@ -12,16 +12,16 @@ extension User {
   static func getMe(handler: @escaping (User) -> User?) {
     if let me = me {
       updateMe(withUser: me, handler: handler)
-    } else {
-      updateMeFromServer(handler: handler)
     }
   }
 
   static func updateMeFromServer(handler: @escaping (User) -> User?) {
-    API.getMe {
-      user in
-      me = user
-      updateMe(withUser: user, handler: handler)
+    if let oldMe = me {
+      API.getMe(withOldMe: oldMe) {
+        user in
+        self.me = user
+        updateMe(withUser: user, handler: handler)
+      }
     }
   }
 

@@ -13,10 +13,10 @@ class HomeVC: UIViewController {
   var sendButton: UIButton!
   var settingsButton: UIButton!
   var cameraButton: UIButton!
-  var qrCodeImageView: UIImageView!
+  var balanceLabel: UILabel!
 
   var backgroundViewHeightConstraint: NSLayoutConstraint!
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -38,7 +38,7 @@ class HomeVC: UIViewController {
     backgroundView.backgroundColor = .primaryBackground
     backgroundView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(backgroundView)
-    
+
     backgroundViewHeightConstraint = backgroundView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4)
 
     NSLayoutConstraint.activate([
@@ -85,7 +85,7 @@ class HomeVC: UIViewController {
     imageContainer.layer.borderColor = UIColor.subdued.cgColor
     imageContainer.layer.cornerRadius = 10
 
-    qrCodeImageView = UIImageView()
+    let qrCodeImageView = UIImageView()
     qrCodeImageView.translatesAutoresizingMaskIntoConstraints = false
     imageContainer.addSubview(qrCodeImageView)
     NSLayoutConstraint.activate([
@@ -95,9 +95,12 @@ class HomeVC: UIViewController {
       qrCodeImageView.centerYAnchor.constraint(equalTo: imageContainer.centerYAnchor)
       ])
     let qrCodeWidth = view.bounds.width * 0.38
-    let qrImage = Util.qrCode(from: "pesto:andrew", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
-    qrCodeImageView.contentMode = .scaleAspectFit
-    qrCodeImageView.image = qrImage
+    User.getMe { me in
+      let qrImage = Util.qrCode(from: "pesto:\(me.username)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
+      qrCodeImageView.contentMode = .scaleAspectFit
+      qrCodeImageView.image = qrImage
+      return nil
+    }
 
     balanceView = UIView()
     balanceView.translatesAutoresizingMaskIntoConstraints = false
@@ -119,7 +122,7 @@ class HomeVC: UIViewController {
       balanceTitle.bottomAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: -15)
       ])
 
-    let balanceLabel = UIButton()
+    balanceLabel = UIButton()
     balanceLabel.tintColor = .primaryTitle
     balanceLabel.titleLabel?.font = UIFont.regular.withSize(36)
     balanceLabel.setTitle("£9.41", for: .normal)
@@ -195,8 +198,16 @@ class HomeVC: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    User.getMe{ me in
+      self.makeUpdates(withUser: me)
+      return nil
+    }
 //    navigationController?.isNavigationBarHidden = true
     navigationController?.setNavigationBarHidden(true, animated: true)
+  }
+
+  func makeUpdates(withUser: user) {
+    self.balanceLabel.text = Util.amountToCurrencyString(Double(me.balance) / 100)
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -210,14 +221,20 @@ class HomeVC: UIViewController {
     let topupVC = TopupVC()
     self.show(topupVC, sender: self)
   }
-  
+
   @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
     switch recognizer.state {
     case .changed:
       let translation  = recognizer.translation(in: self.view).y
       let scale: CGFloat = 0.5
-      backgroundViewHeightConstraint.constant = scale *
-      translation
+      let constant = scale * translation
+      backgroundViewHeightConstraint.constant = constant
+      if constant > 0.1 * view.bounds.height {
+        User.updateMeFromServer { me in
+          self.makeUpdates(withUser: me)
+          return nil
+        }
+      }
     case .ended:
       UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
         self.backgroundViewHeightConstraint.constant = 0
@@ -226,6 +243,7 @@ class HomeVC: UIViewController {
     default: break
     }
   }
+
   @objc func menu() {
     // TODO: Change to proper menu action once implemented
     let loginVC = LoginVC()

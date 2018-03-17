@@ -55,11 +55,19 @@ extension API {
     }
   }
 
-  static func getMe(completion: @escaping (User) -> Void) {
-    var testUser = User()
-    testUser.username = "tester"
-    testUser.phoneNo = "9999"
-    completion(testUser)
+  static func getMe(withOldMe oldMe: User, completion: @escaping (User) -> Void) {
+    let route = "users/\(oldMe.uid)"
+    Util.get(toRoute: route) { (result: Result<User>?) in
+      if case let .ok(me)? = result {
+        completion(me)
+      } else {
+        completion(oldMe)
+      }
+    }
+//    var testUser = User()
+//    testUser.username = "tester"
+//    testUser.phoneNo = "9999"
+//    completion(testUser)
   }
 
   static func verify(user: User, completion: @escaping (Bool) -> Void) {

@@ -61,6 +61,41 @@ extension Util {
 }
 
 extension Util {
+  static func get<T: SwiftProtobuf.Message>(toRoute route: String, completion: @escaping (Result<T>?) -> Void) {
+    let url = URL(string: "\(server)/\(route)")!
+    let request = URLRequest(url: url)
+    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+      guard let data = data, error == nil else {
+        // check for fundamental networking error
+        print("error=\(String(describing: error))")
+        completion(nil)
+        return
+      }
+
+      guard let httpStatus = response as? HTTPURLResponse else {
+        completion(nil)
+        return
+      }
+
+      guard httpStatus.statusCode == 200 else { // check for http errors
+        print("response = \(String(describing: response))")
+        print("statusCode should be 200, but is \(httpStatus.statusCode)")
+        completion(nil)
+        return
+      }
+
+      if let response = try? T(serializedData: data) {
+        completion(.ok(response: response))
+      } else if let string = String.init(data: data, encoding: .utf8) {
+        print("ERROR 🤯: \(string)")
+        completion(.error(description: string))
+      } else {
+        completion(nil)
+      }
+    }
+    task.resume()
+  }
+
   static func post<T: RequestResponsePair>(toRoute route: String, withProtoMessage message: T, completion: ((Result<T.ResponseType>?) -> Void)? = nil) {
     let url = URL(string: "\(server)/\(route)")!
     var request = URLRequest(url: url)

@@ -16,12 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     UIApplication.shared.statusBarStyle = .lightContent
     window = UIWindow(frame: UIScreen.main.bounds)
-    let homeVC = HomeVC()
+//    let homeVC = HomeVC()
     let loginVC = LoginVC()
-    let verifyVC = VerifyNumberVC()
-    let sendVC = SendAmountVC()
-    let topupVC = TopupVC()
-    Util.switchTo(viewController: homeVC, window: window)
+    Util.switchTo(viewController: loginVC, window: window)
     window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()
     return true

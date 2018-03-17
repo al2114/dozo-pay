@@ -120,8 +120,10 @@ class LoginVC: UIViewController {
     API.login(withUsername: username, password: encryptedPassword) {
       success in
       if success {
-        let homeVC = HomeVC()
-        Util.switchTo(viewController: homeVC, presentingController: self)
+        DispatchQueue.main.async {
+          let homeVC = HomeVC()
+          Util.switchTo(viewController: homeVC, presentingController: self)
+        }
       }
     }
   }

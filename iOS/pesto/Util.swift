@@ -9,7 +9,8 @@
 import UIKit
 import SwiftProtobuf
 
-let server = "http://localhost:3001"
+//let server = "http://localhost:3001"
+let server = "http://54.84.120.127"
 
 struct Util {
   static var filter = CIFilter(name: "CIQRCodeGenerator")!
@@ -61,7 +62,7 @@ extension Util {
 
 extension Util {
   static func post<T: RequestResponsePair>(toRoute route: String, withProtoMessage message: T, completion: ((Result<T.ResponseType>?) -> Void)? = nil) {
-    let url = URL(string: "\(server)/register")!
+    let url = URL(string: "\(server)/\(route)")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     request.httpBody = try! message.serializedData()
@@ -88,6 +89,7 @@ extension Util {
       if let response = try? T.ResponseType(serializedData: data) {
         completion?(.ok(response: response))
       } else if let string = String.init(data: data, encoding: .utf8) {
+        print("ERROR 🤯: \(string)")
         completion?(.error(description: string))
       } else {
         completion?(nil)

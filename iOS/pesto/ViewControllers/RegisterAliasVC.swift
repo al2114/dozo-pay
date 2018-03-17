@@ -60,9 +60,8 @@ class RegisterAliasVC: UIViewController {
   @objc func completeRegistration() {
     var newUser = User()
     newUser.phoneNo = phoneNumber
-    let _ = aliasField.textField.text ?? ""
-//    newUser.encryptedPassword = encryptedPassword
-    API.register(user: newUser) { user in
+    newUser.username = aliasField.textField.text ?? ""
+    API.register(user: newUser, withPassword: encryptedPassword) { user in
     }
 //    API.completeRegistration(ofUser: newUser, withAlias: alias) {
 //      user in

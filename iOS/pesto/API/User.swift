@@ -18,9 +18,9 @@ typealias LoginResponse = Pesto_UserMessages_LoginResponse
 import Foundation
 
 extension API {
-  static func register(user: User, completion: @escaping (User?) -> Void) {
+  static func register(user: User, withPassword password: String, completion: @escaping (User?) -> Void) {
     var registerRequest = RegisterRequest()
-    registerRequest.password = "password"
+    registerRequest.password = password
     registerRequest.phoneNo = user.phoneNo
     registerRequest.username = user.username
 

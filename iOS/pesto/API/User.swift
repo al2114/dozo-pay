@@ -70,6 +70,17 @@ extension API {
 //    completion(testUser)
   }
 
+  static func getMe(withId id: Int32, completion: @escaping (User?) -> Void) {
+    let route = "user/\(id)"
+    Util.get(toRoute: route) { (result: Result<User>?) in
+      if case let .ok(me)? = result {
+        completion(me)
+      } else {
+        completion(nil)
+      }
+    }
+  }
+
   static func verify(user: User, completion: @escaping (Bool) -> Void) {
     completion(true)
   }

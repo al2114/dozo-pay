@@ -14,6 +14,7 @@ class HomeVC: UIViewController {
   var settingsButton: UIButton!
   var cameraButton: UIButton!
   var balanceLabel: UIButton!
+  var shouldReload: Bool = false
 
   var backgroundViewHeightConstraint: NSLayoutConstraint!
 
@@ -207,7 +208,9 @@ class HomeVC: UIViewController {
   }
 
   func makeUpdates(withUser user: User) {
-    self.balanceLabel.setTitle(Util.amountToCurrencyString(Double(user.balance) / 100), for: .normal)
+    DispatchQueue.main.async {
+      self.balanceLabel.setTitle(Util.amountToCurrencyString(Double(user.balance) / 100), for: .normal)
+    }
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -229,12 +232,16 @@ class HomeVC: UIViewController {
       let constant = scale * translation
       backgroundViewHeightConstraint.constant = constant
       if constant > 0.1 * view.bounds.height {
+        shouldReload = true
+      }
+    case .ended:
+      if shouldReload {
+        shouldReload = false
         User.updateMeFromServer { me in
           self.makeUpdates(withUser: me)
           return nil
         }
       }
-    case .ended:
       UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
         self.backgroundViewHeightConstraint.constant = 0
         self.view.layoutIfNeeded()

@@ -84,7 +84,7 @@ class TopupVC: UIViewController, UITextFieldDelegate {
     topupButton.isEnabled = false
     topupButton.setImage(#imageLiteral(resourceName: "circleRightArrow").withRenderingMode(.alwaysTemplate), for: .normal)
     topupButton.tintColor = .white
-    topupButton.addTarget(self, action: #selector(send), for: .touchUpInside)
+    topupButton.addTarget(self, action: #selector(topup), for: .touchUpInside)
     view.addSubview(topupButton)
     NSLayoutConstraint.activate([
       topupButton.leftAnchor.constraint(equalTo: amountField.rightAnchor),
@@ -92,8 +92,6 @@ class TopupVC: UIViewController, UITextFieldDelegate {
       topupButton.widthAnchor.constraint(equalToConstant: 36),
       topupButton.heightAnchor.constraint(equalTo: topupButton.widthAnchor),
       ])
-    
-    
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -115,21 +113,14 @@ class TopupVC: UIViewController, UITextFieldDelegate {
     self.amountLabel.transform = .identity //Scale label area
   }
   
-  @objc func send() {
+  @objc func topup() {
     let amount = Util.currencyStringToAmount(amountField.text!)
-//    let intAmount = Int32(amount * 100)
-//    if let payee = payee {
-//      API.payUser(withId: payee.uid, amount: intAmount) { success in
-//        if success {
-          let confirmationVC = ConfirmationVC()
-          confirmationVC.amount = amount
-          self.present(confirmationVC, animated: true)
-//        }
-//      }
-//    } else {
-    
-//    self.show(sendVC, sender: self)
-//    }
+    let intAmount = Int32(amount * 100)
+    API.topup(amount: intAmount) { success in
+      if success {
+        self.navigationController?.popViewController(animated: true)
+      }
+    }
   }
   
   @objc func dismissKeyboard (_ sender: UITapGestureRecognizer) {

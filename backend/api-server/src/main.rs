@@ -203,6 +203,28 @@ fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result
     Ok(serialize(response)?)
 }
 
+#[get("/user/<user_id>")]
+fn get_user_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec<u8>, String> {
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    use schema::users::dsl::users as users_sql;
+    use models::User;
+    use schema::accounts::dsl::accounts as accounts_sql;
+    use models::Account;
+
+    let user = users_sql
+        .find(user_id)
+        .first::<User>(&db_connection)
+        .map_err(|_| "User not found")?;
+    let account = accounts_sql
+        .find(user.account_id)
+        .first::<Account>(&db_connection)
+        .map_err(|_| "Account not found")?;
+
+    let user = protoize_user(user, account.balance);
+    Ok(serialize(user)?)
+}
+
 #[post("/pay", data="<input>")]
 fn transaction_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<TransactionRequest>(input)?;
@@ -366,7 +388,10 @@ fn main() {
                register_route,
                login_route,
                topup_route,
-               transaction_route
+               transaction_route,
+               add_contact_route,
+               get_contacts_route,
+               get_user_route,
         ])
         .launch();
 }

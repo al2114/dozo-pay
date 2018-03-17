@@ -33,8 +33,6 @@ class HomeVC: UIViewController {
       viewTopAnchor = topLayoutGuide.topAnchor
     }
 
-    UIApplication.shared.statusBarStyle = .lightContent
-
     let backgroundView = UIView()
     backgroundView.backgroundColor = .primaryBackground
     backgroundView.translatesAutoresizingMaskIntoConstraints = false
@@ -199,6 +197,8 @@ class HomeVC: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    UIApplication.shared.keyWindow?.backgroundColor = .primaryBackground
+    UIApplication.shared.statusBarStyle = .lightContent
     User.getMe{ me in
       self.makeUpdates(withUser: me)
       return nil

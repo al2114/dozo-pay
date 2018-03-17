@@ -57,16 +57,30 @@ class ContactCell: UITableViewCell {
 
 class SendContactVC: UIViewController {
   var searchController: UISearchController!
-
+  
   var amount: Double!
   let contacts: [[String]] = [["Andrew Li", "Fu Yong Quah"], ["Bob Dylan"]]
 
   var tableView: UITableView!
 
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    UIApplication.shared.keyWindow?.backgroundColor = .white
+
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    UIView.animate(withDuration: 0.2, animations: {
+      UIApplication.shared.statusBarStyle = .default
+      self.navigationController?.navigationBar.backgroundColor = .white
+      self.navigationController?.navigationBar.barTintColor = .white
+      self.navigationController?.navigationBar.tintColor = .pestoGreen
+    })
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .white
-    UIApplication.shared.statusBarStyle = .default
     
     self.edgesForExtendedLayout = []
 

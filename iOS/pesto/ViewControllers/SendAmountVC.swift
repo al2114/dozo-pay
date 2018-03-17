@@ -120,6 +120,14 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     super.viewWillDisappear(animated)
     self.view.endEditing(true)
   }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    navigationController?.navigationBar.backgroundColor = .primaryBackground
+    navigationController?.navigationBar.barTintColor = .primaryBackground
+    navigationController?.navigationBar.tintColor = .primaryTitle
+    UIApplication.shared.keyWindow?.backgroundColor = .primaryBackground
+    UIApplication.shared.statusBarStyle = .lightContent
+  }
 
   deinit {
     NotificationCenter.default.removeObserver(self)

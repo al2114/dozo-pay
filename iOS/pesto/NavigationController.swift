@@ -13,7 +13,7 @@ extension UINavigationController {
     navigationBar.setBackgroundImage(UIImage(), for: .default)
     navigationBar.backgroundColor = .primaryBackground
     navigationBar.shadowImage = UIImage()
-    navigationItem.backBarButtonItem = UIBarButtonItem(title: "<", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
+    navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
 //    navigationBar.backIndicatorImage = UIImage()
     //    navVC.navigationBar.isTranslucent = true
     

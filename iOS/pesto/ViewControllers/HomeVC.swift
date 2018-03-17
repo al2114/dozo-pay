@@ -13,7 +13,7 @@ class HomeVC: UIViewController {
   var sendButton: UIButton!
   var settingsButton: UIButton!
   var cameraButton: UIButton!
-  var balanceLabel: UILabel!
+  var balanceLabel: UIButton!
 
   var backgroundViewHeightConstraint: NSLayoutConstraint!
 
@@ -206,8 +206,8 @@ class HomeVC: UIViewController {
     navigationController?.setNavigationBarHidden(true, animated: true)
   }
 
-  func makeUpdates(withUser: user) {
-    self.balanceLabel.text = Util.amountToCurrencyString(Double(me.balance) / 100)
+  func makeUpdates(withUser user: User) {
+    self.balanceLabel.text = Util.amountToCurrencyString(Double(user.balance) / 100)
   }
 
   override func viewWillDisappear(_ animated: Bool) {

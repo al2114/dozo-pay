@@ -49,7 +49,7 @@ class HomeVC: UIViewController {
       backgroundViewHeightConstraint
       ])
 
-    let infoView = UIView()//InclusiveView()
+    let infoView = InclusiveView()
     infoView.backgroundColor = .secondaryBackground
     infoView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(infoView)

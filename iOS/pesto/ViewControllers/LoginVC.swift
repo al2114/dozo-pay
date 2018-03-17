@@ -85,17 +85,6 @@ class LoginVC: UIViewController {
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
   }
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    navigationController?.isNavigationBarHidden = true
-  }
-
-  override func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(true)
-    navigationController?.isNavigationBarHidden = false
-    self.view.endEditing(true)
-  }
-
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
@@ -108,9 +97,24 @@ class LoginVC: UIViewController {
     self.view.frame.origin.y = 0 // Move view to original position
   }
 
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    self.view.endEditing(true)
+  }
+
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     super.touchesBegan(touches, with: event)
     view.endEditing(true)
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    navigationController?.isNavigationBarHidden = true
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(true)
+    navigationController?.isNavigationBarHidden = false
   }
 
   @objc func login() {

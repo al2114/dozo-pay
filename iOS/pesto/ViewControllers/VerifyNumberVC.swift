@@ -29,9 +29,6 @@ class VerifyNumberVC: UIViewController {
     
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-    self.view.addGestureRecognizer(tapGesture)
-    
     self.edgesForExtendedLayout = []
 
     view.backgroundColor = .primaryBackground
@@ -110,8 +107,7 @@ class VerifyNumberVC: UIViewController {
     }
     
   }
-  
-  
+
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     self.view.endEditing(true)
@@ -130,11 +126,5 @@ class VerifyNumberVC: UIViewController {
     self.view.frame.origin.y = 0 // Move view to original position
     self.verifyLabel.transform = .identity //Scale label area
   }
-  
-  @objc func dismissKeyboard (_ sender: UITapGestureRecognizer) {
-    self.view.endEditing(true)
-  }
-
-  
 }
 

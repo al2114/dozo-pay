@@ -24,6 +24,7 @@ struct API {
       Util.post(toRoute: route, withProtoMessage: transactionRequest) {
         result in
         if case let .ok(transactionResponse)? = result {
+          User.updateMe(withUser: transactionResponse.user)
           completion(transactionResponse.successful)
         } else {
           completion(false)

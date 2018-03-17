@@ -65,6 +65,7 @@ class SendContactVC: UIViewController {
 
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
+    UIApplication.shared.statusBarStyle = .default
     UIApplication.shared.keyWindow?.backgroundColor = .white
 
   }
@@ -72,7 +73,6 @@ class SendContactVC: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     UIView.animate(withDuration: 0.2, animations: {
-      UIApplication.shared.statusBarStyle = .default
       self.navigationController?.navigationBar.backgroundColor = .white
       self.navigationController?.navigationBar.barTintColor = .white
       self.navigationController?.navigationBar.tintColor = .pestoGreen

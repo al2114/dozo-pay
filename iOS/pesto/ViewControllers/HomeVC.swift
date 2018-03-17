@@ -15,6 +15,8 @@ class HomeVC: UIViewController {
   var cameraButton: UIButton!
   var qrCodeImageView: UIImageView!
 
+  var backgroundViewHeightConstraint: NSLayoutConstraint!
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -36,11 +38,14 @@ class HomeVC: UIViewController {
     backgroundView.backgroundColor = .primaryBackground
     backgroundView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(backgroundView)
+    
+    backgroundViewHeightConstraint = backgroundView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4)
+
     NSLayoutConstraint.activate([
       backgroundView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       backgroundView.widthAnchor.constraint(equalTo: view.widthAnchor),
       backgroundView.topAnchor.constraint(equalTo: viewTopAnchor),
-      backgroundView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4)
+      backgroundViewHeightConstraint
       ])
 
     let infoView = UIView()
@@ -57,6 +62,8 @@ class HomeVC: UIViewController {
     border.translatesAutoresizingMaskIntoConstraints = false
     border.backgroundColor = .subdued
     infoView.addSubview(border)
+    let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(menuDrag(recognizer:)))
+    infoView.addGestureRecognizer(gestureRecognizer)
     NSLayoutConstraint.activate([
       border.leftAnchor.constraint(equalTo: infoView.leftAnchor),
       border.rightAnchor.constraint(equalTo: infoView.rightAnchor),
@@ -194,6 +201,22 @@ class HomeVC: UIViewController {
 //    navigationController?.isNavigationBarHidden = false
   }
 
+  @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
+    print(recognizer.state.rawValue)
+    
+    switch recognizer.state {
+    case .changed:
+      let translation  = recognizer.translation(in: self.view).y
+      print(translation)
+      let scale: CGFloat = 0.5
+      backgroundViewHeightConstraint.constant = scale * max(translation, 0)
+    case .cancelled: fallthrough
+    case .ended:
+      print("ended")
+      backgroundViewHeightConstraint.constant = 0
+    default: break
+    }
+  }
   @objc func menu() {
     // TODO: Change to proper menu action once implemented
     let loginVC = LoginVC()

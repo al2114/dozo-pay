@@ -11,10 +11,10 @@ import UIKit
 extension UINavigationController {
   func configure() {
     navigationBar.setBackgroundImage(UIImage(), for: .default)
-//    navigationBar.shadowImage = UIImage()
-//    navigationItem.backBarButtonItem = UIBarButtonItem(title: "<", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
-//    navigationBar.backIndicatorImage = UIImage()
-    //    navVC.navigationBar.isTranslucent = true
+    navigationBar.backgroundColor = .primaryBackground
+    navigationBar.shadowImage = UIImage()
+    navigationItem.backBarButtonItem = UIBarButtonItem(title: "<", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
+    navigationBar.barTintColor = .primaryBackground
     navigationBar.tintColor = .primaryTitle
   }
 }

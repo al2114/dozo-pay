@@ -1,32 +1,24 @@
 //
-//  SendAmountVC.swift
-//  pesto
+//  File.swift
+//  Pesto Pay
 //
-//  Created by Saurav Mitra on 06/02/2018.
-//  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
+//  Created by Andrew Li on 17/03/2018.
+//  Copyright © 2018 Pesto Techonologies Ltd. All rights reserved.
 //
+
 
 import UIKit
 
-class AmountField: TextField {
-  override func closestPosition(to point: CGPoint) -> UITextPosition? {
-    let beginning = self.beginningOfDocument
-    let end = self.position(from: beginning, offset: (self.text?.count)!)
-    return end
-  }
-}
-
-class SendAmountVC: UIViewController, UITextFieldDelegate {
+class TopupVC: UIViewController, UITextFieldDelegate {
   var amountLabel: UILabel!
   var amountField: AmountField!
   var separatorView: UIView!
-  var sendButton: UIButton!
-  var shareButton: UIButton!
+  var topupButton: UIButton!
   var payee: User? = nil
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+
     self.edgesForExtendedLayout = []
 
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
@@ -55,7 +47,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     view.addSubview(amountField)
     NSLayoutConstraint.activate([
       amountField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      amountField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+      amountField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
       amountField.centerYAnchor.constraint(equalTo: view.centerYAnchor)
       ])
 
@@ -65,7 +57,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       amountLabel.attributedText = "send to ".colored(with: .primaryTitle) + "@\(payee.username)".colored(with: .highlight)
     } else {
       amountLabel.textColor = .white
-      amountLabel.text = "send amount"
+      amountLabel.text = "topup amount"
     }
     amountLabel.font = UIFont.light.withSize(28)
     amountLabel.textAlignment = .center
@@ -81,52 +73,30 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     separatorView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(separatorView)
     NSLayoutConstraint.activate([
-      separatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      separatorView.centerXAnchor.constraint(equalTo: amountField.centerXAnchor),
       separatorView.topAnchor.constraint(equalTo: amountField.bottomAnchor, constant: 5),
-      separatorView.widthAnchor.constraint(equalTo: amountField.widthAnchor, multiplier: 0.6),
+      separatorView.widthAnchor.constraint(equalTo: amountField.widthAnchor, multiplier: 0.8),
       separatorView.heightAnchor.constraint(equalToConstant: 1)
       ])
 
-    sendButton = UIButton(type: .system)
-    sendButton.translatesAutoresizingMaskIntoConstraints = false
-    sendButton.isEnabled = false
-    sendButton.setImage(#imageLiteral(resourceName: "circleRightArrow").withRenderingMode(.alwaysTemplate), for: .normal)
-    sendButton.tintColor = .white
-    sendButton.addTarget(self, action: #selector(send), for: .touchUpInside)
-    view.addSubview(sendButton)
+    topupButton = UIButton(type: .system)
+    topupButton.translatesAutoresizingMaskIntoConstraints = false
+    topupButton.isEnabled = false
+    topupButton.setImage(#imageLiteral(resourceName: "circleRightArrow").withRenderingMode(.alwaysTemplate), for: .normal)
+    topupButton.tintColor = .white
+    topupButton.addTarget(self, action: #selector(topup), for: .touchUpInside)
+    view.addSubview(topupButton)
     NSLayoutConstraint.activate([
-      sendButton.leftAnchor.constraint(equalTo: view.centerXAnchor, constant: 40),
-      sendButton.topAnchor.constraint(equalTo: amountField.bottomAnchor, constant: 100),
-      sendButton.widthAnchor.constraint(equalToConstant: 36),
-      sendButton.heightAnchor.constraint(equalTo: sendButton.widthAnchor),
+      topupButton.leftAnchor.constraint(equalTo: amountField.rightAnchor),
+      topupButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+      topupButton.widthAnchor.constraint(equalToConstant: 36),
+      topupButton.heightAnchor.constraint(equalTo: topupButton.widthAnchor),
       ])
-
-    shareButton = UIButton(type: .system)
-    shareButton.translatesAutoresizingMaskIntoConstraints = false
-    shareButton.isEnabled = false
-    shareButton.tintColor = .white
-    shareButton.setImage(#imageLiteral(resourceName: "circleShare").withRenderingMode(.alwaysTemplate), for: .normal)
-    view.addSubview(shareButton)
-    NSLayoutConstraint.activate([
-      shareButton.rightAnchor.constraint(equalTo: view.centerXAnchor, constant: -40),
-      shareButton.topAnchor.constraint(equalTo: amountField.bottomAnchor, constant: 100),
-      shareButton.widthAnchor.constraint(equalToConstant: 36),
-      shareButton.heightAnchor.constraint(equalTo: sendButton.widthAnchor),
-      ])
-
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     self.view.endEditing(true)
-  }
-  
-  override func viewWillAppear(_ animated: Bool) {
-    navigationController?.navigationBar.backgroundColor = .primaryBackground
-    navigationController?.navigationBar.barTintColor = .primaryBackground
-    navigationController?.navigationBar.tintColor = .primaryTitle
-    UIApplication.shared.keyWindow?.backgroundColor = .primaryBackground
-    UIApplication.shared.statusBarStyle = .lightContent
   }
 
   deinit {
@@ -143,22 +113,13 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     self.amountLabel.transform = .identity //Scale label area
   }
 
-  @objc func send() {
+  @objc func topup() {
     let amount = Util.currencyStringToAmount(amountField.text!)
     let intAmount = Int32(amount * 100)
-    if let payee = payee {
-      API.payUser(withId: payee.uid, amount: intAmount) { success in
-        if success {
-          let confirmationVC = ConfirmationVC()
-          confirmationVC.amount = amount
-          confirmationVC.username = payee.username
-          self.present(confirmationVC, animated: true)
-        }
+    API.topup(amount: intAmount) { success in
+      if success {
+        self.navigationController?.popViewController(animated: true)
       }
-    } else {
-      let sendVC = SendContactVC()
-      sendVC.amount = amount
-      self.show(sendVC, sender: self)
     }
   }
 
@@ -184,7 +145,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       if(filledLength < 3) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(0, 1))
       }
-      sendButton.isEnabled = amount != 0
+      topupButton.isEnabled = amount != 0
       if(amount == 0) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1,(result.count)-1))
       }

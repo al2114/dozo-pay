@@ -59,6 +59,32 @@ class RegisterPasswordVC: UIViewController {
       nextButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       nextButton.topAnchor.constraint(equalTo: checkPasswordField.bottomAnchor, constant: 100)
       ])
+
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
+  @objc func keyboardWillShow(sender: NSNotification) {
+    self.view.frame.origin.y = -150
+  }
+
+  @objc func keyboardWillHide(sender: NSNotification) {
+    self.view.frame.origin.y = 0 // Move view to original position
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    self.view.endEditing(true)
+  }
+
+  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesBegan(touches, with: event)
+    view.endEditing(true)
   }
 
   @objc func nextVC() {

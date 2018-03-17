@@ -56,13 +56,6 @@ message AddContactResponse {
   bool successful = 1;
 }
 
-message GetContactsRequest {
-  int32 user_id = 1;
-}
-
 message GetContactsResponse {
   repeated models.Contact contacts = 1;
 }
-
-
-

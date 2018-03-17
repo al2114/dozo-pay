@@ -13,7 +13,10 @@ class HomeVC: UIViewController {
   var sendButton: UIButton!
   var settingsButton: UIButton!
   var cameraButton: UIButton!
-  var qrCodeImageView: UIImageView!
+  var balanceLabel: UIButton!
+  var shouldReload: Bool = false
+
+  var backgroundViewHeightConstraint: NSLayoutConstraint!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -30,20 +33,21 @@ class HomeVC: UIViewController {
       viewTopAnchor = topLayoutGuide.topAnchor
     }
 
-    UIApplication.shared.statusBarStyle = .lightContent
-
     let backgroundView = UIView()
     backgroundView.backgroundColor = .primaryBackground
     backgroundView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(backgroundView)
+
+    backgroundViewHeightConstraint = backgroundView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4)
+
     NSLayoutConstraint.activate([
       backgroundView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       backgroundView.widthAnchor.constraint(equalTo: view.widthAnchor),
       backgroundView.topAnchor.constraint(equalTo: viewTopAnchor),
-      backgroundView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4)
+      backgroundViewHeightConstraint
       ])
 
-    let infoView = UIView()
+    let infoView = InclusiveView()
     infoView.backgroundColor = .secondaryBackground
     infoView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(infoView)
@@ -57,6 +61,8 @@ class HomeVC: UIViewController {
     border.translatesAutoresizingMaskIntoConstraints = false
     border.backgroundColor = .subdued
     infoView.addSubview(border)
+    let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(menuDrag(recognizer:)))
+    infoView.addGestureRecognizer(gestureRecognizer)
     NSLayoutConstraint.activate([
       border.leftAnchor.constraint(equalTo: infoView.leftAnchor),
       border.rightAnchor.constraint(equalTo: infoView.rightAnchor),
@@ -78,7 +84,7 @@ class HomeVC: UIViewController {
     imageContainer.layer.borderColor = UIColor.subdued.cgColor
     imageContainer.layer.cornerRadius = 10
 
-    qrCodeImageView = UIImageView()
+    let qrCodeImageView = UIImageView()
     qrCodeImageView.translatesAutoresizingMaskIntoConstraints = false
     imageContainer.addSubview(qrCodeImageView)
     NSLayoutConstraint.activate([
@@ -88,9 +94,12 @@ class HomeVC: UIViewController {
       qrCodeImageView.centerYAnchor.constraint(equalTo: imageContainer.centerYAnchor)
       ])
     let qrCodeWidth = view.bounds.width * 0.38
-    let qrImage = Util.qrCode(from: "Kill Yourself", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
-    qrCodeImageView.contentMode = .scaleAspectFit
-    qrCodeImageView.image = qrImage
+    User.getMe { me in
+      let qrImage = Util.qrCode(from: "pesto:\(me.username):\(me.uid)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
+      qrCodeImageView.contentMode = .scaleAspectFit
+      qrCodeImageView.image = qrImage
+      return nil
+    }
 
     balanceView = UIView()
     balanceView.translatesAutoresizingMaskIntoConstraints = false
@@ -109,18 +118,20 @@ class HomeVC: UIViewController {
     NSLayoutConstraint.activate([
       balanceTitle.centerXAnchor.constraint(equalTo: balanceView.centerXAnchor),
       balanceTitle.topAnchor.constraint(equalTo: balanceView.topAnchor),
-      balanceTitle.bottomAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: 5)
+      balanceTitle.bottomAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: -15)
       ])
 
-    let balanceLabel = UILabel()
-    balanceLabel.textColor = .primaryTitle
-    balanceLabel.font = UIFont.regular.withSize(36)
-    balanceLabel.text = "£9.41"
+    balanceLabel = UIButton()
+    balanceLabel.tintColor = .primaryTitle
+    balanceLabel.titleLabel?.font = UIFont.regular.withSize(36)
+    balanceLabel.setTitle("£9.41", for: .normal)
+    balanceLabel.isUserInteractionEnabled = true
     balanceLabel.translatesAutoresizingMaskIntoConstraints = false
-    balanceView.addSubview(balanceLabel)
+    balanceLabel.addTarget(self, action: #selector(topup), for: .touchUpInside)
+    view.addSubview(balanceLabel)
     NSLayoutConstraint.activate([
       balanceLabel.centerXAnchor.constraint(equalTo: balanceView.centerXAnchor),
-      balanceLabel.topAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: -5),
+      balanceLabel.topAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: -20),
       balanceLabel.bottomAnchor.constraint(equalTo: balanceView.bottomAnchor)
       ])
 
@@ -186,12 +197,55 @@ class HomeVC: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-//    navigationController?.isNavigationBarHidden = true
+    UIApplication.shared.keyWindow?.backgroundColor = .primaryBackground
+    UIApplication.shared.statusBarStyle = .lightContent
+    User.getMe{ me in
+      self.makeUpdates(withUser: me)
+      return nil
+    }
+    navigationController?.setNavigationBarHidden(true, animated: true)
+  }
+
+  func makeUpdates(withUser user: User) {
+    DispatchQueue.main.async {
+      self.balanceLabel.setTitle(Util.amountToCurrencyString(Double(user.balance) / 100), for: .normal)
+    }
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(true)
-//    navigationController?.isNavigationBarHidden = false
+    navigationController?.setNavigationBarHidden(false, animated: true)
+  }
+
+  @objc func topup() {
+    let topupVC = TopupVC()
+    self.show(topupVC, sender: self)
+  }
+
+  @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
+    switch recognizer.state {
+    case .changed:
+      let translation  = recognizer.translation(in: self.view).y
+      let scale: CGFloat = 0.5
+      let constant = scale * translation
+      backgroundViewHeightConstraint.constant = constant
+      if constant > 0.1 * view.bounds.height {
+        shouldReload = true
+      }
+    case .ended:
+      if shouldReload {
+        shouldReload = false
+        User.updateMeFromServer { me in
+          self.makeUpdates(withUser: me)
+          return nil
+        }
+      }
+      UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
+        self.backgroundViewHeightConstraint.constant = 0
+        self.view.layoutIfNeeded()
+      }, completion: nil)
+    default: break
+    }
   }
 
   @objc func menu() {

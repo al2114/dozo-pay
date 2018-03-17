@@ -18,6 +18,20 @@ extension String {
   }
 }
 
+extension NSAttributedString {
+  func withAttribute(_ attribute: NSAttributedStringKey, value: Any) -> NSAttributedString {
+    let string = NSMutableAttributedString(attributedString: self)
+    string.addAttribute(attribute, value: value, range: NSRange(location: 0, length: self.length))
+    return string
+  }
+  
+  func withKerning(_ value: Any) -> NSAttributedString {
+    let string = NSMutableAttributedString(attributedString: self)
+    string.addAttribute(.kern, value: value, range: NSRange(location: 0, length: self.length-1))
+    return string
+  }
+}
+
 func +(left: NSAttributedString, right: NSAttributedString) -> NSAttributedString
 {
   let result = NSMutableAttributedString()

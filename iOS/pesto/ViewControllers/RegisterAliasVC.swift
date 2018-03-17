@@ -46,6 +46,32 @@ class RegisterAliasVC: UIViewController {
       completeButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       completeButton.topAnchor.constraint(equalTo: aliasField.bottomAnchor, constant: 100)
       ])
+
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
+  @objc func keyboardWillShow(sender: NSNotification) {
+    self.view.frame.origin.y = -150
+  }
+
+  @objc func keyboardWillHide(sender: NSNotification) {
+    self.view.frame.origin.y = 0 // Move view to original position
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    self.view.endEditing(true)
+  }
+
+  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesBegan(touches, with: event)
+    view.endEditing(true)
   }
 
   @objc func textFieldDidChange(textField: UITextField) {
@@ -60,9 +86,8 @@ class RegisterAliasVC: UIViewController {
   @objc func completeRegistration() {
     var newUser = User()
     newUser.phoneNo = phoneNumber
-    let _ = aliasField.textField.text ?? ""
-//    newUser.encryptedPassword = encryptedPassword
-    API.register(user: newUser) { user in
+    newUser.username = aliasField.textField.text ?? ""
+    API.register(user: newUser, withPassword: encryptedPassword) { user in
     }
 //    API.completeRegistration(ofUser: newUser, withAlias: alias) {
 //      user in

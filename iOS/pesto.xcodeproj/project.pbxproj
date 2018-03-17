@@ -41,7 +41,10 @@
 		2BCBE3CF2041E87200AA7D30 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BCBE3CE2041E87200AA7D30 /* Security.framework */; };
 		3787C5763444638857844FD6 /* Pods_Pesto_Pay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */; };
 		CB046909204349C100DF284F /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB046908204349C100DF284F /* CircleButton.swift */; };
+		CB450895205D826600129603 /* TopupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB450894205D826600129603 /* TopupVC.swift */; };
 		CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB49D95520472B6E00A33C4A /* Preferences.swift */; };
+		CBD9EE01205CBBFF0080427E /* InclusiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD9EE00205CBBFF0080427E /* InclusiveView.swift */; };
+		CBD9EE03205CF3100080427E /* ProtectedTextfield.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */; };
 		CBE78F46202A8A8F00AE1EA5 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */; };
 		CBE78F6A202A8AAF00AE1EA5 /* dataapp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CBE78F68202A8AAF00AE1EA5 /* dataapp.xcdatamodeld */; };
 		CBE78F6C202A8B0A00AE1EA5 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */; };
@@ -87,7 +90,10 @@
 		39B21EBB56EB792421D7B33A /* Pods-Pesto Pay.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pesto Pay.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay.release.xcconfig"; sourceTree = "<group>"; };
 		B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pesto_Pay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB046908204349C100DF284F /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
+		CB450894205D826600129603 /* TopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopupVC.swift; sourceTree = "<group>"; };
 		CB49D95520472B6E00A33C4A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		CBD9EE00205CBBFF0080427E /* InclusiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InclusiveView.swift; sourceTree = "<group>"; };
+		CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedTextfield.swift; sourceTree = "<group>"; };
 		CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		CBE78F69202A8AAF00AE1EA5 /* dataapp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = dataapp.xcdatamodel; sourceTree = "<group>"; };
 		CBE78F6B202A8B0A00AE1EA5 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
@@ -188,6 +194,8 @@
 				2B0F9B69204E022400C56461 /* CircularImageView.swift */,
 				2B0F9B6B204F101F00C56461 /* TextField.swift */,
 				2B501623205227AF00B35EB0 /* NiceTextField.swift */,
+				CBD9EE00205CBBFF0080427E /* InclusiveView.swift */,
+				CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -196,6 +204,7 @@
 			isa = PBXGroup;
 			children = (
 				2B4777AE202A29110077415A /* HomeVC.swift */,
+				CB450894205D826600129603 /* TopupVC.swift */,
 				2B4777B8202A367C0077415A /* ConfirmationVC.swift */,
 				2B4777B6202A363D0077415A /* SendContactVC.swift */,
 				2B4777B4202A32130077415A /* SendAmountVC.swift */,
@@ -360,6 +369,8 @@
 				2B4CE3BB2034FD5B006408DC /* Claim.swift in Sources */,
 				2B0F9B6A204E022400C56461 /* CircularImageView.swift in Sources */,
 				2B84DFDC204AEFF600691EAA /* QRReader.swift in Sources */,
+				CBD9EE03205CF3100080427E /* ProtectedTextfield.swift in Sources */,
+				CBD9EE01205CBBFF0080427E /* InclusiveView.swift in Sources */,
 				2B4777B9202A367C0077415A /* ConfirmationVC.swift in Sources */,
 				2B0F9B6E204F19D400C56461 /* String.swift in Sources */,
 				2B4CE3BF20350188006408DC /* Me.swift in Sources */,
@@ -372,6 +383,7 @@
 				2B7FD800203CEA180076EB74 /* VerifyNumberVC.swift in Sources */,
 				2B7FD802203CEA230076EB74 /* RegisterAliasVC.swift in Sources */,
 				2B50162620532BEB00B35EB0 /* NavigationController.swift in Sources */,
+				CB450895205D826600129603 /* TopupVC.swift in Sources */,
 				2B501624205227AF00B35EB0 /* NiceTextField.swift in Sources */,
 				CBE78F6C202A8B0A00AE1EA5 /* PersistenceService.swift in Sources */,
 				2B0F9B6C204F101F00C56461 /* TextField.swift in Sources */,

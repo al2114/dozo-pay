@@ -195,7 +195,10 @@ fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result
         .map_err(|_| "Unable to find contacts")?;
 
     use protobuf::repeated::RepeatedField;
-    let contacts: RepeatedField<_> = contacts.into_iter().map(protoize_contact).collect();
+    let contacts: RepeatedField<_> = contacts
+        .into_iter()
+        .map(protoize_contact)
+        .collect();
 
     let mut response = GetContactsResponse::new();
     response.set_contacts(contacts);

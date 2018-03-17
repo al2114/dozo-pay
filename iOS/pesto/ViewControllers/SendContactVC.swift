@@ -59,12 +59,31 @@ class SendContactVC: UIViewController {
   var searchController: UISearchController!
 
   var amount: Double!
-  let contacts: [[String]] = [["Andrew Li", "Fu Yong Quah"], ["Bob Dylan"]]
+  var contacts: [[Contact]] = []
 
   var tableView: UITableView!
 
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    UIApplication.shared.statusBarStyle = .default
+    UIApplication.shared.keyWindow?.backgroundColor = .white
+
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    UIView.animate(withDuration: 0.2, animations: {
+      self.navigationController?.navigationBar.backgroundColor = .white
+      self.navigationController?.navigationBar.barTintColor = .white
+      self.navigationController?.navigationBar.tintColor = .pestoGreen
+    })
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    view.backgroundColor = .white
+    UIApplication.shared.statusBarStyle = .default
 
     self.edgesForExtendedLayout = []
 
@@ -96,6 +115,11 @@ class SendContactVC: UIViewController {
     searchController.searchResultsUpdater = self
     searchController.searchBar.searchBarStyle = .minimal
     tableView.tableHeaderView = searchController.searchBar
+
+    API.getContacts { contacts in
+      self.contacts = [contacts]
+      self.tableView.reloadData()
+    }
   }
 
   override func viewDidLayoutSubviews() {
@@ -108,7 +132,7 @@ class SendContactVC: UIViewController {
 
 extension SendContactVC: UITableViewDataSource {
   func numberOfSections(in tableView: UITableView) -> Int {
-    return 2
+    return contacts.count
   }
 
   func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -124,10 +148,13 @@ extension SendContactVC: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let contact = contacts[indexPath.section][indexPath.row]
+
     let contactCell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
-    contactCell.nameLabel.text = contacts[indexPath.section][indexPath.row]
-    let image = #imageLiteral(resourceName: "logo")
+    contactCell.nameLabel.text = "@\(contact.username)"
+    let image = #imageLiteral(resourceName: "logo").withRenderingMode(.alwaysTemplate)
     contactCell.profileImageView.image = image
+    contactCell.profileImageView.tintColor = .pestoGreen
     contactCell.separatorView.isHidden = indexPath.row == contacts[indexPath.section].count - 1
     return contactCell
   }
@@ -149,17 +176,17 @@ extension SendContactVC: UITableViewDelegate {
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let name = contacts[indexPath.section][indexPath.row]
+    let contact = contacts[indexPath.section][indexPath.row]
     let amountString = Util.amountToCurrencyString(amount)
-    let alert = UIAlertController(title: "Confirm", message: "Send \(amountString) to \(name)?", preferredStyle: .alert)
+    let alert = UIAlertController(title: "Confirm", message: "Send \(amountString) to @\(contact.username)?", preferredStyle: .alert)
     let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in }
     let confirmAction = UIAlertAction(title: "Confirm", style: .default) { _ in
       let intAmount = Int32(self.amount * 100)
-      API.payUser(withId: 2, amount: intAmount) { success in
+      API.payUser(withId: contact.uid, amount: intAmount) { success in
         if success {
           let confirmationVC = ConfirmationVC()
           confirmationVC.amount = self.amount
-          confirmationVC.name = name
+          confirmationVC.username = contact.username
           self.present(confirmationVC, animated: true)
         }
       }

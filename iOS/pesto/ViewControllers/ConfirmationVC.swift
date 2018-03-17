@@ -10,7 +10,7 @@ import UIKit
 
 class ConfirmationVC: UIViewController {
   var amount: Double!
-  var name: String!
+  var username: String!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -54,7 +54,7 @@ class ConfirmationVC: UIViewController {
     let moreInfoLabel = UILabel()
     moreInfoLabel.translatesAutoresizingMaskIntoConstraints = false
     moreInfoLabel.font = UIFont.light.withSize(21)
-    moreInfoLabel.attributedText = "to ".attributed + "@andrew".colored(with: .secondaryTitle)
+    moreInfoLabel.attributedText = "to ".attributed + "@\(username!)".colored(with: .secondaryTitle)
     view.addSubview(moreInfoLabel)
     NSLayoutConstraint.activate([
       moreInfoLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -84,7 +84,11 @@ class ConfirmationVC: UIViewController {
 
     let balanceLabel = UILabel()
     balanceLabel.translatesAutoresizingMaskIntoConstraints = false
-    balanceLabel.text = "Balance Blah"
+    User.getMe { me in
+      let balance = Util.amountToCurrencyString(Double(me.balance) / 100)
+      balanceLabel.text = "Balance: \(balance)"
+      return nil
+    }
     balanceLabel.textColor = .lightGray
     balanceLabel.font = UIFont.regular.withSize(14)
     balanceView.addSubview(balanceLabel)
@@ -117,9 +121,6 @@ class ConfirmationVC: UIViewController {
   }
 
   @objc func home() {
-    presentingViewController?.dismiss(animated: true, completion: {
-      print("asfd")
-      self.presentingViewController?.navigationController?.popToRootViewController(animated: true)
-    })
+    Util.switchTo(viewController: HomeVC())
   }
 }

@@ -207,9 +207,7 @@ class HomeVC: UIViewController {
   }
 
   func makeUpdates(withUser user: User) {
-    DispatchQueue.main.async {
-      self.balanceLabel.setTitle(Util.amountToCurrencyString(Double(user.balance) / 100), for: .normal)
-    }
+    self.balanceLabel.setTitle(Util.amountToCurrencyString(Double(user.balance) / 100), for: .normal)
   }
 
   override func viewWillDisappear(_ animated: Bool) {

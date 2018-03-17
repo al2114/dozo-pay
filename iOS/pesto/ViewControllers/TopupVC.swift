@@ -15,32 +15,32 @@ class TopupVC: UIViewController, UITextFieldDelegate {
   var separatorView: UIView!
   var topupButton: UIButton!
   var payee: User? = nil
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+
     self.edgesForExtendedLayout = []
-    
+
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-    
+
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-    
+
     UIApplication.shared.statusBarStyle = .lightContent
-    
+
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     self.view.addGestureRecognizer(tapGesture)
-    
+
     view.backgroundColor = UIColor.pestoGreen
-    
+
     amountField = AmountField(fontSize: 36)
     amountField.delegate = self
     amountField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-    
+
     let defaultText = "\(Locale.defaultCurrencySymbol)0.00"
     let amountText: NSMutableAttributedString = NSMutableAttributedString(string: defaultText)
     amountText.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(0, 1))
     amountText.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1, defaultText.count-1))
-    
+
     amountField.attributedText = amountText
     amountField.keyboardType = .numberPad
     amountField.translatesAutoresizingMaskIntoConstraints = false
@@ -50,8 +50,8 @@ class TopupVC: UIViewController, UITextFieldDelegate {
       amountField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
       amountField.centerYAnchor.constraint(equalTo: view.centerYAnchor)
       ])
-    
-    
+
+
     amountLabel = UILabel()
     if let payee = payee {
       amountLabel.attributedText = "send to ".colored(with: .primaryTitle) + "@\(payee.username)".colored(with: .highlight)
@@ -67,7 +67,7 @@ class TopupVC: UIViewController, UITextFieldDelegate {
       amountLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       amountLabel.bottomAnchor.constraint(equalTo: amountField.topAnchor, constant: -5)
       ])
-    
+
     separatorView = UIView()
     separatorView.backgroundColor = .washed
     separatorView.translatesAutoresizingMaskIntoConstraints = false
@@ -78,7 +78,7 @@ class TopupVC: UIViewController, UITextFieldDelegate {
       separatorView.widthAnchor.constraint(equalTo: amountField.widthAnchor, multiplier: 0.8),
       separatorView.heightAnchor.constraint(equalToConstant: 1)
       ])
-    
+
     topupButton = UIButton(type: .system)
     topupButton.translatesAutoresizingMaskIntoConstraints = false
     topupButton.isEnabled = false
@@ -93,26 +93,26 @@ class TopupVC: UIViewController, UITextFieldDelegate {
       topupButton.heightAnchor.constraint(equalTo: topupButton.widthAnchor),
       ])
   }
-  
+
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     self.view.endEditing(true)
   }
-  
+
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
-  
+
   @objc func keyboardWillShow(sender: NSNotification) {
     self.view.frame.origin.y = -150
     self.amountLabel.transform = CGAffineTransform(scaleX: 0.7, y: 0.7).translatedBy(x: 0, y: 10) //Scale label area
   }
-  
+
   @objc func keyboardWillHide(sender: NSNotification) {
     self.view.frame.origin.y = 0 // Move view to original position
     self.amountLabel.transform = .identity //Scale label area
   }
-  
+
   @objc func topup() {
     let amount = Util.currencyStringToAmount(amountField.text!)
     let intAmount = Int32(amount * 100)
@@ -122,11 +122,11 @@ class TopupVC: UIViewController, UITextFieldDelegate {
       }
     }
   }
-  
+
   @objc func dismissKeyboard (_ sender: UITapGestureRecognizer) {
     self.view.endEditing(true)
   }
-  
+
   @objc func textFieldDidChange(textField: UITextField) {
     if textField == amountField {
       var amount: Double = 0
@@ -162,7 +162,7 @@ class TopupVC: UIViewController, UITextFieldDelegate {
       }
       textField.attributedText = attributedResult
     }
-    
+
   }
-  
+
 }

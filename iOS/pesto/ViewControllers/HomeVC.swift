@@ -205,7 +205,6 @@ class HomeVC: UIViewController {
       self.makeUpdates(withUser: me)
       return nil
     }
-//    navigationController?.isNavigationBarHidden = true
     navigationController?.setNavigationBarHidden(true, animated: true)
   }
 
@@ -217,7 +216,6 @@ class HomeVC: UIViewController {
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(true)
-//    navigationController?.isNavigationBarHidden = false
     navigationController?.setNavigationBarHidden(false, animated: true)
   }
 
@@ -252,21 +250,6 @@ class HomeVC: UIViewController {
     }
   }
 
-  @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
-    switch recognizer.state {
-    case .changed:
-      let translation  = recognizer.translation(in: self.view).y
-      let scale: CGFloat = 0.5
-      backgroundViewHeightConstraint.constant = scale *
-      translation
-    case .ended:
-      UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
-        self.backgroundViewHeightConstraint.constant = 0
-        self.view.layoutIfNeeded()
-      }, completion: nil)
-    default: break
-    }
-  }
   @objc func menu() {
     // TODO: Change to proper menu action once implemented
     let loginVC = LoginVC()

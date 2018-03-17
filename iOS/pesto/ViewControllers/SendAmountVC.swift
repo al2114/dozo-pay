@@ -151,6 +151,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
         if success {
           let confirmationVC = ConfirmationVC()
           confirmationVC.amount = amount
+          confirmationVC.username = payee.username
           self.present(confirmationVC, animated: true)
         }
       }

@@ -175,6 +175,10 @@ extension Pesto_UserMessages_TopupRequest: RequestResponsePair {
   typealias ResponseType = Pesto_UserMessages_TopupResponse
 }
 
+extension Pesto_UserMessages_AddContactRequest: RequestResponsePair {
+  typealias ResponseType = Pesto_UserMessages_AddContactResponse
+}
+
 extension UIViewController {
   var topAnchor: NSLayoutYAxisAnchor {
     if #available(iOS 11.0, *) {

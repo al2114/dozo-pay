@@ -10,10 +10,15 @@ typealias User = Pesto_Models_User
 typealias Room = Pesto_Models_Room
 typealias Claim = Pesto_Models_Claim
 typealias RoomItem = Pesto_Models_RoomItem
+typealias Contact = Pesto_Models_Contact
+
 typealias RegisterRequest = Pesto_UserMessages_RegisterRequest
 typealias RegisterResponse = Pesto_UserMessages_RegisterResponse
 typealias LoginRequest = Pesto_UserMessages_LoginRequest
 typealias LoginResponse = Pesto_UserMessages_LoginResponse
+typealias GetContactResponse = Pesto_UserMessages_GetContactsResponse
+typealias AddContactRequest = Pesto_UserMessages_AddContactRequest
+typealias AddContactResponse = Pesto_UserMessages_AddContactResponse
 
 import Foundation
 
@@ -92,8 +97,36 @@ extension API {
     completion(user)
   }
 
-  static func addContacts(withPhoneNumbers phoneNumbers: [String], completion: @escaping () -> Void) {
+  static func getContacts(completion: @escaping ([Contact]) -> Void) {
+    User.getMe { me in
+      let route = "contact/\(me.uid)"
+      Util.get(toRoute: route) { (result: Result<GetContactResponse>?) in
+        if case let .ok(getContactResponse)? = result {
+          completion(getContactResponse.contacts)
+        } else {
+          completion([])
+        }
+      }
+      return nil
+    }
+  }
 
+  static func addContact(withUsername username: String, completion: @escaping (Bool) -> Void) {
+    User.getMe { me in
+      var addContactRequest = AddContactRequest()
+      addContactRequest.contactUsername = username
+      addContactRequest.userID = me.uid
+
+      let route = "contact"
+      Util.post(toRoute: route, withProtoMessage: addContactRequest) { result in
+        if case let .ok(addContactResponse)? = result {
+          completion(addContactResponse.successful)
+        } else {
+          completion(false)
+        }
+      }
+      return nil
+    }
   }
 
   static func searchForUser(withAlias alias: String, completion: @escaping () -> Void) {

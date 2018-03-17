@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()
 
-    API.getMe(withId: 3) { me in
+    API.getMe(withId: 4) { me in
       if let me = me {
         User.updateMe(withUser: me)
         let homeVC = HomeVC()

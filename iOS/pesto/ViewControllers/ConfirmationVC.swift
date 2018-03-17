@@ -10,7 +10,7 @@ import UIKit
 
 class ConfirmationVC: UIViewController {
   var amount: Double!
-  var name: String!
+  var username: String!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -54,7 +54,7 @@ class ConfirmationVC: UIViewController {
     let moreInfoLabel = UILabel()
     moreInfoLabel.translatesAutoresizingMaskIntoConstraints = false
     moreInfoLabel.font = UIFont.light.withSize(21)
-    moreInfoLabel.attributedText = "to ".attributed + "@andrew".colored(with: .secondaryTitle)
+    moreInfoLabel.attributedText = "to ".attributed + "@\(username!)".colored(with: .secondaryTitle)
     view.addSubview(moreInfoLabel)
     NSLayoutConstraint.activate([
       moreInfoLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),

@@ -257,7 +257,8 @@ class HomeVC: UIViewController {
     case .changed:
       let translation  = recognizer.translation(in: self.view).y
       let scale: CGFloat = 0.5
-      backgroundViewHeightConstraint.constant = scale * translation
+      backgroundViewHeightConstraint.constant = scale *
+      translation
     case .ended:
       UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
         self.backgroundViewHeightConstraint.constant = 0

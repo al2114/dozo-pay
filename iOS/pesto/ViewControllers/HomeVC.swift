@@ -18,6 +18,8 @@ class HomeVC: UIViewController {
 
   var backgroundViewHeightConstraint: NSLayoutConstraint!
 
+  var backgroundViewHeightConstraint: NSLayoutConstraint!
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -250,6 +252,22 @@ class HomeVC: UIViewController {
     }
   }
 
+  @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
+    print(recognizer.state.rawValue)
+
+    switch recognizer.state {
+    case .changed:
+      let translation  = recognizer.translation(in: self.view).y
+      print(translation)
+      let scale: CGFloat = 0.5
+      backgroundViewHeightConstraint.constant = scale * max(translation, 0)
+    case .cancelled: fallthrough
+    case .ended:
+      print("ended")
+      backgroundViewHeightConstraint.constant = 0
+    default: break
+    }
+  }
   @objc func menu() {
     // TODO: Change to proper menu action once implemented
     let loginVC = LoginVC()

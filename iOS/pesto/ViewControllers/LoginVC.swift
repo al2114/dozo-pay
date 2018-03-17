@@ -46,7 +46,8 @@ class LoginVC: UIViewController {
       ])
 
     let logoView = UIImageView()
-    logoView.image = #imageLiteral(resourceName: "logo")
+    logoView.image = #imageLiteral(resourceName: "logo").withRenderingMode(.alwaysTemplate)
+    logoView.tintColor = .primaryTitle
     logoView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(logoView)
     NSLayoutConstraint.activate([

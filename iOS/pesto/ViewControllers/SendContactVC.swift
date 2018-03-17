@@ -81,6 +81,7 @@ class SendContactVC: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+
     view.backgroundColor = .white
     UIApplication.shared.statusBarStyle = .default
 

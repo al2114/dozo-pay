@@ -28,11 +28,13 @@ class CameraVC: UIViewController {
       code in
       if !self.processingQRCode {
         self.processingQRCode = true
-        let sendAmountVC = SendAmountVC()
-        var user = User()
-        user.username = code
-        sendAmountVC.payee = user
-        self.show(sendAmountVC, sender: self)
+        if code.hasPrefix("pesto:") {
+          let sendAmountVC = SendAmountVC()
+          var user = User()
+          user.username = String(code.split(separator: ":", maxSplits: 2, omittingEmptySubsequences: false)[1])
+          sendAmountVC.payee = user
+          self.show(sendAmountVC, sender: self)
+        }
       }
     }
     qrReader.translatesAutoresizingMaskIntoConstraints = false
@@ -41,7 +43,7 @@ class CameraVC: UIViewController {
       qrReader.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       qrReader.centerYAnchor.constraint(equalTo: view.centerYAnchor),
       qrReader.widthAnchor.constraint(equalTo: view.widthAnchor),
-      qrReader.heightAnchor.constraint(equalTo: qrReader.widthAnchor)
+      qrReader.heightAnchor.constraint(equalTo: view.heightAnchor)
       ])
     qrReader.start()
 

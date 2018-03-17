@@ -95,7 +95,7 @@ class HomeVC: UIViewController {
       qrCodeImageView.centerYAnchor.constraint(equalTo: imageContainer.centerYAnchor)
       ])
     let qrCodeWidth = view.bounds.width * 0.38
-    let qrImage = Util.qrCode(from: "Kill Yourself", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
+    let qrImage = Util.qrCode(from: "pesto:andrew", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
     qrCodeImageView.contentMode = .scaleAspectFit
     qrCodeImageView.image = qrImage
 
@@ -206,7 +206,8 @@ class HomeVC: UIViewController {
     case .changed:
       let translation  = recognizer.translation(in: self.view).y
       let scale: CGFloat = 0.5
-      backgroundViewHeightConstraint.constant = scale * translation
+      backgroundViewHeightConstraint.constant = scale *
+      translation
     case .ended:
       UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
         self.backgroundViewHeightConstraint.constant = 0

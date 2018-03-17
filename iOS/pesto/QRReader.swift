@@ -18,10 +18,10 @@ import UIKit
 import AVFoundation
 
 class QRReader: UIView {
-  var label: UILabel!
+//  var label: UILabel!
 
   var captureSession: AVCaptureSession?
-  var qrCodeFrameView: UIView!
+//  var qrCodeFrameView: UIView!
 
   var captureReceiptButton: UIButton!
 
@@ -56,10 +56,10 @@ class QRReader: UIView {
       captureSession?.addOutput(captureMetadataOutput)
       captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
       captureMetadataOutput.metadataObjectTypes = [AVMetadataObject.ObjectType.qr]
-
-      qrCodeFrameView = UIView()
-      qrCodeFrameView.layer.borderColor = UIColor.green.cgColor
-      qrCodeFrameView.layer.borderWidth = 2
+//
+//      qrCodeFrameView = UIView()
+//      qrCodeFrameView.layer.borderColor = UIColor.green.cgColor
+//      qrCodeFrameView.layer.borderWidth = 2
     } catch {
       print(error)
       return
@@ -67,19 +67,19 @@ class QRReader: UIView {
     guard let videoPreviewLayer = self.layer as? AVCaptureVideoPreviewLayer else { return }
     videoPreviewLayer.session = captureSession
     videoPreviewLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+//
+//    label = UILabel()
+//    label.textColor = .white
+//    label.translatesAutoresizingMaskIntoConstraints = false
+//    addSubview(label)
+//    NSLayoutConstraint.activate([
+//      label.centerXAnchor.constraint(equalTo: centerXAnchor),
+//      label.centerYAnchor.constraint(equalTo: centerYAnchor)
+//      ])
 
-    label = UILabel()
-    label.textColor = .white
-    label.translatesAutoresizingMaskIntoConstraints = false
-    addSubview(label)
-    NSLayoutConstraint.activate([
-      label.centerXAnchor.constraint(equalTo: centerXAnchor),
-      label.centerYAnchor.constraint(equalTo: centerYAnchor)
-      ])
-
-    if let qrCodeFrameView = qrCodeFrameView {
-      addSubview(qrCodeFrameView)
-    }
+//    if let qrCodeFrameView = qrCodeFrameView {
+//      addSubview(qrCodeFrameView)
+//    }
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -95,19 +95,19 @@ extension QRReader: AVCaptureMetadataOutputObjectsDelegate {
   func metadataOutput(_ captureOutput: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
 
     guard metadataObjects.count > 0, let metadataObj = metadataObjects[0] as? AVMetadataMachineReadableCodeObject, metadataObj.type == AVMetadataObject.ObjectType.qr else {
-      qrCodeFrameView.frame = CGRect.zero
-      label.backgroundColor = .clear
-      label.text = ""
+//      qrCodeFrameView.frame = CGRect.zero
+//      label.backgroundColor = .clear
+//      label.text = ""
       return
     }
 
     guard let videoPreviewLayer = self.layer as? AVCaptureVideoPreviewLayer else { return }
 
     let barCodeObject = videoPreviewLayer.transformedMetadataObject(for: metadataObj)
-    qrCodeFrameView.frame = barCodeObject!.bounds
+//    qrCodeFrameView.frame = barCodeObject!.bounds
 
-    label.backgroundColor = .black
-    label.text = metadataObj.stringValue
+//    label.backgroundColor = .black
+//    label.text = metadataObj.stringValue
     if let qrCode = metadataObj.stringValue {
       processQRCode(qrCode)
     }

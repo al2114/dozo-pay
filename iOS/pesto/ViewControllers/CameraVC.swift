@@ -31,7 +31,9 @@ class CameraVC: UIViewController {
         if code.hasPrefix("pesto:") {
           let sendAmountVC = SendAmountVC()
           var user = User()
-          user.username = String(code.split(separator: ":", maxSplits: 2, omittingEmptySubsequences: false)[1])
+          let splits = code.split(separator: ":", maxSplits: 3, omittingEmptySubsequences: false)
+          user.username = String(splits[1])
+          user.uid = Int32(splits[2])!
           sendAmountVC.payee = user
           self.show(sendAmountVC, sender: self)
         }

@@ -121,9 +121,6 @@ class ConfirmationVC: UIViewController {
   }
 
   @objc func home() {
-    presentingViewController?.dismiss(animated: true, completion: {
-      print("asfd")
-      self.presentingViewController?.navigationController?.popToRootViewController(animated: true)
-    })
+    Util.switchTo(viewController: HomeVC())
   }
 }

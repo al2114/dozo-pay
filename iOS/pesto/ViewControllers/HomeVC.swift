@@ -95,7 +95,7 @@ class HomeVC: UIViewController {
       ])
     let qrCodeWidth = view.bounds.width * 0.38
     User.getMe { me in
-      let qrImage = Util.qrCode(from: "pesto:\(me.username)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
+      let qrImage = Util.qrCode(from: "pesto:\(me.username):\(me.uid)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
       qrCodeImageView.contentMode = .scaleAspectFit
       qrCodeImageView.image = qrImage
       return nil

@@ -116,18 +116,20 @@ class HomeVC: UIViewController {
     NSLayoutConstraint.activate([
       balanceTitle.centerXAnchor.constraint(equalTo: balanceView.centerXAnchor),
       balanceTitle.topAnchor.constraint(equalTo: balanceView.topAnchor),
-      balanceTitle.bottomAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: 5)
+      balanceTitle.bottomAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: -15)
       ])
 
-    let balanceLabel = UILabel()
-    balanceLabel.textColor = .primaryTitle
-    balanceLabel.font = UIFont.regular.withSize(36)
-    balanceLabel.text = "£9.41"
+    let balanceLabel = UIButton()
+    balanceLabel.tintColor = .primaryTitle
+    balanceLabel.titleLabel?.font = UIFont.regular.withSize(36)
+    balanceLabel.setTitle("£9.41", for: .normal)
+    balanceLabel.isUserInteractionEnabled = true
     balanceLabel.translatesAutoresizingMaskIntoConstraints = false
-    balanceView.addSubview(balanceLabel)
+    balanceLabel.addTarget(self, action: #selector(topup), for: .touchUpInside)
+    view.addSubview(balanceLabel)
     NSLayoutConstraint.activate([
       balanceLabel.centerXAnchor.constraint(equalTo: balanceView.centerXAnchor),
-      balanceLabel.topAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: -5),
+      balanceLabel.topAnchor.constraint(equalTo: balanceView.centerYAnchor, constant: -20),
       balanceLabel.bottomAnchor.constraint(equalTo: balanceView.bottomAnchor)
       ])
 
@@ -193,14 +195,21 @@ class HomeVC: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-//    navigationController?.isNavigationBarHidden = true
+    navigationController?.isNavigationBarHidden = true
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(true)
 //    navigationController?.isNavigationBarHidden = false
+    navigationController?.setNavigationBarHidden(false, animated: true)
   }
 
+  @objc func topup() {
+    print("Touch balancet")
+    let topupVC = TopupVC()
+    self.show(topupVC, sender: self)
+  }
+  
   @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
     switch recognizer.state {
     case .changed:

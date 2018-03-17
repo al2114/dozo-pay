@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let loginVC = LoginVC()
     let verifyVC = VerifyNumberVC()
     let sendVC = SendAmountVC()
+    let topupVC = TopupVC()
     Util.switchTo(viewController: homeVC, window: window)
     window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()

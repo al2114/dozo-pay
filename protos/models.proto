@@ -1,11 +1,12 @@
 syntax = "proto3";
 
 package pesto.models;
+import "google/protobuf/timestamp.proto";
 
 message Claim {
-  string identifier = 2;
-  string name = 3;
-  User owner = 4;
+  string identifier = 1;
+  string name = 2;
+  User owner = 3;
 }
 
 message User {
@@ -14,6 +15,11 @@ message User {
   string picture_url = 3;
   int32 balance = 4;
   string username = 5;
+}
+
+message Profile {
+  int32 uid = 1;
+  string username = 2;
 }
 
 message Room {
@@ -35,4 +41,15 @@ message Contact {
   int32 uid = 1;
   string username = 2;
   bool trusted = 3;
+}
+
+message Transaction {
+  Profile profile = 1;
+  int32 amount = 2;
+  enum Type {
+    FROM = 0;
+    TO = 1;
+  }
+  Type type = 3;
+  google.protobuf.Timestamp timestamp = 4;
 }

@@ -59,3 +59,7 @@ message AddContactResponse {
 message GetContactsResponse {
   repeated models.Contact contacts = 1;
 }
+
+message GetTransactionsResponse {
+  repeated models.Transaction trnsaction = 1;
+}

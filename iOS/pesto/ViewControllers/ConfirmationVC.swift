@@ -71,24 +71,10 @@ class ConfirmationVC: UIViewController {
     let moreInfoLabel = UILabel()
     moreInfoLabel.translatesAutoresizingMaskIntoConstraints = false
     moreInfoLabel.font = UIFont.light.withSize(21)
-<<<<<<< HEAD
-<<<<<<< HEAD
     if let infoText = infoText {
       moreInfoLabel.text = infoText
     } else if let username = username {
       moreInfoLabel.attributedText = "to ".attributed + "@\(username)".colored(with: .secondaryTitle)
-=======
-    if let username = username {
-      moreInfoLabel.attributedText = "to ".attributed + "@\(username)".colored(with: .secondaryTitle)
-    } else {
-      moreInfoLabel.text = infoText
->>>>>>> Change nav VCs to full screen to fix transition & modify confirmation VC
-=======
-    if let infoText = infoText {
-      moreInfoLabel.text = infoText
-    } else if let username = username {
-      moreInfoLabel.attributedText = "to ".attributed + "@\(username)".colored(with: .secondaryTitle)
->>>>>>> Add confirmation to topup
     }
     view.addSubview(moreInfoLabel)
     NSLayoutConstraint.activate([

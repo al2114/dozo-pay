@@ -80,6 +80,8 @@ class SendContactVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    self.edgesForExtendedLayout = []
+    
     view.backgroundColor = .white
     UIApplication.shared.statusBarStyle = .default
 

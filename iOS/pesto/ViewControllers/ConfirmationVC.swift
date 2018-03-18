@@ -18,6 +18,8 @@ class ConfirmationVC: UIViewController {
 
   var willDismiss: (() -> Void)?
 
+  var willDismiss: (() -> Void)?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 

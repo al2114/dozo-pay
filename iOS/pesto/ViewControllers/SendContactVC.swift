@@ -18,7 +18,7 @@ class ContactCell: UITableViewCell {
     profileImageView = CircularImageView()
     separatorView = UIView()
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    
+
     nameLabel.font = .regular
 
     profileImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -79,6 +79,8 @@ class SendContactVC: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    self.edgesForExtendedLayout = []
 
     view.backgroundColor = .white
     UIApplication.shared.statusBarStyle = .default

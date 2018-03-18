@@ -17,7 +17,7 @@ class ConfirmationVC: UIViewController {
   var successful: Bool = true
 
   var willDismiss: (() -> Void)?
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
 

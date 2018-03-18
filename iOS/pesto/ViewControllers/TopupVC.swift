@@ -98,6 +98,14 @@ class TopupVC: UIViewController, UITextFieldDelegate {
     super.viewWillDisappear(animated)
     self.view.endEditing(true)
   }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    navigationController?.navigationBar.backgroundColor = .primaryBackground
+    navigationController?.navigationBar.barTintColor = .primaryBackground
+    navigationController?.navigationBar.tintColor = .primaryTitle
+
+  }
 
   deinit {
     NotificationCenter.default.removeObserver(self)

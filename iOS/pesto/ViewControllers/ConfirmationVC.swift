@@ -12,10 +12,12 @@ class ConfirmationVC: UIViewController {
   var amount: Double!
   var username: String!
 
+  var willDismiss: (() -> Void)?
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.edgesForExtendedLayout = []
+//    self.edgesForExtendedLayout = []
 
     view.backgroundColor = .white
 
@@ -121,6 +123,7 @@ class ConfirmationVC: UIViewController {
   }
 
   @objc func home() {
-    Util.switchTo(viewController: HomeVC())
+    willDismiss?()
+    dismiss(animated: true, completion: nil)
   }
 }

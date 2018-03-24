@@ -32,6 +32,7 @@ class HomeVC: UIViewController {
     super.viewDidLoad()
 
     view.backgroundColor = .pestoGreen
+    self.extendedLayoutIncludesOpaqueBars = true
 
     self.edgesForExtendedLayout = []
 

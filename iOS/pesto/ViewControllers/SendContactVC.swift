@@ -65,16 +65,13 @@ class SendContactVC: UIViewController {
 
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    UIApplication.shared.statusBarStyle = .default
-    UIApplication.shared.keyWindow?.backgroundColor = .white
-
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
     UIView.animate(withDuration: 0.2, animations: {
-      self.navigationController?.navigationBar.backgroundColor = .white
+//      self.navigationController?.navigationBar.backgroundColor = .white
       self.navigationController?.navigationBar.barTintColor = .white
       self.navigationController?.navigationBar.tintColor = .pestoGreen
     })
@@ -83,12 +80,10 @@ class SendContactVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.edgesForExtendedLayout = []
-    
     view.backgroundColor = .white
     UIApplication.shared.statusBarStyle = .default
 
-    self.edgesForExtendedLayout = []
+    self.extendedLayoutIncludesOpaqueBars = true
 
     tableView = UITableView()
     tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -191,6 +186,7 @@ extension SendContactVC: UITableViewDelegate {
           confirmationVC.willDismiss = {
             self.navigationController?.popToRootViewController(animated: false)
           }
+          confirmationVC.descriptionText = "Payment Sent"
           confirmationVC.amount = self.amount
           confirmationVC.username = contact.username
           self.present(confirmationVC, animated: true)

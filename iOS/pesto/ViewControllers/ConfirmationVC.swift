@@ -10,7 +10,11 @@ import UIKit
 
 class ConfirmationVC: UIViewController {
   var amount: Double!
-  var username: String!
+  var username: String?
+
+  var descriptionText: String!
+  var infoText: String?
+  var successful: Bool = false
 
   var willDismiss: (() -> Void)?
   
@@ -24,7 +28,8 @@ class ConfirmationVC: UIViewController {
     let amountLabel = UILabel()
     amountLabel.translatesAutoresizingMaskIntoConstraints = false
     amountLabel.text = Util.amountToCurrencyString(amount)
-    amountLabel.font = UIFont.regular.withSize(32)
+    amountLabel.font = UIFont.regular.withSize(50)
+    amountLabel.textColor = .text
     view.addSubview(amountLabel)
     NSLayoutConstraint.activate([
       amountLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -33,18 +38,28 @@ class ConfirmationVC: UIViewController {
 
     let descriptionLabel = UILabel()
     descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-    descriptionLabel.textColor = .secondaryTitle
-    descriptionLabel.text = "Payment Sent"
+    if successful {
+      descriptionLabel.textColor = .secondaryTitle
+    } else {
+      descriptionLabel.textColor = .text
+    }
+    descriptionLabel.font = UIFont.light.withSize(32)
+    descriptionLabel.text = descriptionText
     view.addSubview(descriptionLabel)
     NSLayoutConstraint.activate([
       descriptionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      descriptionLabel.bottomAnchor.constraint(equalTo: amountLabel.topAnchor, constant: -20)
+      descriptionLabel.bottomAnchor.constraint(equalTo: amountLabel.topAnchor, constant: -5)
       ])
 
     let descriptionImageView = UIImageView()
     descriptionImageView.translatesAutoresizingMaskIntoConstraints = false
-    descriptionImageView.image = #imageLiteral(resourceName: "circleCheck").withRenderingMode(.alwaysTemplate)
-    descriptionImageView.tintColor = .secondaryTitle
+    if successful {
+      descriptionImageView.image = #imageLiteral(resourceName: "circleCheck").withRenderingMode(.alwaysTemplate)
+      descriptionImageView.tintColor = .secondaryTitle
+    } else {
+      descriptionImageView.image = #imageLiteral(resourceName: "circleCross").withRenderingMode(.alwaysTemplate)
+      descriptionImageView.tintColor = .red
+    }
     view.addSubview(descriptionImageView)
     NSLayoutConstraint.activate([
       descriptionImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -56,11 +71,15 @@ class ConfirmationVC: UIViewController {
     let moreInfoLabel = UILabel()
     moreInfoLabel.translatesAutoresizingMaskIntoConstraints = false
     moreInfoLabel.font = UIFont.light.withSize(21)
-    moreInfoLabel.attributedText = "to ".attributed + "@\(username!)".colored(with: .secondaryTitle)
+    if let username = username {
+      moreInfoLabel.attributedText = "to ".attributed + "@\(username)".colored(with: .secondaryTitle)
+    } else {
+      moreInfoLabel.text = infoText
+    }
     view.addSubview(moreInfoLabel)
     NSLayoutConstraint.activate([
       moreInfoLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      moreInfoLabel.topAnchor.constraint(equalTo: amountLabel.bottomAnchor, constant: 20)
+      moreInfoLabel.topAnchor.constraint(equalTo: amountLabel.bottomAnchor, constant: 10)
       ])
 
     let doneButton = UIButton(type: .system)
@@ -92,7 +111,7 @@ class ConfirmationVC: UIViewController {
       return nil
     }
     balanceLabel.textColor = .lightGray
-    balanceLabel.font = UIFont.regular.withSize(14)
+    balanceLabel.font = UIFont.light.withSize(16)
     balanceView.addSubview(balanceLabel)
     NSLayoutConstraint.activate([
       balanceLabel.centerXAnchor.constraint(equalTo: balanceView.centerXAnchor),
@@ -107,7 +126,7 @@ class ConfirmationVC: UIViewController {
       upperSeparator.centerXAnchor.constraint(equalTo: balanceView.centerXAnchor),
       upperSeparator.bottomAnchor.constraint(equalTo: balanceLabel.centerYAnchor, constant: -30),
       upperSeparator.widthAnchor.constraint(equalTo: balanceView.widthAnchor, multiplier: 0.8),
-      upperSeparator.heightAnchor.constraint(equalToConstant: 2)
+      upperSeparator.heightAnchor.constraint(equalToConstant: 1)
       ])
 
     let lowerSeparator = UIView()
@@ -118,7 +137,7 @@ class ConfirmationVC: UIViewController {
       lowerSeparator.centerXAnchor.constraint(equalTo: balanceView.centerXAnchor),
       lowerSeparator.topAnchor.constraint(equalTo: balanceLabel.centerYAnchor, constant: 30),
       lowerSeparator.widthAnchor.constraint(equalTo: balanceView.widthAnchor, multiplier: 0.8),
-      lowerSeparator.heightAnchor.constraint(equalToConstant: 2)
+      lowerSeparator.heightAnchor.constraint(equalToConstant: 1)
       ])
   }
 

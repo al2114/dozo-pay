@@ -14,11 +14,7 @@ class ConfirmationVC: UIViewController {
 
   var descriptionText: String!
   var infoText: String?
-<<<<<<< HEAD
   var successful: Bool = true
-=======
-  var successful: Bool = false
->>>>>>> Change nav VCs to full screen to fix transition & modify confirmation VC
 
   var willDismiss: (() -> Void)?
 
@@ -76,6 +72,7 @@ class ConfirmationVC: UIViewController {
     moreInfoLabel.translatesAutoresizingMaskIntoConstraints = false
     moreInfoLabel.font = UIFont.light.withSize(21)
 <<<<<<< HEAD
+<<<<<<< HEAD
     if let infoText = infoText {
       moreInfoLabel.text = infoText
     } else if let username = username {
@@ -86,6 +83,12 @@ class ConfirmationVC: UIViewController {
     } else {
       moreInfoLabel.text = infoText
 >>>>>>> Change nav VCs to full screen to fix transition & modify confirmation VC
+=======
+    if let infoText = infoText {
+      moreInfoLabel.text = infoText
+    } else if let username = username {
+      moreInfoLabel.attributedText = "to ".attributed + "@\(username)".colored(with: .secondaryTitle)
+>>>>>>> Add confirmation to topup
     }
     view.addSubview(moreInfoLabel)
     NSLayoutConstraint.activate([

@@ -14,7 +14,7 @@ class ConfirmationVC: UIViewController {
 
   var descriptionText: String!
   var infoText: String?
-  var successful: Bool = false
+  var successful: Bool = true
 
   var willDismiss: (() -> Void)?
   
@@ -71,10 +71,10 @@ class ConfirmationVC: UIViewController {
     let moreInfoLabel = UILabel()
     moreInfoLabel.translatesAutoresizingMaskIntoConstraints = false
     moreInfoLabel.font = UIFont.light.withSize(21)
-    if let username = username {
-      moreInfoLabel.attributedText = "to ".attributed + "@\(username)".colored(with: .secondaryTitle)
-    } else {
+    if let infoText = infoText {
       moreInfoLabel.text = infoText
+    } else if let username = username {
+      moreInfoLabel.attributedText = "to ".attributed + "@\(username)".colored(with: .secondaryTitle)
     }
     view.addSubview(moreInfoLabel)
     NSLayoutConstraint.activate([
@@ -85,7 +85,12 @@ class ConfirmationVC: UIViewController {
     let doneButton = UIButton(type: .system)
     doneButton.translatesAutoresizingMaskIntoConstraints = false
     doneButton.setTitle("Done", for: .normal)
-    doneButton.tintColor = .secondaryTitle
+    if successful {
+      doneButton.tintColor = .secondaryTitle
+    }
+    else {
+      doneButton.tintColor = .text
+    }
     doneButton.addTarget(self, action: #selector(home), for: .touchUpInside)
     view.addSubview(doneButton)
     NSLayoutConstraint.activate([

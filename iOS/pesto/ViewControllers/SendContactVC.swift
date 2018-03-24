@@ -186,7 +186,7 @@ extension SendContactVC: UITableViewDelegate {
           confirmationVC.willDismiss = {
             self.navigationController?.popToRootViewController(animated: false)
           }
-          confirmationVC.descriptionText = "Payment Sent"
+          confirmationVC.descriptionText = "Payment sent"
           confirmationVC.amount = self.amount
           confirmationVC.username = contact.username
           self.present(confirmationVC, animated: true)

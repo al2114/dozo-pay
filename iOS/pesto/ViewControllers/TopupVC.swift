@@ -124,7 +124,15 @@ class TopupVC: UIViewController, UITextFieldDelegate {
     let intAmount = Int32(amount * 100)
     API.topup(amount: intAmount) { success in
       if success {
-        self.navigationController?.popViewController(animated: true)
+        let confirmationVC = ConfirmationVC()
+        confirmationVC.willDismiss = {
+          self.navigationController?.popToRootViewController(animated: true)
+        }
+        confirmationVC.descriptionText = "Topup successful"
+        confirmationVC.amount = amount
+        confirmationVC.infoText = "added to balance"
+        self.present(confirmationVC, animated: true)
+//        self.navigationController?.popViewController(animated: true)
       }
     }
   }

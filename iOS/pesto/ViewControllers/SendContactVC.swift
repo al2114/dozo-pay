@@ -80,8 +80,6 @@ class SendContactVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.edgesForExtendedLayout = []
-
     view.backgroundColor = .white
     UIApplication.shared.statusBarStyle = .default
 
@@ -188,7 +186,11 @@ extension SendContactVC: UITableViewDelegate {
           confirmationVC.willDismiss = {
             self.navigationController?.popToRootViewController(animated: false)
           }
+<<<<<<< HEAD
           confirmationVC.descriptionText = "Payment sent"
+=======
+          confirmationVC.descriptionText = "Payment Sent"
+>>>>>>> Change nav VCs to full screen to fix transition & modify confirmation VC
           confirmationVC.amount = self.amount
           confirmationVC.username = contact.username
           self.present(confirmationVC, animated: true)

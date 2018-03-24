@@ -32,6 +32,7 @@ class HomeVC: UIViewController {
     super.viewDidLoad()
 
     view.backgroundColor = .pestoGreen
+    self.extendedLayoutIncludesOpaqueBars = true
 
     self.edgesForExtendedLayout = []
 
@@ -262,7 +263,7 @@ class HomeVC: UIViewController {
 
   @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
     switch recognizer.state {
-      
+
     // TODO: Properly handle the collapsing & allow table view interaction/scroll
     case .changed:
       let translation  = recognizer.translation(in: self.view).y

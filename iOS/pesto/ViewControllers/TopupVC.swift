@@ -129,7 +129,7 @@ class TopupVC: UIViewController, UITextFieldDelegate {
           self.navigationController?.popToRootViewController(animated: true)
         }
         confirmationVC.descriptionText = "Topup successful"
-        confirmationVC.amount = amount
+        confirmationVC.amount = Double(amount)/100.0
         confirmationVC.infoText = "added to balance"
         self.present(confirmationVC, animated: true)
 //        self.navigationController?.popViewController(animated: true)

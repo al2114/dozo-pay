@@ -153,14 +153,14 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       API.payUser(withId: payee.uid, amount: amount) { success in
         if success {
           let confirmationVC = ConfirmationVC()
-          confirmationVC.amount = amount
+          confirmationVC.amount = Double(amount)/100.0
           confirmationVC.username = payee.username
           self.present(confirmationVC, animated: true)
         }
       }
     } else {
       let sendVC = SendContactVC()
-      sendVC.amount = amount
+      sendVC.amount = Double(amount)/100.0
       self.show(sendVC, sender: self)
     }
   }

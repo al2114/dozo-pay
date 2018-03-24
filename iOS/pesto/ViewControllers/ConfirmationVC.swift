@@ -71,10 +71,10 @@ class ConfirmationVC: UIViewController {
     let moreInfoLabel = UILabel()
     moreInfoLabel.translatesAutoresizingMaskIntoConstraints = false
     moreInfoLabel.font = UIFont.light.withSize(21)
-    if let infoText = infoText {
-      moreInfoLabel.text = infoText
-    } else if let username = username {
+    if let username = username {
       moreInfoLabel.attributedText = "to ".attributed + "@\(username)".colored(with: .secondaryTitle)
+    } else {
+      moreInfoLabel.text = infoText
     }
     view.addSubview(moreInfoLabel)
     NSLayoutConstraint.activate([

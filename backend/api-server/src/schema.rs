@@ -7,6 +7,17 @@ table! {
 }
 
 table! {
+    claims (uid) {
+        uid -> Int4,
+        account_id -> Int4,
+        owner_id -> Int4,
+        receiver_id -> Nullable<Int4>,
+        is_active -> Bool,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
     contacts (user_id, contact_id) {
         user_id -> Int4,
         contact_id -> Int4,
@@ -41,6 +52,7 @@ table! {
 
 allow_tables_to_appear_in_same_query!(
     accounts,
+    claims,
     contacts,
     transactions,
     users,

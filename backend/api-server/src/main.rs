@@ -64,6 +64,16 @@ fn protoize_user(user: models::User, balance: i32) -> protos::models::User {
     proto_user
 }
 
+fn protoize_claim(claim: models::Claim, owner: models::User, receiver: Option<models::User>, amount: i32) -> protos::models::Claim {
+    let mut proto_claim= protos::models::Claim::new();
+    proto_claim.set_uid(claim.uid);
+    proto_claim.set_owner(protoize_user(owner, 0));
+    if let Some(receiver) = receiver {
+        proto_claim.set_receiver(protoize_user(receiver, 0));
+    }
+    proto_claim.set_amount(amount);
+    proto_claim
+}
 
 #[get("/")]
 fn index_route() -> io::Result<NamedFile> {
@@ -369,10 +379,9 @@ fn topup_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
 }
 
 #[post("/register", data="<input>")]
-fn register_route(db_connection: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<RegisterRequest>(input)?;
 
-    let db_connection_pool = &db_connection;
     let new_account = models::NewAccount {
         balance:    &0
     };
@@ -380,10 +389,11 @@ fn register_route(db_connection: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8
     use schema::accounts;
     use models::Account;
 
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
     let account = diesel::insert_into(accounts::table)
         .values(&new_account)
-        .get_result::<Account>(&db_connection_pool.get()
-                               .expect("failed to obtain database connection"))
+        .get_result::<Account>(&db_connection)
         .map_err(|_| "Error inserting new account")?;
 
     let new_user = models::NewUser {
@@ -400,8 +410,7 @@ fn register_route(db_connection: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8
 
     let user = diesel::insert_into(users::table)
         .values(&new_user)
-        .get_result::<User>(&db_connection_pool.get()
-                                    .expect("failed to obtain database connection"))
+        .get_result::<User>(&db_connection)
         .map_err(|_| "Error inserting new user")?;
 
     let user = protoize_user(user, 0);
@@ -442,6 +451,142 @@ fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     } else {
         response.set_successful(false);
     }
+
+    Ok(serialize(response)?)
+}
+
+#[post("/claims/create", data="<input>")]
+fn create_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+    let request = deserialize::<CreateClaimRequest>(input)?;
+
+    let amount = request.get_amount();
+    let owner_id = request.get_owner_id();
+
+    let new_account = models::NewAccount {
+        balance:    &0
+    };
+
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    use schema::accounts::dsl::accounts as accounts_sql;
+    use schema::accounts;
+    use models::Account;
+
+    let account = diesel::insert_into(accounts::table)
+        .values(&new_account)
+        .get_result::<Account>(&db_connection)
+        .map_err(|_| "Error inserting new account")?;
+
+
+    let new_claim = models::NewClaim {
+        account_id: &account.uid,
+        owner_id: &owner_id
+    };
+
+    use schema::claims;
+    use models::Claim;
+
+    use schema::users::dsl::users as users_sql;
+    use models::User;
+
+    let owner = users_sql
+        .find(owner_id)
+        .first::<User>(&db_connection)
+        .map_err(|_| "Unable to find user")?;
+
+    let claim = diesel::insert_into(claims::table)
+        .values(&new_claim)
+        .get_result::<Claim>(&db_connection)
+        .map_err(|_| "Error inserting new claim")?;
+
+    let _ = execute_transaction(&owner.account_id, &account.uid, &amount, &db_connection)?;
+
+    let account_balance = accounts_sql
+        .find(account.uid)
+        .select(accounts::balance)
+        .first::<i32>(&db_connection)
+        .map_err(|_| "Unable to find account")?;
+
+    let mut response = CreateClaimResponse::new();
+    response.set_successful(true);
+    response.set_claim(protoize_claim(claim, owner, None, account_balance));
+    Ok(serialize(response)?)
+}
+
+
+#[post("/claims/accept", data="<input>")]
+fn accept_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+    let request = deserialize::<AcceptClaimRequest>(input)?;
+    let claim_id = request.get_claim_id();
+    let receiver_id = request.get_receiver_id();
+
+    let db_connection = pool.get().expect("failed to obtain database connection");
+    let claim = accept_claim(&db_connection, claim_id, receiver_id)?;
+
+    let mut response = AcceptClaimResponse::new();
+    response.set_claim(claim);
+    response.set_successful(true);
+
+    Ok(serialize(response)?)
+}
+
+fn accept_claim(db_connection: &pg_pool::PooledConnection, claim_id: i32, receiver_id: i32) -> Result<protos::models::Claim, String> {
+    use schema::claims;
+    use models::Claim;
+    use schema::claims::dsl::claims as claims_sql;
+    use schema::accounts;
+
+    let (account_id, balance) = claims_sql
+        .find(claim_id)
+        .inner_join(accounts::table.on(accounts::uid.eq(claims::account_id)))
+        .select((claims::account_id, accounts::balance))
+        .first::<(i32, i32)>(db_connection)
+        .map_err(|_| "Unable to find claim")?;
+
+    use models::User;
+    use schema::users::dsl::users as users_sql;
+    let receiver = users_sql
+        .find(receiver_id)
+        .first::<User>(db_connection)
+        .map_err(|_| "Unable to find receiver account")?;
+
+    let _ = execute_transaction(&account_id, &receiver.account_id, &balance, &db_connection)?;
+
+    let claim = diesel::update(claims_sql.find(claim_id))
+        .set((claims::receiver_id.eq(receiver_id),claims::is_active.eq(false)))
+        .get_result::<Claim>(db_connection)
+        .map_err(|_| "Unable to update claim")?;
+
+    let owner = users_sql
+        .find(claim.owner_id)
+        .first::<User>(db_connection)
+        .map_err(|_| "Unable to find claim owner")?;
+
+    let claim = protoize_claim(claim, owner, Some(receiver), balance);
+    Ok(claim)
+}
+
+#[post("/claims/revoke", data="<input>")]
+fn revoke_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+    let request = deserialize::<RevokeClaimRequest>(input)?;
+    let claim_id = request.get_claim_id();
+
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    use schema::claims;
+    use schema::claims::dsl::claims as claims_sql;
+
+    let owner_id = claims_sql
+        .find(claim_id)
+        .select(claims::owner_id)
+        .first::<i32>(&db_connection)
+        .map_err(|_| "Unable to find claim")?;
+
+    let claim = accept_claim(&db_connection, claim_id, owner_id)?;
+
+    let mut response = AcceptClaimResponse::new();
+    response.set_claim(claim);
+    response.set_successful(true);
 
     Ok(serialize(response)?)
 }

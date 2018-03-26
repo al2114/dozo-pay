@@ -7,6 +7,57 @@
 //
 
 import UIKit
+import SwiftProtobuf
+
+class TransactionCell: UITableViewCell {
+  let titleLabel: UILabel!
+  let dateLabel: UILabel!
+  let amountLabel: UILabel!
+  let userLabel: UILabel!
+
+  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    titleLabel = UILabel()
+    userLabel = UILabel()
+    dateLabel = UILabel()
+    amountLabel = UILabel()
+
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    contentView.addSubview(titleLabel)
+    NSLayoutConstraint.activate([
+      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor)
+      ])
+
+    userLabel.translatesAutoresizingMaskIntoConstraints = false
+    contentView.addSubview(userLabel)
+    NSLayoutConstraint.activate([
+      userLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+      userLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor)
+      ])
+
+
+    dateLabel.translatesAutoresizingMaskIntoConstraints = false
+    contentView.addSubview(dateLabel)
+    NSLayoutConstraint.activate([
+      dateLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+      dateLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor)
+      ])
+
+    amountLabel.translatesAutoresizingMaskIntoConstraints = false
+    contentView.addSubview(amountLabel)
+    NSLayoutConstraint.activate([
+      amountLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor),
+      amountLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor)
+      ])
+
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+}
 
 class HomeVC: UIViewController {
   var balanceView: UIView!
@@ -21,10 +72,9 @@ class HomeVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-//    setMockTrasactions()
+    setMockTrasactions()
 
     view.backgroundColor = .pestoGreen
-    self.extendedLayoutIncludesOpaqueBars = true
 
     self.edgesForExtendedLayout = []
 
@@ -186,6 +236,21 @@ class HomeVC: UIViewController {
       border.heightAnchor.constraint(equalToConstant: 3),
       ])
 
+    let transactionView = UITableView()
+    transactionView.translatesAutoresizingMaskIntoConstraints = false
+    transactionView.register(ContactCell.self, forCellReuseIdentifier: "ContactCell")
+    transactionView.dataSource = self
+    transactionView.register(TransactionCell.self, forCellReuseIdentifier: "TransactionCell")
+    transactionView.separatorStyle = .none
+    transactionView.rowHeight = 60
+    infoView.addSubview(transactionView)
+    NSLayoutConstraint.activate([
+      transactionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      transactionView.widthAnchor.constraint(equalTo: view.widthAnchor),
+      transactionView.topAnchor.constraint(equalTo: imageContainer.bottomAnchor),
+      transactionView.bottomAnchor.constraint(equalTo: border.topAnchor)
+      ])
+
     let cameraImageView = UIImageView()
     cameraImageView.translatesAutoresizingMaskIntoConstraints = false
     cameraImageView.tintColor = .text
@@ -268,4 +333,64 @@ class HomeVC: UIViewController {
     let cameraVC = CameraVC()
     self.show(cameraVC, sender: self)
   }
+  var transactions: [Transaction] = []
+
+  func setMockTrasactions() {
+
+    var toTransaction = Transaction()
+    var fromTransaction = Transaction()
+
+    var saurav = Profile()
+    saurav.uid = 3
+    saurav.username = "saurav"
+
+    toTransaction.profile = saurav
+    toTransaction.amount = 200
+    toTransaction.type = .to
+    var timestamp = SwiftProtobuf.Google_Protobuf_Timestamp()
+    timestamp.seconds = Int64(Date().addingTimeInterval(-(2*24*3600)).timeIntervalSince1970)
+    toTransaction.timestamp = timestamp
+
+    fromTransaction.profile = saurav
+    fromTransaction.amount = 580
+    fromTransaction.type = .from
+    timestamp.seconds = Int64(Date().addingTimeInterval(-(2*24*3600) + 2200).timeIntervalSince1970)
+    fromTransaction.timestamp = timestamp
+    transactions = [toTransaction, fromTransaction]
+  }
+
+
 }
+
+extension HomeVC: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return transactions.count
+  }
+
+  func transactionTypeToString(_ type: Pesto_Models_Transaction.TypeEnum) -> String {
+    switch type {
+    case .from: return "from"
+    case .to: return "to"
+    default: return ""
+    }
+  }
+
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let transaction = transactions[indexPath.row]
+
+    let transactionCell = tableView.dequeueReusableCell(withIdentifier: "TransactionCell") as! TransactionCell
+
+    transactionCell.titleLabel.text = transactionTypeToString(transaction.type)
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MMM dd H:mm"
+    dateFormatter.locale = Locale.defaultLocale
+
+    transactionCell.dateLabel.text = dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(transaction.timestamp.seconds)))
+    transactionCell.amountLabel.text = Util.amountToCurrencyString(Double(transaction.amount)/100)
+    transactionCell.userLabel.text = transaction.profile.username
+
+    return transactionCell
+  }
+}
+

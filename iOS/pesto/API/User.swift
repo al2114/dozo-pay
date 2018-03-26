@@ -11,6 +11,8 @@ typealias Room = Pesto_Models_Room
 typealias Claim = Pesto_Models_Claim
 typealias RoomItem = Pesto_Models_RoomItem
 typealias Contact = Pesto_Models_Contact
+typealias Profile = Pesto_Models_Profile
+typealias Transaction = Pesto_Models_Transaction
 
 typealias RegisterRequest = Pesto_UserMessages_RegisterRequest
 typealias RegisterResponse = Pesto_UserMessages_RegisterResponse

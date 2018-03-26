@@ -11,14 +11,21 @@ import SwiftProtobuf
 
 class HomeVC: UIViewController {
   var balanceView: UIView!
+  var imageContainer: UIView!
   var sendButton: UIButton!
   var settingsButton: UIButton!
   var cameraButton: UIButton!
   var balanceLabel: UIButton!
+  var transactionView: UITableView!
+
+  var shouldCollapse: Bool = false
+  var isCollapsed: Bool = false
+  var shouldExpand: Bool = false
   var shouldReload: Bool = false
 
   var backgroundViewHeightConstraint: NSLayoutConstraint!
-
+  var imageContainerWidthConstraint: NSLayoutConstraint!
+  var imageContainerCenterYConstraint: NSLayoutConstraint!
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -75,14 +82,19 @@ class HomeVC: UIViewController {
       border.heightAnchor.constraint(equalToConstant: 3),
       ])
 
-    let imageContainer = UIView()
+    imageContainer = UIView()
     imageContainer.translatesAutoresizingMaskIntoConstraints = false
     infoView.addSubview(imageContainer)
+
+    imageContainerWidthConstraint = imageContainer.widthAnchor.constraint(equalTo: infoView.widthAnchor, multiplier: 0.46)
+    imageContainerCenterYConstraint = imageContainer.centerYAnchor.constraint(equalTo: infoView.topAnchor)
+
+
     NSLayoutConstraint.activate([
       imageContainer.centerXAnchor.constraint(equalTo: infoView.centerXAnchor),
-      imageContainer.widthAnchor.constraint(equalTo: infoView.widthAnchor, multiplier: 0.46),
+      imageContainerWidthConstraint,
       imageContainer.heightAnchor.constraint(equalTo: imageContainer.widthAnchor),
-      imageContainer.centerYAnchor.constraint(equalTo: infoView.topAnchor)
+      imageContainerCenterYConstraint
       ])
     imageContainer.backgroundColor = .secondaryBackground
     imageContainer.layer.borderWidth = 3
@@ -94,7 +106,7 @@ class HomeVC: UIViewController {
     imageContainer.addSubview(qrCodeImageView)
     NSLayoutConstraint.activate([
       qrCodeImageView.centerXAnchor.constraint(equalTo: imageContainer.centerXAnchor),
-      qrCodeImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.38),
+      qrCodeImageView.widthAnchor.constraint(equalTo: imageContainer.widthAnchor, multiplier: 0.8),
       qrCodeImageView.heightAnchor.constraint(equalTo: qrCodeImageView.widthAnchor),
       qrCodeImageView.centerYAnchor.constraint(equalTo: imageContainer.centerYAnchor)
       ])
@@ -186,18 +198,20 @@ class HomeVC: UIViewController {
       border.heightAnchor.constraint(equalToConstant: 3),
       ])
 
-    let transactionView = UITableView()
+    transactionView = UITableView()
     transactionView.translatesAutoresizingMaskIntoConstraints = false
     transactionView.register(ContactCell.self, forCellReuseIdentifier: "ContactCell")
     transactionView.dataSource = self
     transactionView.register(TransactionCell.self, forCellReuseIdentifier: "TransactionCell")
     transactionView.separatorStyle = .none
     transactionView.rowHeight = 100
+    transactionView.isUserInteractionEnabled = false
     infoView.addSubview(transactionView)
     NSLayoutConstraint.activate([
       transactionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       transactionView.widthAnchor.constraint(equalTo: view.widthAnchor),
       transactionView.topAnchor.constraint(equalTo: imageContainer.bottomAnchor, constant: 5),
+//      transactionView.topAnchor.constraint(greaterThanOrEqualTo: infoView.topAnchor, constant: 20),
       transactionView.bottomAnchor.constraint(equalTo: border.topAnchor)
       ])
 
@@ -244,13 +258,38 @@ class HomeVC: UIViewController {
 
   @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
     switch recognizer.state {
+      
+    // TODO: Properly handle the collapsing & allow table view interaction/scroll
     case .changed:
       let translation  = recognizer.translation(in: self.view).y
       let scale: CGFloat = 0.5
       let constant = scale * translation
-      backgroundViewHeightConstraint.constant = constant
-      if constant > 0.1 * view.bounds.height {
-        shouldReload = true
+      if isCollapsed {
+        backgroundViewHeightConstraint.constant = -200+max(constant,0)
+        imageContainerWidthConstraint.constant = -150+min(max(constant-50, 0),150)
+        let ratio = min(max((translation-100)/300,0),1)
+        balanceView.alpha = ratio
+        balanceLabel.alpha = ratio
+        imageContainer.alpha = ratio
+        if constant > 0.1 * view.bounds.height {
+          shouldExpand = true
+        }
+      } else {
+        backgroundViewHeightConstraint.constant = max(constant,-200)
+        imageContainerWidthConstraint.constant = max(min(constant, 0),-150)
+        let ratio = min((300+translation)/300,1)
+        balanceView.alpha = ratio
+        balanceLabel.alpha = ratio
+        imageContainer.alpha = ratio
+        if constant < -200 {
+          transactionView.contentOffset = CGPoint(x: 0, y: -constant-200)
+        }
+        if constant > 0.1 * view.bounds.height {
+          shouldReload = true
+        }
+        else if -constant > 0.1 * view.bounds.height {
+          shouldCollapse = true
+        }
       }
     case .ended:
       if shouldReload {
@@ -260,10 +299,32 @@ class HomeVC: UIViewController {
           return nil
         }
       }
-      UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
-        self.backgroundViewHeightConstraint.constant = 0
-        self.view.layoutIfNeeded()
-      }, completion: nil)
+
+      if shouldCollapse || (isCollapsed && !shouldExpand) {
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
+          self.backgroundViewHeightConstraint.constant = -200
+          self.imageContainerWidthConstraint.constant = -150
+          self.balanceView.alpha = 0
+          self.balanceLabel.alpha = 0
+          self.imageContainer.alpha = 0
+          self.view.layoutIfNeeded()
+        }, completion: nil)
+        shouldCollapse = false
+        isCollapsed = true
+      }
+      else if !isCollapsed || shouldExpand {
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut, .allowUserInteraction], animations: {
+          self.backgroundViewHeightConstraint.constant = 0
+          self.imageContainerCenterYConstraint.constant = 0
+          self.imageContainerWidthConstraint.constant = 0
+          self.balanceView.alpha = 1
+          self.balanceLabel.alpha = 1
+          self.imageContainer.alpha = 1
+          self.view.layoutIfNeeded()
+        }, completion: nil)
+        isCollapsed = false
+        shouldExpand = false
+      }
     default: break
     }
   }

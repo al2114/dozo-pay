@@ -24,10 +24,10 @@ class HomeVC: UIViewController {
   var shouldReload: Bool = false
 
   var transactions: [Transaction] = []
-
   var backgroundViewHeightConstraint: NSLayoutConstraint!
   var imageContainerWidthConstraint: NSLayoutConstraint!
   var imageContainerCenterYConstraint: NSLayoutConstraint!
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -211,6 +211,7 @@ class HomeVC: UIViewController {
       transactionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       transactionView.widthAnchor.constraint(equalTo: view.widthAnchor),
       transactionView.topAnchor.constraint(equalTo: imageContainer.bottomAnchor, constant: 5),
+//      transactionView.topAnchor.constraint(greaterThanOrEqualTo: infoView.topAnchor, constant: 20),
       transactionView.bottomAnchor.constraint(equalTo: border.topAnchor)
       ])
 

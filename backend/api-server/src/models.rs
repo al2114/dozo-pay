@@ -38,7 +38,6 @@ pub struct NewAccount<'a> {
     pub balance: &'a i32,
 }
 
-
 use super::schema::transactions;
 
 #[derive(Queryable)]
@@ -85,13 +84,31 @@ pub struct Claim {
     pub owner_id: i32,
     pub receiver_id: Option<i32>,
     pub is_active: bool,
-    pub created_at: NaiveDateTime
+    pub created_at: NaiveDateTime,
 }
 
 #[derive(Insertable)]
 #[table_name = "claims"]
 pub struct NewClaim<'a> {
     pub account_id: &'a i32,
-    pub owner_id: &'a i32
+    pub owner_id: &'a i32,
 }
 
+use super::schema::claims;
+
+#[derive(Queryable)]
+pub struct Claim {
+    pub uid: i32,
+    pub account_id: i32,
+    pub owner_id: i32,
+    pub receiver_id: Option<i32>,
+    pub is_active: bool,
+    pub created_at: NaiveDateTime,
+}
+
+#[derive(Insertable)]
+#[table_name = "claims"]
+pub struct NewClaim<'a> {
+    pub account_id: &'a i32,
+    pub owner_id: &'a i32,
+}

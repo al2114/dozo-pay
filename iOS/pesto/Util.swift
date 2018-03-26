@@ -150,6 +150,53 @@ extension Util {
   }
 }
 
+extension Util {
+  static func dateStringFromProtoTimestamp(_ timestamp: SwiftProtobuf.Google_Protobuf_Timestamp) -> String {
+
+    let calendar = Calendar.current
+
+    let date = Date(timeIntervalSince1970: TimeInterval(timestamp.seconds))
+    let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+
+    let today = Date()
+    let todayComponents = calendar.dateComponents([.year, .month, .day], from: today)
+
+    let yesterday = calendar.date(byAdding: .day, value: -1, to: today)
+    let yesterdayComponents = calendar.dateComponents([.year, .month, .day], from: yesterday!)
+
+    let lastWeek = calendar.date(byAdding: .day, value: -7, to: today)
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale.defaultLocale
+
+    dateFormatter.dateFormat = "MM/dd/yy HH:mm"
+
+    print("Formatting \(dateFormatter.string(from: date))")
+
+    var dateString = ""
+
+    if dateComponents == todayComponents {
+      dateFormatter.dateFormat = "H:mm"
+      dateString = "Today \(dateFormatter.string(from: date))"
+    }
+    else if dateComponents == yesterdayComponents  {
+      dateFormatter.dateFormat = "H:mm"
+      dateString = "Yesterday \(dateFormatter.string(from: date))"
+    }
+    else if date > lastWeek! {
+      dateFormatter.dateFormat = "E H:mm"
+      dateString = dateFormatter.string(from: date)
+    }
+    else {
+      dateFormatter.dateFormat = "MMM dd H:mm"
+      dateString = dateFormatter.string(from: date)
+    }
+    print("to \(dateString)")
+
+    return dateString
+  }
+}
+
 enum Result<T> {
   case ok(response: T)
   case error(description: String)

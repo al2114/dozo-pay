@@ -34,6 +34,7 @@ extension UIColor {
   static var primaryTitle: UIColor { return UIColor(hex: "#ffffff") }
   static var secondaryTitle: UIColor { return .pestoGreen }
   static var text: UIColor { return UIColor(hex: "#404040") }
+  static var secondaryText: UIColor { return UIColor(hex: "#b5b5b5") }
   static var accent: UIColor { return UIColor(hex: "#16a747") }
   static var highlight: UIColor { return UIColor(hex: "#52e56d") }
   static var subdued: UIColor { return UIColor(hex: "#f2f2f2") }

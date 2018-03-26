@@ -9,56 +9,6 @@
 import UIKit
 import SwiftProtobuf
 
-class TransactionCell: UITableViewCell {
-  let titleLabel: UILabel!
-  let dateLabel: UILabel!
-  let amountLabel: UILabel!
-  let userLabel: UILabel!
-
-  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-    titleLabel = UILabel()
-    userLabel = UILabel()
-    dateLabel = UILabel()
-    amountLabel = UILabel()
-
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(titleLabel)
-    NSLayoutConstraint.activate([
-      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
-      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor)
-      ])
-
-    userLabel.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(userLabel)
-    NSLayoutConstraint.activate([
-      userLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-      userLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor)
-      ])
-
-
-    dateLabel.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(dateLabel)
-    NSLayoutConstraint.activate([
-      dateLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
-      dateLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor)
-      ])
-
-    amountLabel.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(amountLabel)
-    NSLayoutConstraint.activate([
-      amountLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor),
-      amountLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor)
-      ])
-
-  }
-
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-}
-
 class HomeVC: UIViewController {
   var balanceView: UIView!
   var sendButton: UIButton!
@@ -242,12 +192,12 @@ class HomeVC: UIViewController {
     transactionView.dataSource = self
     transactionView.register(TransactionCell.self, forCellReuseIdentifier: "TransactionCell")
     transactionView.separatorStyle = .none
-    transactionView.rowHeight = 60
+    transactionView.rowHeight = 100
     infoView.addSubview(transactionView)
     NSLayoutConstraint.activate([
       transactionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       transactionView.widthAnchor.constraint(equalTo: view.widthAnchor),
-      transactionView.topAnchor.constraint(equalTo: imageContainer.bottomAnchor),
+      transactionView.topAnchor.constraint(equalTo: imageContainer.bottomAnchor, constant: 5),
       transactionView.bottomAnchor.constraint(equalTo: border.topAnchor)
       ])
 
@@ -348,7 +298,7 @@ class HomeVC: UIViewController {
     toTransaction.amount = 200
     toTransaction.type = .to
     var timestamp = SwiftProtobuf.Google_Protobuf_Timestamp()
-    timestamp.seconds = Int64(Date().addingTimeInterval(-(2*24*3600)).timeIntervalSince1970)
+    timestamp.seconds = Int64(Date().timeIntervalSince1970)
     toTransaction.timestamp = timestamp
 
     fromTransaction.profile = saurav
@@ -367,7 +317,7 @@ extension HomeVC: UITableViewDataSource {
     return transactions.count
   }
 
-  func transactionTypeToString(_ type: Pesto_Models_Transaction.TypeEnum) -> String {
+  func transactionTypeToString(_ type: Transaction.TypeEnum) -> String {
     switch type {
     case .from: return "from"
     case .to: return "to"
@@ -380,15 +330,19 @@ extension HomeVC: UITableViewDataSource {
 
     let transactionCell = tableView.dequeueReusableCell(withIdentifier: "TransactionCell") as! TransactionCell
 
-    transactionCell.titleLabel.text = transactionTypeToString(transaction.type)
+    transactionCell.titleLabel.text = transactionTypeToString(transaction.type).uppercased()
+    switch transaction.type {
+    case .from:
+      transactionCell.amountLabel.text = "+\(Util.amountToCurrencyString(Double(transaction.amount)/100))"
+      transactionCell.amountLabel.textColor = .secondaryTitle
+    case .to:
+      transactionCell.amountLabel.text = Util.amountToCurrencyString(Double(transaction.amount)/100)
+      transactionCell.amountLabel.textColor = .text
+    default: break
+    }
 
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "MMM dd H:mm"
-    dateFormatter.locale = Locale.defaultLocale
-
-    transactionCell.dateLabel.text = dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(transaction.timestamp.seconds)))
-    transactionCell.amountLabel.text = Util.amountToCurrencyString(Double(transaction.amount)/100)
-    transactionCell.userLabel.text = transaction.profile.username
+    transactionCell.dateLabel.text = Util.dateStringFromProtoTimestamp(transaction.timestamp).uppercased()
+    transactionCell.userLabel.text = "@\(transaction.profile.username)"
 
     return transactionCell
   }

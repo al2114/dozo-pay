@@ -211,6 +211,7 @@ class HomeVC: UIViewController {
       transactionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       transactionView.widthAnchor.constraint(equalTo: view.widthAnchor),
       transactionView.topAnchor.constraint(equalTo: imageContainer.bottomAnchor, constant: 5),
+//      transactionView.topAnchor.constraint(greaterThanOrEqualTo: infoView.topAnchor, constant: 20),
       transactionView.bottomAnchor.constraint(equalTo: border.topAnchor)
       ])
 
@@ -261,7 +262,6 @@ class HomeVC: UIViewController {
 
   @objc func menuDrag(recognizer: UIPanGestureRecognizer) {
     switch recognizer.state {
-
     // TODO: Properly handle the collapsing & allow table view interaction/scroll
     case .changed:
       let translation  = recognizer.translation(in: self.view).y
@@ -347,8 +347,6 @@ class HomeVC: UIViewController {
     let cameraVC = CameraVC()
     self.show(cameraVC, sender: self)
   }
-
-  var transactions: [Transaction] = []
 
   func setMockTrasactions() {
 

@@ -19,10 +19,12 @@ class CameraVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.edgesForExtendedLayout = []
+//    self.edgesForExtendedLayout = []
 
     // Get the back-facing camera for capturing videos
-    view.backgroundColor = .primaryBackground
+//    view.backgroundColor = .
+    navigationController?.navigationBar.backgroundColor = .none
+
 
     qrReader = QRReader {
       code in

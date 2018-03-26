@@ -211,7 +211,6 @@ class HomeVC: UIViewController {
       transactionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       transactionView.widthAnchor.constraint(equalTo: view.widthAnchor),
       transactionView.topAnchor.constraint(equalTo: imageContainer.bottomAnchor, constant: 5),
-//      transactionView.topAnchor.constraint(greaterThanOrEqualTo: infoView.topAnchor, constant: 20),
       transactionView.bottomAnchor.constraint(equalTo: border.topAnchor)
       ])
 

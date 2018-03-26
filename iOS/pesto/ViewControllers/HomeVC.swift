@@ -9,56 +9,6 @@
 import UIKit
 import SwiftProtobuf
 
-class TransactionCell: UITableViewCell {
-  let titleLabel: UILabel!
-  let dateLabel: UILabel!
-  let amountLabel: UILabel!
-  let userLabel: UILabel!
-
-  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-    titleLabel = UILabel()
-    userLabel = UILabel()
-    dateLabel = UILabel()
-    amountLabel = UILabel()
-
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(titleLabel)
-    NSLayoutConstraint.activate([
-      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
-      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor)
-      ])
-
-    userLabel.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(userLabel)
-    NSLayoutConstraint.activate([
-      userLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-      userLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor)
-      ])
-
-
-    dateLabel.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(dateLabel)
-    NSLayoutConstraint.activate([
-      dateLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
-      dateLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor)
-      ])
-
-    amountLabel.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(amountLabel)
-    NSLayoutConstraint.activate([
-      amountLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor),
-      amountLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor)
-      ])
-
-  }
-
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-}
-
 class HomeVC: UIViewController {
   var balanceView: UIView!
   var imageContainer: UIView!
@@ -413,7 +363,7 @@ class HomeVC: UIViewController {
     toTransaction.amount = 200
     toTransaction.transactionType = .to
     var timestamp = SwiftProtobuf.Google_Protobuf_Timestamp()
-    timestamp.seconds = Int64(Date().addingTimeInterval(-(2*24*3600)).timeIntervalSince1970)
+    timestamp.seconds = Int64(Date().timeIntervalSince1970)
     toTransaction.timestamp = timestamp
 
     fromTransaction.profile = saurav

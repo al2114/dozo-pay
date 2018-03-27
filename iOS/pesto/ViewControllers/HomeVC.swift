@@ -24,6 +24,7 @@ class HomeVC: UIViewController {
   var shouldReload: Bool = false
 
   var transactions: [Transaction] = []
+
   var backgroundViewHeightConstraint: NSLayoutConstraint!
   var imageContainerWidthConstraint: NSLayoutConstraint!
   var imageContainerCenterYConstraint: NSLayoutConstraint!
@@ -32,7 +33,6 @@ class HomeVC: UIViewController {
     super.viewDidLoad()
 
     view.backgroundColor = .pestoGreen
-
     self.edgesForExtendedLayout = []
 
     let viewBottomAnchor: NSLayoutYAxisAnchor
@@ -227,6 +227,11 @@ class HomeVC: UIViewController {
       cameraImageView.widthAnchor.constraint(equalToConstant: 36),
       cameraImageView.heightAnchor.constraint(equalTo: cameraImageView.widthAnchor),
       ])
+
+    API.getTransactions { transactions in
+      self.transactions = transactions
+      self.transactionView.reloadData()
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {

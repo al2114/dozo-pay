@@ -227,6 +227,11 @@ class HomeVC: UIViewController {
       cameraImageView.widthAnchor.constraint(equalToConstant: 36),
       cameraImageView.heightAnchor.constraint(equalTo: cameraImageView.widthAnchor),
       ])
+
+    API.getTransactions { transactions in
+      self.transactions = transactions
+      self.transactionView.reloadData()
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {

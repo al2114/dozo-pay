@@ -60,7 +60,7 @@ fn add_contact(client: &Client, user_id: i32, contact_username: &str) -> AddCont
     request.set_contact_username(contact_username.to_string());
 
     let mut response = client
-        .post("/contact")
+        .post("/contacts")
         .body(super::serialize(request).unwrap())
         .header(ContentType::Form)
         .dispatch();
@@ -81,7 +81,7 @@ fn test_add_contact(){
 
 fn get_contacts(client: &Client, user_id: i32) -> GetContactsResponse {
     let mut response = client
-        .get(format!("/contact/{}",user_id))
+        .get(format!("/contacts/{}",user_id))
         .header(ContentType::Form)
         .dispatch();
 

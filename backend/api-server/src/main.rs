@@ -187,19 +187,18 @@ fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result
     use schema::contacts;
     use models::Contact;
 
-    use schema::users::dsl::users as users_sql;
     use schema::users;
     use models::User;
 
-    let results = users_sql
-        .find(user_id)
-        .inner_join(contacts::table.on(contacts::user_id.eq(users::uid)))
-        .load::<(User, Contact)>(&db_connection)
+    let results = contacts::table
+        .filter(contacts::user_id.eq(user_id))
+        .inner_join(users::table.on(contacts::contact_id.eq(users::uid)))
+        .load::<(Contact, User)>(&db_connection)
         .map_err(|_| "Unable to find contacts")?;
 
     let contacts = results
         .into_iter()
-        .map(|(user, contact)| protoize_contact(contact, user.username))
+        .map(|(contact, user)| protoize_contact(contact, user.username))
         .collect();
 
     let mut response = GetContactsResponse::new();

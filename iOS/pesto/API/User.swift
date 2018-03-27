@@ -64,7 +64,7 @@ extension API {
   }
 
   static func getMe(withOldMe oldMe: User, completion: @escaping (User) -> Void) {
-    let route = "user/\(oldMe.uid)"
+    let route = "users/\(oldMe.uid)"
     Util.get(toRoute: route) { (result: Result<User>?) in
       if case let .ok(me)? = result {
         completion(me)
@@ -79,7 +79,7 @@ extension API {
   }
 
   static func getMe(withId id: Int32, completion: @escaping (User?) -> Void) {
-    let route = "user/\(id)"
+    let route = "users/\(id)"
     Util.get(toRoute: route) { (result: Result<User>?) in
       if case let .ok(me)? = result {
         completion(me)

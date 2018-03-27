@@ -61,5 +61,5 @@ message GetContactsResponse {
 }
 
 message GetTransactionsResponse {
-  repeated models.Transaction trnsaction = 1;
+  repeated models.Transaction transaction = 1;
 }

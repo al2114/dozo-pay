@@ -50,6 +50,6 @@ message Transaction {
     FROM = 0;
     TO = 1;
   }
-  Type type = 3;
+  Type transaction_type = 3;
   google.protobuf.Timestamp timestamp = 4;
 }

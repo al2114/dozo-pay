@@ -257,7 +257,7 @@ fn get_transactions_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Re
 
     let to_results = transactions::table
         .filter(transactions::uid.eq_any(to_tids))
-        .inner_join(users::table.on(transactions::payer_id.eq(users::account_id)))
+        .inner_join(users::table.on(transactions::payee_id.eq(users::account_id)))
         .load::<(Transaction, User)>(&db_connection)
         .map_err(|_| "Transactions not found")?
         .into_iter()

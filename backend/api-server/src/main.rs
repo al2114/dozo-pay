@@ -263,8 +263,13 @@ fn get_transactions_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Re
         .into_iter()
         .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::TO));
 
-    let transactions = from_results
+    let mut transactions = from_results
         .chain(to_results)
+        .collect::<Vec<_>>();
+    transactions.sort_by(|a, b| a.get_timestamp().get_seconds().cmp(
+                                &b.get_timestamp().get_seconds()));
+    let transactions = transactions
+        .into_iter()
         .collect();
 
     let mut response = GetTransactionsResponse::new();

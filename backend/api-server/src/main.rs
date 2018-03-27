@@ -458,6 +458,7 @@ fn main() {
                login_route,
                topup_route,
                transaction_route,
+               get_transactions_route,
                add_contact_route,
                get_contacts_route,
                get_user_route,

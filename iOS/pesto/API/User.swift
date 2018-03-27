@@ -102,7 +102,7 @@ extension API {
 
   static func getContacts(completion: @escaping ([Contact]) -> Void) {
     User.getMe { me in
-      let route = "contact/\(me.uid)"
+      let route = "contacts/\(me.uid)"
       Util.get(toRoute: route) { (result: Result<GetContactResponse>?) in
         if case let .ok(getContactResponse)? = result {
           completion(getContactResponse.contacts)
@@ -134,7 +134,7 @@ extension API {
       addContactRequest.contactUsername = username
       addContactRequest.userID = me.uid
 
-      let route = "contact"
+      let route = "contacts"
       Util.post(toRoute: route, withProtoMessage: addContactRequest) { result in
         if case let .ok(addContactResponse)? = result {
           completion(addContactResponse.successful)

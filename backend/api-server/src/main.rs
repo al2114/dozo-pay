@@ -266,8 +266,8 @@ fn get_transactions_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Re
     let mut transactions = from_results
         .chain(to_results)
         .collect::<Vec<_>>();
-    transactions.sort_by(|a, b| a.get_timestamp().get_seconds().cmp(
-                                &b.get_timestamp().get_seconds()));
+    transactions.sort_by(|a, b| b.get_timestamp().get_seconds().cmp(
+                                &a.get_timestamp().get_seconds()));
     let transactions = transactions
         .into_iter()
         .collect();

@@ -234,6 +234,7 @@ class HomeVC: UIViewController {
       self.transactions = transactions
       self.transactionView.reloadData()
     }
+//    setMockTrasactions()
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -283,19 +284,19 @@ class HomeVC: UIViewController {
         }
       } else {
         backgroundViewHeightConstraint.constant = max(constant,-200)
-        imageContainerWidthConstraint.constant = max(min(constant, 0),-150)
-        let ratio = min((300+translation)/300,1)
-        balanceView.alpha = ratio
-        balanceLabel.alpha = ratio
-        imageContainer.alpha = ratio
-        if constant < -200 {
-          transactionView.contentOffset = CGPoint(x: 0, y: -constant-200)
+        if transactions.count > 1 {
+          imageContainerWidthConstraint.constant = max(min(constant, 0),-150)
+          let ratio = min((300+translation)/300,1)
+          balanceView.alpha = ratio
+          balanceLabel.alpha = ratio
+          imageContainer.alpha = ratio
+
+          if -constant > 0.1 * view.bounds.height {
+            shouldCollapse = true
+          }
         }
         if constant > 0.1 * view.bounds.height {
           shouldReload = true
-        }
-        else if -constant > 0.1 * view.bounds.height {
-          shouldCollapse = true
         }
       }
     case .ended:

@@ -232,6 +232,7 @@ class HomeVC: UIViewController {
       self.transactions = transactions
       self.transactionView.reloadData()
     }
+//    setMockTrasactions()
   }
 
   override func viewWillAppear(_ animated: Bool) {

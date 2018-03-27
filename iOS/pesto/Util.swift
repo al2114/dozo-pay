@@ -41,8 +41,8 @@ extension Util {
     return formatter.string(from: amount as NSNumber) ?? "\(Locale.defaultCurrencySymbol)0.00"
   }
 
-  static func currencyStringToAmount(_ string: String) -> Double {
-    return Double(string.replacingOccurrences(of: Locale.defaultCurrencySymbol, with: "").replacingOccurrences(of: ",", with: "")) ?? 0
+  static func currencyStringToAmount(_ string: String) -> Int32 {
+    return Int32(string.replacingOccurrences(of: Locale.defaultCurrencySymbol, with: "").replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: "")) ?? 0
   }
 }
 

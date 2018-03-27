@@ -31,8 +31,6 @@ class HomeVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-//    setMockTrasactions()
-
     view.backgroundColor = .pestoGreen
 
     self.edgesForExtendedLayout = []
@@ -229,12 +227,6 @@ class HomeVC: UIViewController {
       cameraImageView.widthAnchor.constraint(equalToConstant: 36),
       cameraImageView.heightAnchor.constraint(equalTo: cameraImageView.widthAnchor),
       ])
-
-    API.getTransactions { transactions in
-      self.transactions = transactions
-      self.transactionView.reloadData()
-    }
-//    setMockTrasactions()
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -244,6 +236,10 @@ class HomeVC: UIViewController {
     User.getMe{ me in
       self.makeUpdates(withUser: me)
       return nil
+    }
+    API.getTransactions { transactions in
+      self.transactions = transactions
+      self.transactionView.reloadData()
     }
     navigationController?.setNavigationBarHidden(true, animated: true)
   }

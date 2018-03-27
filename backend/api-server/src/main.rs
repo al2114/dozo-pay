@@ -218,6 +218,7 @@ fn protoize_transaction(transaction: models::Transaction, user: models::User, tr
     let mut timestamp = ::protobuf::well_known_types::Timestamp::new();
     timestamp.set_seconds(transaction.created_at.timestamp());
     timestamp.set_nanos(transaction.created_at.timestamp_subsec_nanos() as i32);
+    proto_transaction.set_timestamp(timestamp);
     proto_transaction
 }
 

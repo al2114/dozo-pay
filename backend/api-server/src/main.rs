@@ -208,19 +208,13 @@ fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result
     Ok(serialize(response)?)
 }
 
-fn protoize_transaction(transaction: models::Transaction, payee: models::User , payer: model::User, account_id: i32) -> protos::models::Transaction {
+fn protoize_transaction(transaction: models::Transaction, user: models::User, transaction_type: protos::models::Transaction_Type) -> protos::models::Transaction {
     let mut proto_transaction = protos::models::Transaction::new();
     let mut profile = protos::models::Profile::new();
-    if account_id == transaction.payer_id {
-        profile.set_uid(payee.uid);
-        profile.set_username(payee.username);
-        proto_transaction.set_transaction_type(protos::models::Transaction_Type::TO);
-    } else {
-        profile.set_uid(payer.uid);
-        profile.set_username(payer.username);
-        proto_transaction.set_transaction_type(protos::models::Transaction_Type::FROM);
-    }
+    profile.set_uid(user.uid);
+    profile.set_username(user.username);
     proto_transaction.set_profile(profile);
+    proto_transaction.set_transaction_type(transaction_type);
     proto_transaction.set_amount(transaction.amount);
     let mut timestamp = ::protobuf::well_known_types::Timestamp::new();
     timestamp.set_seconds(transaction.created_at.timestamp());
@@ -239,29 +233,42 @@ fn get_transactions_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Re
     use schema::transactions;
     use models::Transaction;
 
-    let account_id = users_sql
+    let from_tids = users_sql
         .find(user_id)
-        .select(users::account_id)
-        .first::<i32>(&db_connection)
-        .map_err(|_| "Account not found")?;
+        .inner_join(transactions::table.on(transactions::payee_id.eq(users::account_id)))
+        .select(transactions::uid)
+        .load::<i32>(&db_connection)
+        .map_err(|_| "Transactions not found")?;
 
-    let results = transactions::table
-        .filter(transactions::payee_id.eq(account_id)
-                .or(transactions::payer_id.eq(account_id)))
-        .inner_join(users::table.on(transactions::payee_id.eq(users::account_id)))
-        .inner_join(users::table.on(transactions::payer_id.eq(users::account_id)));
-    let result = diesel::debug_query(&results).to_string();
-    print!("{}", result);
-        //.load::<(Transaction, User, User)>(&db_connection)
-        //.map_err(|_| "Transactions not found")?;
+    let to_tids = users_sql
+        .find(user_id)
+        .inner_join(transactions::table.on(transactions::payer_id.eq(users::account_id)))
+        .select(transactions::uid)
+        .load::<i32>(&db_connection)
+        .map_err(|_| "Transactions not found")?;
 
-    //let transactions = results
-        //.into_iter()
-        //.map(|(t, u1, u2)| protoize_transaction(t, u1, u2, account_id))
-        //.collect();
+    let from_results = transactions::table
+        .filter(transactions::uid.eq_any(from_tids))
+        .inner_join(users::table.on(transactions::payer_id.eq(users::account_id)))
+        .load::<(Transaction, User)>(&db_connection)
+        .map_err(|_| "Transactions not found")?
+        .into_iter()
+        .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::FROM));
+
+    let to_results = transactions::table
+        .filter(transactions::uid.eq_any(to_tids))
+        .inner_join(users::table.on(transactions::payer_id.eq(users::account_id)))
+        .load::<(Transaction, User)>(&db_connection)
+        .map_err(|_| "Transactions not found")?
+        .into_iter()
+        .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::TO));
+
+    let transactions = from_results
+        .chain(to_results)
+        .collect();
 
     let mut response = GetTransactionsResponse::new();
-    //response.set_transactions(transactions);
+    response.set_transactions(transactions);
     Ok(serialize(response)?)
 }
 

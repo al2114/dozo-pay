@@ -23,13 +23,15 @@ class HomeVC: UIViewController {
   var shouldExpand: Bool = false
   var shouldReload: Bool = false
 
+  var transactions: [Transaction] = []
+
   var backgroundViewHeightConstraint: NSLayoutConstraint!
   var imageContainerWidthConstraint: NSLayoutConstraint!
   var imageContainerCenterYConstraint: NSLayoutConstraint!
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    setMockTrasactions()
+//    setMockTrasactions()
 
     view.backgroundColor = .pestoGreen
 
@@ -227,6 +229,11 @@ class HomeVC: UIViewController {
       cameraImageView.widthAnchor.constraint(equalToConstant: 36),
       cameraImageView.heightAnchor.constraint(equalTo: cameraImageView.widthAnchor),
       ])
+
+    API.getTransactions { transactions in
+      self.transactions = transactions
+      self.transactionView.reloadData()
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -344,7 +351,6 @@ class HomeVC: UIViewController {
     let cameraVC = CameraVC()
     self.show(cameraVC, sender: self)
   }
-  var transactions: [Transaction] = []
 
   func setMockTrasactions() {
 
@@ -357,14 +363,14 @@ class HomeVC: UIViewController {
 
     toTransaction.profile = saurav
     toTransaction.amount = 200
-    toTransaction.type = .to
+    toTransaction.transactionType = .to
     var timestamp = SwiftProtobuf.Google_Protobuf_Timestamp()
     timestamp.seconds = Int64(Date().timeIntervalSince1970)
     toTransaction.timestamp = timestamp
 
     fromTransaction.profile = saurav
     fromTransaction.amount = 580
-    fromTransaction.type = .from
+    fromTransaction.transactionType = .from
     timestamp.seconds = Int64(Date().addingTimeInterval(-(2*24*3600) + 2200).timeIntervalSince1970)
     fromTransaction.timestamp = timestamp
     transactions = [toTransaction, fromTransaction]
@@ -391,8 +397,8 @@ extension HomeVC: UITableViewDataSource {
 
     let transactionCell = tableView.dequeueReusableCell(withIdentifier: "TransactionCell") as! TransactionCell
 
-    transactionCell.titleLabel.text = transactionTypeToString(transaction.type).uppercased()
-    switch transaction.type {
+    transactionCell.titleLabel.text = transactionTypeToString(transaction.transactionType).uppercased()
+    switch transaction.transactionType {
     case .from:
       transactionCell.amountLabel.text = "+\(Util.amountToCurrencyString(Double(transaction.amount)/100))"
       transactionCell.amountLabel.textColor = .secondaryTitle

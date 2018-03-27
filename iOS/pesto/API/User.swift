@@ -21,6 +21,7 @@ typealias LoginResponse = Pesto_UserMessages_LoginResponse
 typealias GetContactResponse = Pesto_UserMessages_GetContactsResponse
 typealias AddContactRequest = Pesto_UserMessages_AddContactRequest
 typealias AddContactResponse = Pesto_UserMessages_AddContactResponse
+typealias GetTransactionsResponse = Pesto_UserMessages_GetTransactionsResponse
 
 import Foundation
 
@@ -105,6 +106,20 @@ extension API {
       Util.get(toRoute: route) { (result: Result<GetContactResponse>?) in
         if case let .ok(getContactResponse)? = result {
           completion(getContactResponse.contacts)
+        } else {
+          completion([])
+        }
+      }
+      return nil
+    }
+  }
+
+  static func getTransactions(completion: @escaping ([Transaction]) -> Void) {
+    User.getMe { me in
+      let route = "transactions/\(me.uid)"
+      Util.get(toRoute: route) { (result: Result<GetTransactionsResponse>?) in
+        if case let .ok(getTransactionsResponse)? = result {
+          completion(getTransactionsResponse.transactions)
         } else {
           completion([])
         }

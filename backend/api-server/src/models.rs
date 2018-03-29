@@ -8,17 +8,19 @@ pub struct User {
     pub account_id: i32,
     pub username: String,
     pub password: String,
-    pub created_at: NaiveDateTime
+    pub created_at: NaiveDateTime,
+    pub device_token: Option<String>,
 }
 
 #[derive(Insertable)]
 #[table_name = "users"]
 pub struct NewUser<'a> {
     pub phone_no: &'a str,
-    pub picture_url: &'a str,
+    pub picture_url: Option<&'a str>,
     pub account_id: &'a i32,
     pub username: &'a str,
-    pub password: &'a str
+    pub password: &'a str,
+    pub device_token: Option<&'a str>,
 }
 
 use super::schema::accounts;
@@ -27,13 +29,13 @@ use super::schema::accounts;
 pub struct Account {
     pub uid: i32,
     pub balance: i32,
-    pub created_at: NaiveDateTime
+    pub created_at: NaiveDateTime,
 }
 
 #[derive(Insertable)]
 #[table_name = "accounts"]
 pub struct NewAccount<'a> {
-    pub balance: &'a i32
+    pub balance: &'a i32,
 }
 
 
@@ -46,7 +48,7 @@ pub struct Transaction {
     pub payee_id: i32,
     pub amount: i32,
     pub is_successful: bool,
-    pub created_at: NaiveDateTime
+    pub created_at: NaiveDateTime,
 }
 
 #[derive(Insertable)]
@@ -54,7 +56,7 @@ pub struct Transaction {
 pub struct NewTransaction<'a> {
     pub payer_id: &'a i32,
     pub payee_id: &'a i32,
-    pub amount: &'a i32
+    pub amount: &'a i32,
 }
 
 use super::schema::contacts;
@@ -64,12 +66,12 @@ pub struct Contact {
     pub user_id: i32,
     pub contact_id: i32,
     pub is_trusted: bool,
-    pub created_at: NaiveDateTime
+    pub created_at: NaiveDateTime,
 }
 
 #[derive(Insertable)]
 #[table_name = "contacts"]
 pub struct NewContact<'a> {
     pub user_id: &'a i32,
-    pub contact_id: &'a i32
+    pub contact_id: &'a i32,
 }

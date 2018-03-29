@@ -35,6 +35,7 @@ table! {
         username -> Varchar,
         password -> Bpchar,
         created_at -> Timestamp,
+        device_token -> Nullable<Varchar>,
     }
 }
 

@@ -1,30 +1,24 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 
-extern crate rocket;
-// #[macro_use]
-extern crate rocket_contrib;
-
-// #[macro_use]
-// extern crate serde_derive;
+extern crate apns;
+use apns::{APNs, APNsClient};
+extern crate chrono;
+#[macro_use] extern crate diesel;
+extern crate dotenv;
 
 extern crate protobuf;
-
-#[macro_use]
-extern crate diesel;
-extern crate chrono;
-extern crate lazy_static;
-extern crate dotenv;
-extern crate r2d2;
-
 use protobuf::{CodedInputStream};
 use protobuf::{CodedOutputStream};
-use protos::user_messages::*;
+
+extern crate r2d2;
+extern crate rocket;
+use rocket::State;
 
 use std::io::Cursor;
-
 use dotenv::dotenv;
 use std::env;
+
 use self::diesel::prelude::*;
 
 use std::io;
@@ -34,7 +28,9 @@ use rocket::response::NamedFile;
 
 mod models;
 mod pg_pool;
+use pg_pool::{PgPool, PgPooledConnection};
 mod protos;
+use protos::user_messages::*;
 mod schema;
 
 #[cfg(test)]
@@ -82,8 +78,7 @@ fn file_route(file: PathBuf) -> Option<NamedFile>{
     NamedFile::open(Path::new("static/").join(file)).ok()
 }
 
-
-fn update_balances(transaction: &models::Transaction, db_connection: &pg_pool::PooledConnection) -> Result<(bool, models::Account), String> {
+fn update_balances(transaction: &models::Transaction, db_connection: &PgPooledConnection) -> Result<(bool, models::Account), String> {
     use schema::accounts::dsl::accounts as accounts_sql;
     use schema::accounts;
     use models::Account;
@@ -117,7 +112,7 @@ impl From<Error> for Err {
     }
 }
 
-fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &pg_pool::PooledConnection) -> Result<(models::Account, models::Transaction), String> {
+fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &PgPooledConnection) -> Result<(models::Account, models::Transaction), String> {
     let new_transaction = models::NewTransaction {
         payer_id: &payer_id,
         payee_id: &payee_id,
@@ -149,7 +144,7 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
 }
 
 #[post("/contacts", data="<input>")]
-fn add_contact_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+fn add_contact_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let requests = deserialize::<AddContactRequest>(input)?;
 
     let user_id = requests.get_user_id();
@@ -191,7 +186,7 @@ fn protoize_contact(contact: models::Contact, username: String) -> protos::model
 }
 
 #[get("/contacts/<user_id>")]
-fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec<u8>, String> {
+fn get_contacts_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, String> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::contacts;
@@ -233,7 +228,7 @@ fn protoize_transaction(transaction: models::Transaction, user: models::User, tr
 }
 
 #[get("/transactions/<user_id>")]
-fn get_transactions_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec<u8>, String> {
+fn get_transactions_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, String> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::users::dsl::users as users_sql;
@@ -288,7 +283,7 @@ fn get_transactions_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Re
 }
 
 #[get("/users/<user_id>")]
-fn get_user_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec<u8>, String> {
+fn get_user_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, String> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::users::dsl::users as users_sql;
@@ -309,7 +304,7 @@ fn get_user_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec
 }
 
 #[post("/pay", data="<input>")]
-fn transaction_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+fn transaction_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<TransactionRequest>(input)?;
     let payer_id = request.get_payer_id();
     let payee_id = request.get_payee_id();
@@ -337,7 +332,7 @@ fn transaction_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Resu
 }
 
 #[post("/topup", data="<input>")]
-fn topup_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+fn topup_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<TopupRequest>(input)?;
 
     let db_connection = pool.get().expect("failed to obtain database connection");
@@ -377,7 +372,7 @@ fn topup_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec
 }
 
 #[post("/register", data="<input>")]
-fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+fn register_route(db_connection: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<RegisterRequest>(input)?;
 
     let db_connection_pool = &db_connection;
@@ -395,11 +390,12 @@ fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -
         .map_err(|_| "Error inserting new account")?;
 
     let new_user = models::NewUser {
-        phone_no:    request.get_phone_no(),
-        picture_url: "",
-        account_id:  &account.uid,
-        username:    request.get_username(),
-        password:    request.get_password()
+        phone_no:     request.get_phone_no(),
+        picture_url:  None,
+        account_id:   &account.uid,
+        username:     request.get_username(),
+        password:     request.get_password(),
+        device_token: None
     };
 
     use schema::users;
@@ -420,7 +416,7 @@ fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -
 }
 
 #[post("/login", data="<input>")]
-fn login_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<LoginRequest>(input)?;
 
     let username = request.get_username();
@@ -460,8 +456,14 @@ fn main() {
         .expect("DATABASE_URL must be set");
     let database_connection = pg_pool::init(&database_url);
 
+    let apns = APNs::new("apn/apn.crt", "apn/apn.key", false)
+        .expect("APN config unsucessful");
+    let apns_client = apns.new_client()
+        .expect("APN client setup unsucessful");
+
     rocket::ignite()
         .manage(database_connection)
+        .manage(apns_client)
         .mount("/", routes![
                index_route,
                file_route,

@@ -27,6 +27,11 @@ use dotenv::dotenv;
 use std::env;
 use self::diesel::prelude::*;
 
+use std::io;
+use std::path::{Path, PathBuf};
+
+use rocket::response::NamedFile;
+
 mod models;
 mod pg_pool;
 mod protos;
@@ -68,10 +73,15 @@ fn protoize_user(user: models::User, balance: i32) -> protos::models::User {
 
 
 #[get("/")]
-fn hello_route() -> String {
-    let response = "Hello, world!".to_string();
-    response
+fn index_route() -> io::Result<NamedFile> {
+    NamedFile::open("static/index.html")
 }
+
+#[get("/<file..>", rank = 2)]
+fn file_route(file: PathBuf) -> Option<NamedFile>{
+    NamedFile::open(Path::new("static/").join(file)).ok()
+}
+
 
 fn update_balances(transaction: &models::Transaction, db_connection: &pg_pool::PooledConnection) -> Result<(bool, models::Account), String> {
     use schema::accounts::dsl::accounts as accounts_sql;
@@ -453,7 +463,8 @@ fn main() {
     rocket::ignite()
         .manage(database_connection)
         .mount("/", routes![
-               hello_route,
+               index_route,
+               file_route,
                register_route,
                login_route,
                topup_route,

@@ -42,6 +42,7 @@
 		3787C5763444638857844FD6 /* Pods_Pesto_Pay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */; };
 		CB046909204349C100DF284F /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB046908204349C100DF284F /* CircleButton.swift */; };
 		CB450895205D826600129603 /* TopupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB450894205D826600129603 /* TopupVC.swift */; };
+		CB45F10E2069774400351E8D /* TransactionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB45F10D2069774400351E8D /* TransactionCell.swift */; };
 		CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB49D95520472B6E00A33C4A /* Preferences.swift */; };
 		CBD9EE01205CBBFF0080427E /* InclusiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD9EE00205CBBFF0080427E /* InclusiveView.swift */; };
 		CBD9EE03205CF3100080427E /* ProtectedTextfield.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */; };
@@ -91,6 +92,7 @@
 		B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pesto_Pay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB046908204349C100DF284F /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
 		CB450894205D826600129603 /* TopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopupVC.swift; sourceTree = "<group>"; };
+		CB45F10D2069774400351E8D /* TransactionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCell.swift; sourceTree = "<group>"; };
 		CB49D95520472B6E00A33C4A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		CBD9EE00205CBBFF0080427E /* InclusiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InclusiveView.swift; sourceTree = "<group>"; };
 		CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedTextfield.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				2B501623205227AF00B35EB0 /* NiceTextField.swift */,
 				CBD9EE00205CBBFF0080427E /* InclusiveView.swift */,
 				CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */,
+				CB45F10D2069774400351E8D /* TransactionCell.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -377,6 +380,7 @@
 				2B4777BB202A3D0F0077415A /* Util.swift in Sources */,
 				2B90929E203E50E400077DC1 /* Configuration.swift in Sources */,
 				2B90927B203E349400077DC1 /* Design.swift in Sources */,
+				CB45F10E2069774400351E8D /* TransactionCell.swift in Sources */,
 				2B4777AF202A29110077415A /* HomeVC.swift in Sources */,
 				2BCBE3CA2041E3A900AA7D30 /* Crypto.swift in Sources */,
 				2B4777B5202A32130077415A /* SendAmountVC.swift in Sources */,

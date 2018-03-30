@@ -18,7 +18,7 @@ class ContactCell: UITableViewCell {
     profileImageView = CircularImageView()
     separatorView = UIView()
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    
+
     nameLabel.font = .regular
 
     profileImageView.translatesAutoresizingMaskIntoConstraints = false

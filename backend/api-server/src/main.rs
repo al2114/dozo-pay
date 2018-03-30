@@ -138,7 +138,7 @@ fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connecti
     }).map_err(|e| e.description )
 }
 
-#[post("/contact", data="<input>")]
+#[post("/contacts", data="<input>")]
 fn add_contact_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let requests = deserialize::<AddContactRequest>(input)?;
 
@@ -180,35 +180,25 @@ fn protoize_contact(contact: models::Contact, username: String) -> protos::model
     proto_contact
 }
 
-#[get("/contact/<user_id>")]
+#[get("/contacts/<user_id>")]
 fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec<u8>, String> {
-
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::contacts::dsl::contacts as contacts_sql;
     use schema::contacts;
     use models::Contact;
 
-    let contacts = contacts_sql
+    use schema::users;
+    use models::User;
+
+    let results = contacts::table
         .filter(contacts::user_id.eq(user_id))
-        .load::<Contact>(&db_connection)
+        .inner_join(users::table.on(contacts::contact_id.eq(users::uid)))
+        .load::<(Contact, User)>(&db_connection)
         .map_err(|_| "Unable to find contacts")?;
 
-    use protobuf::repeated::RepeatedField;
-    let contacts: RepeatedField<_> = contacts
+    let contacts = results
         .into_iter()
-        .map(|contact| {
-            use schema::users::dsl::users as users_sql;
-            use models::User;
-
-            let user = users_sql
-                .find(contact.contact_id)
-                .first::<User>(&db_connection)
-                .unwrap(); //TODO
-
-            let contact = protoize_contact(contact, user.username);
-            contact
-        })
+        .map(|(contact, user)| protoize_contact(contact, user.username))
         .collect();
 
     let mut response = GetContactsResponse::new();
@@ -217,23 +207,92 @@ fn get_contacts_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result
     Ok(serialize(response)?)
 }
 
-#[get("/user/<user_id>")]
+fn protoize_transaction(transaction: models::Transaction, user: models::User, transaction_type: protos::models::Transaction_Type) -> protos::models::Transaction {
+    let mut proto_transaction = protos::models::Transaction::new();
+    let mut profile = protos::models::Profile::new();
+    profile.set_uid(user.uid);
+    profile.set_username(user.username);
+    proto_transaction.set_profile(profile);
+    proto_transaction.set_transaction_type(transaction_type);
+    proto_transaction.set_amount(transaction.amount);
+    let mut timestamp = ::protobuf::well_known_types::Timestamp::new();
+    timestamp.set_seconds(transaction.created_at.timestamp());
+    timestamp.set_nanos(transaction.created_at.timestamp_subsec_nanos() as i32);
+    proto_transaction.set_timestamp(timestamp);
+    proto_transaction
+}
+
+#[get("/transactions/<user_id>")]
+fn get_transactions_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec<u8>, String> {
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    use schema::users::dsl::users as users_sql;
+    use schema::users;
+    use models::User;
+
+    use schema::transactions;
+    use models::Transaction;
+
+    let from_tids = users_sql
+        .find(user_id)
+        .inner_join(transactions::table.on(transactions::payee_id.eq(users::account_id)))
+        .select(transactions::uid)
+        .load::<i32>(&db_connection)
+        .map_err(|_| "Transactions not found")?;
+
+    let to_tids = users_sql
+        .find(user_id)
+        .inner_join(transactions::table.on(transactions::payer_id.eq(users::account_id)))
+        .select(transactions::uid)
+        .load::<i32>(&db_connection)
+        .map_err(|_| "Transactions not found")?;
+
+    let from_results = transactions::table
+        .filter(transactions::uid.eq_any(from_tids))
+        .inner_join(users::table.on(transactions::payer_id.eq(users::account_id)))
+        .load::<(Transaction, User)>(&db_connection)
+        .map_err(|_| "Transactions not found")?
+        .into_iter()
+        .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::FROM));
+
+    let to_results = transactions::table
+        .filter(transactions::uid.eq_any(to_tids))
+        .inner_join(users::table.on(transactions::payee_id.eq(users::account_id)))
+        .load::<(Transaction, User)>(&db_connection)
+        .map_err(|_| "Transactions not found")?
+        .into_iter()
+        .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::TO));
+
+    let mut transactions = from_results
+        .chain(to_results)
+        .collect::<Vec<_>>();
+    transactions.sort_by(|a, b| b.get_timestamp().get_seconds().cmp(
+                                &a.get_timestamp().get_seconds()));
+    let transactions = transactions
+        .into_iter()
+        .collect();
+
+    let mut response = GetTransactionsResponse::new();
+    response.set_transactions(transactions);
+    Ok(serialize(response)?)
+}
+
+#[get("/users/<user_id>")]
 fn get_user_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Result<Vec<u8>, String> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::users::dsl::users as users_sql;
+    use schema::users;
     use models::User;
-    use schema::accounts::dsl::accounts as accounts_sql;
+
+    use schema::accounts;
     use models::Account;
 
-    let user = users_sql
+    let (user, account) = users_sql
         .find(user_id)
-        .first::<User>(&db_connection)
+        .inner_join(accounts::table.on(users::account_id.eq(accounts::uid)))
+        .first::<(User, Account)>(&db_connection)
         .map_err(|_| "User not found")?;
-    let account = accounts_sql
-        .find(user.account_id)
-        .first::<Account>(&db_connection)
-        .map_err(|_| "Account not found")?;
 
     let user = protoize_user(user, account.balance);
     Ok(serialize(user)?)
@@ -271,14 +330,11 @@ fn transaction_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Resu
 fn topup_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<TopupRequest>(input)?;
 
-    use schema::users::dsl::users as users_sql;
-    use models::User;
-
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    let user = users_sql.find(request.get_uid())
-        .first::<User>(&db_connection)
-        .map_err(|_| "User not found")?;
+    use schema::users::dsl::users as users_sql;
+    use schema::users;
+    use models::User;
 
     use schema::accounts::dsl::accounts as accounts_sql;
     use schema::accounts;
@@ -290,9 +346,11 @@ fn topup_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec
         .get_result::<Account>(&db_connection)
         .map_err(|_| "Master account does not exist")?;
 
-    let mut user_account = accounts_sql.find(user.account_id)
-        .first::<Account>(&db_connection)
-        .map_err(|_| "User does not have an account")?;
+    let (user, mut user_account) = users_sql
+        .find(request.get_uid())
+        .inner_join(accounts::table.on(users::account_id.eq(accounts::uid)))
+        .first::<(User, Account)>(&db_connection)
+        .map_err(|_| "User not found")?;
 
     let (_, transaction) = execute_transaction(&master_account.uid, &user_account.uid, &request.amount, &db_connection)?;
 
@@ -325,7 +383,6 @@ fn register_route(db_connection: rocket::State<pg_pool::Pool>, input: Vec<u8>) -
         .get_result::<Account>(&db_connection_pool.get()
                                .expect("failed to obtain database connection"))
         .map_err(|_| "Error inserting new account")?;
-
 
     let new_user = models::NewUser {
         phone_no:    request.get_phone_no(),
@@ -362,18 +419,16 @@ fn login_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec
     let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::users;
+    use models::User;
 
-    let user = users::table
-        .filter(users::username.eq(username))
-        .first::<models::User>(&db_connection)
-        .map_err(|_| "User not found")?;
-
-    use schema::accounts::dsl::accounts as accounts_sql;
+    use schema::accounts;
     use models::Account;
 
-    let account = accounts_sql.find(user.account_id)
-        .first::<Account>(&db_connection)
-        .map_err(|_| "User has no account")?;
+    let (user, account) = users::table
+        .filter(users::username.eq(username))
+        .inner_join(accounts::table.on(users::account_id.eq(accounts::uid)))
+        .first::<(User, Account)>(&db_connection)
+        .map_err(|_| "User not found")?;
 
     let mut response = LoginResponse::new();
 
@@ -403,6 +458,7 @@ fn main() {
                login_route,
                topup_route,
                transaction_route,
+               get_transactions_route,
                add_contact_route,
                get_contacts_route,
                get_user_route,

@@ -11,6 +11,8 @@ typealias Room = Pesto_Models_Room
 typealias Claim = Pesto_Models_Claim
 typealias RoomItem = Pesto_Models_RoomItem
 typealias Contact = Pesto_Models_Contact
+typealias Profile = Pesto_Models_Profile
+typealias Transaction = Pesto_Models_Transaction
 
 typealias RegisterRequest = Pesto_UserMessages_RegisterRequest
 typealias RegisterResponse = Pesto_UserMessages_RegisterResponse
@@ -19,6 +21,7 @@ typealias LoginResponse = Pesto_UserMessages_LoginResponse
 typealias GetContactResponse = Pesto_UserMessages_GetContactsResponse
 typealias AddContactRequest = Pesto_UserMessages_AddContactRequest
 typealias AddContactResponse = Pesto_UserMessages_AddContactResponse
+typealias GetTransactionsResponse = Pesto_UserMessages_GetTransactionsResponse
 
 import Foundation
 
@@ -61,7 +64,7 @@ extension API {
   }
 
   static func getMe(withOldMe oldMe: User, completion: @escaping (User) -> Void) {
-    let route = "user/\(oldMe.uid)"
+    let route = "users/\(oldMe.uid)"
     Util.get(toRoute: route) { (result: Result<User>?) in
       if case let .ok(me)? = result {
         completion(me)
@@ -76,7 +79,7 @@ extension API {
   }
 
   static func getMe(withId id: Int32, completion: @escaping (User?) -> Void) {
-    let route = "user/\(id)"
+    let route = "users/\(id)"
     Util.get(toRoute: route) { (result: Result<User>?) in
       if case let .ok(me)? = result {
         completion(me)
@@ -99,10 +102,24 @@ extension API {
 
   static func getContacts(completion: @escaping ([Contact]) -> Void) {
     User.getMe { me in
-      let route = "contact/\(me.uid)"
+      let route = "contacts/\(me.uid)"
       Util.get(toRoute: route) { (result: Result<GetContactResponse>?) in
         if case let .ok(getContactResponse)? = result {
           completion(getContactResponse.contacts)
+        } else {
+          completion([])
+        }
+      }
+      return nil
+    }
+  }
+
+  static func getTransactions(completion: @escaping ([Transaction]) -> Void) {
+    User.getMe { me in
+      let route = "transactions/\(me.uid)"
+      Util.get(toRoute: route) { (result: Result<GetTransactionsResponse>?) in
+        if case let .ok(getTransactionsResponse)? = result {
+          completion(getTransactionsResponse.transactions)
         } else {
           completion([])
         }
@@ -117,7 +134,7 @@ extension API {
       addContactRequest.contactUsername = username
       addContactRequest.userID = me.uid
 
-      let route = "contact"
+      let route = "contacts"
       Util.post(toRoute: route, withProtoMessage: addContactRequest) { result in
         if case let .ok(addContactResponse)? = result {
           completion(addContactResponse.successful)

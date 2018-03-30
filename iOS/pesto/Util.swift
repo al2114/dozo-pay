@@ -10,7 +10,8 @@ import UIKit
 import SwiftProtobuf
 
 //let server = "http://localhost:3001"
-let server = "http://54.84.120.127"
+//let server = "http://54.84.120.127"
+let server = "https://pesto-pay.com"
 
 struct Util {
   static var filter = CIFilter(name: "CIQRCodeGenerator")!
@@ -41,8 +42,8 @@ extension Util {
     return formatter.string(from: amount as NSNumber) ?? "\(Locale.defaultCurrencySymbol)0.00"
   }
 
-  static func currencyStringToAmount(_ string: String) -> Double {
-    return Double(string.replacingOccurrences(of: Locale.defaultCurrencySymbol, with: "").replacingOccurrences(of: ",", with: "")) ?? 0
+  static func currencyStringToAmount(_ string: String) -> Int32 {
+    return Int32(string.replacingOccurrences(of: Locale.defaultCurrencySymbol, with: "").replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: "")) ?? 0
   }
 }
 
@@ -147,6 +148,53 @@ extension Util {
       }
     }
     task.resume()
+  }
+}
+
+extension Util {
+  static func dateStringFromProtoTimestamp(_ timestamp: SwiftProtobuf.Google_Protobuf_Timestamp) -> String {
+
+    let calendar = Calendar.current
+
+    let date = Date(timeIntervalSince1970: TimeInterval(timestamp.seconds))
+    let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+
+    let today = Date()
+    let todayComponents = calendar.dateComponents([.year, .month, .day], from: today)
+
+    let yesterday = calendar.date(byAdding: .day, value: -1, to: today)
+    let yesterdayComponents = calendar.dateComponents([.year, .month, .day], from: yesterday!)
+
+    let lastWeek = calendar.date(byAdding: .day, value: -7, to: today)
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale.defaultLocale
+
+    dateFormatter.dateFormat = "MM/dd/yy HH:mm"
+
+    print("Formatting \(dateFormatter.string(from: date))")
+
+    var dateString = ""
+
+    if dateComponents == todayComponents {
+      dateFormatter.dateFormat = "H:mm"
+      dateString = "Today \(dateFormatter.string(from: date))"
+    }
+    else if dateComponents == yesterdayComponents  {
+      dateFormatter.dateFormat = "H:mm"
+      dateString = "Yesterday \(dateFormatter.string(from: date))"
+    }
+    else if date > lastWeek! {
+      dateFormatter.dateFormat = "E H:mm"
+      dateString = dateFormatter.string(from: date)
+    }
+    else {
+      dateFormatter.dateFormat = "MMM dd H:mm"
+      dateString = dateFormatter.string(from: date)
+    }
+    print("to \(dateString)")
+
+    return dateString
   }
 }
 

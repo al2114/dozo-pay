@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SwiftProtobuf
 
 class HomeVC: UIViewController {
   var balanceView: UIView!
@@ -345,30 +344,6 @@ class HomeVC: UIViewController {
   @objc func camera() {
     let cameraVC = CameraVC()
     self.show(cameraVC, sender: self)
-  }
-
-  func setMockTrasactions() {
-
-    var toTransaction = Transaction()
-    var fromTransaction = Transaction()
-
-    var saurav = Profile()
-    saurav.uid = 3
-    saurav.username = "saurav"
-
-    toTransaction.profile = saurav
-    toTransaction.amount = 200
-    toTransaction.transactionType = .to
-    var timestamp = SwiftProtobuf.Google_Protobuf_Timestamp()
-    timestamp.seconds = Int64(Date().timeIntervalSince1970)
-    toTransaction.timestamp = timestamp
-
-    fromTransaction.profile = saurav
-    fromTransaction.amount = 580
-    fromTransaction.transactionType = .from
-    timestamp.seconds = Int64(Date().addingTimeInterval(-(2*24*3600) + 2200).timeIntervalSince1970)
-    fromTransaction.timestamp = timestamp
-    transactions = [toTransaction, fromTransaction]
   }
 }
 

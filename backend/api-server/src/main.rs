@@ -239,7 +239,6 @@ fn get_transactions_route(pool: rocket::State<pg_pool::Pool>, user_id: i32)-> Re
         .select(transactions::uid)
         .load::<i32>(&db_connection)
         .map_err(|_| "Transactions not found")?;
-<<<<<<< HEAD
 
     let to_tids = users_sql
         .find(user_id)

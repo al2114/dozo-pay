@@ -639,6 +639,9 @@ fn main() {
                add_contact_route,
                get_contacts_route,
                get_user_route,
+               create_claim_route,
+               accept_claim_route,
+               revoke_claim_route
         ])
         .launch();
 }

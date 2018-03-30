@@ -9,7 +9,7 @@ pub type PgPooledConnection = r2d2::PooledConnection<ManagedPgConn>;
 use std::ops::Deref;
 use rocket::http::Status;
 use rocket::request::{self, FromRequest};
-use rocket::{Request, State, Outcome};
+use rocket::{Outcome, Request, State};
 /// Db Connection request guard type: wrapper around r2d2 pooled connection
 pub struct DbConn(pub PgPooledConnection);
 

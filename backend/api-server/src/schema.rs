@@ -50,10 +50,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
-    accounts,
-    claims,
-    contacts,
-    transactions,
-    users,
-);
+allow_tables_to_appear_in_same_query!(accounts, claims, contacts, transactions, users,);

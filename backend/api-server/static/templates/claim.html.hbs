@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!--  Meta tags for social media -->
+
+	<meta property="og:title" content="{{currency_symbol}}{{amount}} from @{{sender}}">
+	<meta property="og:image" content="https://al2114.github.io/dozo-site/claim/assets/og-image.jpg">
+	<meta property="og:url" content="https://al2114.github.io/dozo-site/claim/index.html">
+	<meta name="twitter:card" content="https://al2114.github.io/dozo-site/claim/assets/og-image.jpg">
+
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/style.css">
+
+	<title>{{currency_symbol}}{{amount}} from @{{sender}} | Pesto Pay</title>
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <!-- <a class="navbar-brand light small" href="#">Login/Register</a> -->
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	    <span class="navbar-toggler-icon"></span>
+	  </button>
+
+	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+	    <ul class="navbar-nav mr-auto">
+	      <li class="nav-item active">
+	        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+	      </li>
+	    </ul>
+	    <!-- <form class="form-inline my-2 my-lg-0">
+	      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+	      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+	    </form> -->
+	  </div>
+	  <!-- <a href="#" class="my-2 light"">hello, andrew</span> -->
+
+	  <!--
+	<div class="dropdown">
+	  <a class="btn dropdown-toggle my-2 light" data-toggle="dropdown"><span class="pesto">hello, andrew</span>
+	  <span class="caret"></span></a>
+	  <ul class="dropdown-menu">
+	    <li><a href="#">Logout</a></li>
+	  </ul>
+	</div> -->
+	<a href="#" class="my-2 light dropdown-toggle">{{login_text}}</a>
+
+	<!-- hello, andrew <span class="caret"></span> or login / register -->
+
+	</nav>
+
+	<div class="container main">
+		<div class="row justify-content-center">
+			<div class="logo col-3 col-sm-2 col-lg-1 justify-content-center">
+				<img src="/assets/pesto-logo.svg" class="center-block"/>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+	        <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
+	        	<div class="claim-contents text-center">
+					<p class="text-center light align-middle">received</p>
+					<h1 class="text-center highlight">{{currency_symbol}}{{amount}}</h1>
+					<p class="text-center">from <span class="highlight">@{{sender}}</span></p>
+					<button type="button" class="btn btn-pesto center-block">Claim</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="/scripts/jquery-3.3.1.min.js"></script>
+	<script src="/scripts/popper.min.js"></script>
+	<script src="/scripts/bootstrap.min.js"></script>
+	<script src="/scripts/protos/bundle.js"></script>
+	<script src="/scripts/script.js"></script>
+</body>
+</html>

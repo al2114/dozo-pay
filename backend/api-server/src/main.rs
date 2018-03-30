@@ -1,10 +1,13 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 
+#[cfg(feature = "notifications")]
 extern crate apns;
+#[cfg(feature = "notifications")]
 use apns::{APNs, APNsClient, Notification};
 extern crate chrono;
-#[macro_use] extern crate diesel;
+#[macro_use]
+extern crate diesel;
 use self::diesel::prelude::*;
 extern crate dotenv;
 use dotenv::dotenv;
@@ -13,14 +16,22 @@ use protobuf::{CodedInputStream, CodedOutputStream};
 extern crate r2d2;
 extern crate rocket;
 use rocket::State;
+use rocket::http::Cookies;
 use rocket::response::NamedFile;
+extern crate rocket_contrib;
+use rocket_contrib::Template;
+#[macro_use]
+extern crate serde_derive;
 
 use std::env;
+#[cfg(feature = "notifications")]
 use std::thread;
 use std::io;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
+#[cfg(feature = "notifications")]
 use std::sync::Mutex;
+#[cfg(feature = "notifications")]
 use std::sync::mpsc::{channel, Sender};
 
 mod models;
@@ -36,7 +47,8 @@ mod route_tests;
 fn deserialize<T: ::protobuf::MessageStatic>(data: Vec<u8>) -> Result<T, String> {
     let mut proto = T::new();
     let mut cis = CodedInputStream::from_bytes(&data);
-    proto.merge_from(&mut cis)
+    proto
+        .merge_from(&mut cis)
         .map_err(|_| "Protobuf parse error")?;
     Ok(proto)
 }
@@ -46,10 +58,10 @@ fn serialize<T: ::protobuf::MessageStatic>(proto: T) -> Result<Vec<u8>, String> 
     {
         let mut buf = Cursor::new(&mut data);
         let mut cos = CodedOutputStream::new(&mut buf);
-        proto.write_to(&mut cos)
+        proto
+            .write_to(&mut cos)
             .map_err(|_| "Protobuf write error")?;
-        cos.flush()
-            .map_err(|_| "CodecOutputStream flush error")?;
+        cos.flush().map_err(|_| "CodecOutputStream flush error")?;
     }
     Ok(data)
 }
@@ -64,8 +76,13 @@ fn protoize_user(user: models::User, balance: i32) -> protos::models::User {
     proto_user
 }
 
-fn protoize_claim(claim: models::Claim, owner: models::User, receiver: Option<models::User>, amount: i32) -> protos::models::Claim {
-    let mut proto_claim= protos::models::Claim::new();
+fn protoize_claim(
+    claim: models::Claim,
+    owner: models::User,
+    receiver: Option<models::User>,
+    amount: i32,
+) -> protos::models::Claim {
+    let mut proto_claim = protos::models::Claim::new();
     proto_claim.set_uid(claim.uid);
     proto_claim.set_owner(protoize_user(owner, 0));
     if let Some(receiver) = receiver {
@@ -81,11 +98,14 @@ fn index_route() -> io::Result<NamedFile> {
 }
 
 #[get("/<file..>", rank = 2)]
-fn file_route(file: PathBuf) -> Option<NamedFile>{
+fn file_route(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join(file)).ok()
 }
 
-fn update_balances(transaction: &models::Transaction, db_connection: &PgPooledConnection) -> Result<(bool, models::Account), String> {
+fn update_balances(
+    transaction: &models::Transaction,
+    db_connection: &PgPooledConnection,
+) -> Result<(bool, models::Account), String> {
     use schema::accounts::dsl::accounts as accounts_sql;
     use schema::accounts;
     use models::Account;
@@ -115,42 +135,56 @@ struct Err {
 use diesel::result::Error;
 impl From<Error> for Err {
     fn from(_: Error) -> Err {
-        Err { description: "".to_string() }
+        Err {
+            description: "".to_string(),
+        }
     }
 }
 
-fn execute_transaction(payer_id: &i32, payee_id: &i32, amount: &i32, db_connection: &PgPooledConnection) -> Result<(models::Account, models::Transaction), String> {
+fn execute_transaction(
+    payer_id: &i32,
+    payee_id: &i32,
+    amount: &i32,
+    db_connection: &PgPooledConnection,
+) -> Result<(models::Account, models::Transaction), String> {
     let new_transaction = models::NewTransaction {
         payer_id: &payer_id,
         payee_id: &payee_id,
-        amount: &amount
+        amount: &amount,
     };
 
     use schema::transactions;
     use models::Transaction;
 
-    db_connection.transaction::<_, Err, _>(|| {
-        let mut transaction = diesel::insert_into(transactions::table)
-            .values(&new_transaction)
-            .get_result::<Transaction>(db_connection)
-            .map_err(|_| Err { description: "Error inserting new transaction".to_string() })?;
-
-        let (success, account) = update_balances(&transaction, db_connection).map_err(|d| Err { description: d })?;
-
-        if success {
-            use schema::transactions::dsl::transactions as transactions_sql;
-
-            transaction = diesel::update(transactions_sql.find(transaction.uid))
-                .set(transactions::is_successful.eq(true))
+    db_connection
+        .transaction::<_, Err, _>(|| {
+            let mut transaction = diesel::insert_into(transactions::table)
+                .values(&new_transaction)
                 .get_result::<Transaction>(db_connection)
-                .map_err(|_| Err { description: "Error updating failed flag".to_string() })?;
-        }
+                .map_err(|_| Err {
+                    description: "Error inserting new transaction".to_string(),
+                })?;
 
-        Ok((account, transaction))
-    }).map_err(|e| e.description )
+            let (success, account) =
+                update_balances(&transaction, db_connection).map_err(|d| Err { description: d })?;
+
+            if success {
+                use schema::transactions::dsl::transactions as transactions_sql;
+
+                transaction = diesel::update(transactions_sql.find(transaction.uid))
+                    .set(transactions::is_successful.eq(true))
+                    .get_result::<Transaction>(db_connection)
+                    .map_err(|_| Err {
+                        description: "Error updating failed flag".to_string(),
+                    })?;
+            }
+
+            Ok((account, transaction))
+        })
+        .map_err(|e| e.description)
 }
 
-#[post("/contacts", data="<input>")]
+#[post("/contacts", data = "<input>")]
 fn add_contact_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let requests = deserialize::<AddContactRequest>(input)?;
 
@@ -170,7 +204,7 @@ fn add_contact_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, Str
 
     let new_contact = models::NewContact {
         user_id: &user_id,
-        contact_id: &contact_id
+        contact_id: &contact_id,
     };
 
     use schema::contacts;
@@ -193,7 +227,7 @@ fn protoize_contact(contact: models::Contact, username: String) -> protos::model
 }
 
 #[get("/contacts/<user_id>")]
-fn get_contacts_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, String> {
+fn get_contacts_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::contacts;
@@ -219,7 +253,11 @@ fn get_contacts_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, Strin
     Ok(serialize(response)?)
 }
 
-fn protoize_transaction(transaction: models::Transaction, user: models::User, transaction_type: protos::models::Transaction_Type) -> protos::models::Transaction {
+fn protoize_transaction(
+    transaction: models::Transaction,
+    user: models::User,
+    transaction_type: protos::models::Transaction_Type,
+) -> protos::models::Transaction {
     let mut proto_transaction = protos::models::Transaction::new();
     let mut profile = protos::models::Profile::new();
     profile.set_uid(user.uid);
@@ -235,7 +273,7 @@ fn protoize_transaction(transaction: models::Transaction, user: models::User, tr
 }
 
 #[get("/transactions/<user_id>")]
-fn get_transactions_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, String> {
+fn get_transactions_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::users::dsl::users as users_sql;
@@ -275,14 +313,13 @@ fn get_transactions_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, S
         .into_iter()
         .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::TO));
 
-    let mut transactions = from_results
-        .chain(to_results)
-        .collect::<Vec<_>>();
-    transactions.sort_by(|a, b| b.get_timestamp().get_seconds().cmp(
-                                &a.get_timestamp().get_seconds()));
-    let transactions = transactions
-        .into_iter()
-        .collect();
+    let mut transactions = from_results.chain(to_results).collect::<Vec<_>>();
+    transactions.sort_by(|a, b| {
+        b.get_timestamp()
+            .get_seconds()
+            .cmp(&a.get_timestamp().get_seconds())
+    });
+    let transactions = transactions.into_iter().collect();
 
     let mut response = GetTransactionsResponse::new();
     response.set_transactions(transactions);
@@ -290,7 +327,7 @@ fn get_transactions_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, S
 }
 
 #[get("/users/<user_id>")]
-fn get_user_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, String> {
+fn get_user_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
     use schema::users::dsl::users as users_sql;
@@ -310,7 +347,7 @@ fn get_user_route(pool: State<PgPool>, user_id: i32)-> Result<Vec<u8>, String> {
     Ok(serialize(user)?)
 }
 
-#[post("/pay", data="<input>")]
+#[post("/pay", data = "<input>")]
 fn transaction_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<TransactionRequest>(input)?;
     let payer_id = request.get_payer_id();
@@ -321,14 +358,21 @@ fn transaction_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, Str
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    let payer = users_sql.find(payer_id)
+    let payer = users_sql
+        .find(payer_id)
         .first::<User>(&db_connection)
         .map_err(|_| "User not found")?;
-    let payee = users_sql.find(payee_id)
+    let payee = users_sql
+        .find(payee_id)
         .first::<User>(&db_connection)
         .map_err(|_| "User not found")?;
 
-    let (account, transaction) = execute_transaction(&payer.account_id, &payee.account_id, &request.amount, &db_connection)?;
+    let (account, transaction) = execute_transaction(
+        &payer.account_id,
+        &payee.account_id,
+        &request.amount,
+        &db_connection,
+    )?;
 
     let payer = protoize_user(payer, account.balance);
     let mut response = TransactionResponse::new();
@@ -338,7 +382,7 @@ fn transaction_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, Str
     Ok(serialize(response)?)
 }
 
-#[post("/topup", data="<input>")]
+#[post("/topup", data = "<input>")]
 fn topup_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<TopupRequest>(input)?;
 
@@ -364,9 +408,15 @@ fn topup_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
         .first::<(User, Account)>(&db_connection)
         .map_err(|_| "User not found")?;
 
-    let (_, transaction) = execute_transaction(&master_account.uid, &user_account.uid, &request.amount, &db_connection)?;
+    let (_, transaction) = execute_transaction(
+        &master_account.uid,
+        &user_account.uid,
+        &request.amount,
+        &db_connection,
+    )?;
 
-    user_account = accounts_sql.find(user.account_id)
+    user_account = accounts_sql
+        .find(user.account_id)
         .first::<Account>(&db_connection)
         .map_err(|_| "User does not have an account after transaction")?;
 
@@ -378,13 +428,11 @@ fn topup_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     Ok(serialize(response)?)
 }
 
-#[post("/register", data="<input>")]
+#[post("/register", data = "<input>")]
 fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<RegisterRequest>(input)?;
 
-    let new_account = models::NewAccount {
-        balance:    &0
-    };
+    let new_account = models::NewAccount { balance: &0 };
 
     use schema::accounts;
     use models::Account;
@@ -397,12 +445,12 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
         .map_err(|_| "Error inserting new account")?;
 
     let new_user = models::NewUser {
-        phone_no:     request.get_phone_no(),
-        picture_url:  None,
-        account_id:   &account.uid,
-        username:     request.get_username(),
-        password:     request.get_password(),
-        device_token: None
+        phone_no: request.get_phone_no(),
+        picture_url: None,
+        account_id: &account.uid,
+        username: request.get_username(),
+        password: request.get_password(),
+        device_token: None,
     };
 
     use schema::users;
@@ -421,7 +469,7 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
     Ok(serialize(response)?)
 }
 
-#[post("/login", data="<input>")]
+#[post("/login", data = "<input>")]
 fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<LoginRequest>(input)?;
 
@@ -455,16 +503,87 @@ fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     Ok(serialize(response)?)
 }
 
-#[post("/claims/create", data="<input>")]
-fn create_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+#[derive(Serialize)]
+struct ClaimTemplateContext {
+    currency_symbol: String,
+    sender: String,
+    amount: String,
+    login_text: String,
+}
+
+#[get("/claims/<claim_id>")]
+fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<Template, String> {
+    //let uid = cookies.get("user_id").map(|c| c.value().parse::<i32>().unwrap_or(0)).unwrap();
+    let login_text = "login / register".to_string();
+
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    //if uid != 0 {
+    //    use schema::users::dsl::users as users_sql;
+    //    use models::User;
+    //    let user = users_sql.find(uid)
+    //        .first::<User>(&db_connection)
+    //        .map_err(|_| "User not found")?;
+    //    login_text = format!("hello, {}", user.username)
+    //}
+
+    use schema::claims;
+    use models::Claim;
+    use schema::claims::dsl::claims as claims_sql;
+    use schema::accounts;
+
+    let amount = claims_sql
+        .find(claim_id)
+        .inner_join(accounts::table.on(accounts::uid.eq(claims::account_id)))
+        .select(accounts::balance)
+        .first::<i32>(&db_connection)
+        .map_err(|_| "Unable to find claim")?;
+
+    use schema::users;
+    let sender = claims_sql
+        .find(claim_id)
+        .inner_join(users::table.on(users::uid.eq(claims::owner_id)))
+        .select(users::username)
+        .first::<String>(&db_connection)
+        .map_err(|_| "Unable to find claim")?;
+
+    let mut context = ClaimTemplateContext {
+        sender: sender,
+        currency_symbol: "£".to_string(),
+        amount: format!("{:.*}", 2, (amount as f64 / 100.0)),
+        login_text: login_text,
+    };
+    Ok(Template::render("claim", &context))
+}
+
+#[derive(Serialize)]
+struct TemplateContext {
+    name: String,
+    uid: String,
+}
+
+#[get("/test/<name>")]
+fn test_route(name: String, cookies: Cookies) -> Template {
+    let uid = cookies
+        .get("user_id")
+        .map(|c| c.value().to_string())
+        .unwrap_or("".to_string());
+
+    let context = TemplateContext {
+        name: name,
+        uid: uid,
+    };
+    Template::render("test", &context)
+}
+
+#[post("/claims/create", data = "<input>")]
+fn create_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<CreateClaimRequest>(input)?;
 
     let amount = request.get_amount();
     let owner_id = request.get_owner_id();
 
-    let new_account = models::NewAccount {
-        balance:    &0
-    };
+    let new_account = models::NewAccount { balance: &0 };
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
@@ -477,10 +596,9 @@ fn create_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Res
         .get_result::<Account>(&db_connection)
         .map_err(|_| "Error inserting new account")?;
 
-
     let new_claim = models::NewClaim {
         account_id: &account.uid,
-        owner_id: &owner_id
+        owner_id: &owner_id,
     };
 
     use schema::claims;
@@ -513,9 +631,8 @@ fn create_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Res
     Ok(serialize(response)?)
 }
 
-
-#[post("/claims/accept", data="<input>")]
-fn accept_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+#[post("/claims/accept", data = "<input>")]
+fn accept_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<AcceptClaimRequest>(input)?;
     let claim_id = request.get_claim_id();
     let receiver_id = request.get_receiver_id();
@@ -530,7 +647,11 @@ fn accept_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Res
     Ok(serialize(response)?)
 }
 
-fn accept_claim(db_connection: &pg_pool::PooledConnection, claim_id: i32, receiver_id: i32) -> Result<protos::models::Claim, String> {
+fn accept_claim(
+    db_connection: &PgPooledConnection,
+    claim_id: i32,
+    receiver_id: i32,
+) -> Result<protos::models::Claim, String> {
     use schema::claims;
     use models::Claim;
     use schema::claims::dsl::claims as claims_sql;
@@ -553,7 +674,10 @@ fn accept_claim(db_connection: &pg_pool::PooledConnection, claim_id: i32, receiv
     let _ = execute_transaction(&account_id, &receiver.account_id, &balance, &db_connection)?;
 
     let claim = diesel::update(claims_sql.find(claim_id))
-        .set((claims::receiver_id.eq(receiver_id),claims::is_active.eq(false)))
+        .set((
+            claims::receiver_id.eq(receiver_id),
+            claims::is_active.eq(false),
+        ))
         .get_result::<Claim>(db_connection)
         .map_err(|_| "Unable to update claim")?;
 
@@ -566,8 +690,8 @@ fn accept_claim(db_connection: &pg_pool::PooledConnection, claim_id: i32, receiv
     Ok(claim)
 }
 
-#[post("/claims/revoke", data="<input>")]
-fn revoke_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+#[post("/claims/revoke", data = "<input>")]
+fn revoke_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<RevokeClaimRequest>(input)?;
     let claim_id = request.get_claim_id();
 
@@ -591,57 +715,74 @@ fn revoke_claim_route(pool: rocket::State<pg_pool::Pool>, input: Vec<u8>) -> Res
     Ok(serialize(response)?)
 }
 
+#[cfg(feature = "notifications")]
 struct NotificationClient(Mutex<Sender<Notification>>);
+#[cfg(not(feature = "notifications"))]
+struct NotificationClient;
+#[cfg(feature = "notifications")]
 impl NotificationClient {
     fn send(&self, notification: Notification) {
         self.0.lock().unwrap().send(notification).unwrap();
     }
 }
 
+#[cfg(feature = "notifications")]
+fn spawn_notification_client() -> Option<NotificationClient> {
+    let apns_cert_path = env::var("APNS_CERT_PATH").unwrap();
+    let apns_key_path = env::var("APNS_KEY_PATH").unwrap();
+    let (tx, rx) = channel::<Notification>();
+    thread::spawn(move || {
+        let apns = APNs::new(apns_cert_path, apns_key_path, false).expect("APN config unsucessful");
+        let apns_client = apns.new_client().expect("APN client setup unsucessful");
+        loop {
+            let notification = rx.recv().unwrap();
+            let _ = apns.send(notification, &apns_client).unwrap();
+        }
+    });
+
+    Some(NotificationClient(Mutex::new(tx)))
+}
+#[cfg(not(feature = "notifications"))]
+fn spawn_notification_client() -> Option<NotificationClient> {
+    None
+}
+
 fn main() {
     dotenv().ok();
 
-    let database_url = env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let database_connection = pg_pool::init(&database_url);
 
-    let notification_client = env::var("PUSH_NOTIFICATIONS").ok().and_then(|_| {
-        let apns_cert_path = env::var("APNS_CERT_PATH").unwrap();
-        let apns_key_path = env::var("APNS_KEY_PATH").unwrap();
-        let (tx, rx) = channel::<Notification>();
-        thread::spawn(move || {
-            let apns = APNs::new(apns_cert_path,
-                                 apns_key_path,
-                                 false)
-                .expect("APN config unsucessful");
-            let apns_client = apns.new_client()
-                .expect("APN client setup unsucessful");
-            loop {
-                let notification = rx.recv().unwrap();
-                let _ = apns.send(notification, &apns_client).unwrap();
-            }
-        });
-
-        Some(NotificationClient(Mutex::new(tx)))
-    });
+    let notification_client: Option<NotificationClient>;
+    if cfg!(feature = "notifications") {
+        notification_client = spawn_notification_client();
+    } else {
+        notification_client = None;
+    }
 
     rocket::ignite()
         .manage(database_connection)
         .manage(notification_client)
-        .mount("/", routes![
-               index_route,
-               file_route,
-               register_route,
-               login_route,
-               topup_route,
-               transaction_route,
-               get_transactions_route,
-               add_contact_route,
-               get_contacts_route,
-               get_user_route,
-               create_claim_route,
-               accept_claim_route,
-               revoke_claim_route
-        ])
+        .mount(
+            "/",
+            routes![
+                index_route,
+                file_route,
+                register_route,
+                login_route,
+                topup_route,
+                transaction_route,
+                get_transactions_route,
+                add_contact_route,
+                get_contacts_route,
+                get_user_route,
+                create_claim_route,
+                accept_claim_route,
+                revoke_claim_route,
+                claim_route,
+                test_route
+            ],
+        )
+        .attach(Template::fairing())
         .launch();
 }

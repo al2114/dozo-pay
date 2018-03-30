@@ -21,6 +21,11 @@ class HomeVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+//    setMockTrasactions()
+
+    view.backgroundColor = .pestoGreen
+    self.extendedLayoutIncludesOpaqueBars = true
+
     self.edgesForExtendedLayout = []
 
     let viewBottomAnchor: NSLayoutYAxisAnchor

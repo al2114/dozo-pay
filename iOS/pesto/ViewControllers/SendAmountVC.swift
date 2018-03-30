@@ -27,8 +27,6 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    self.edgesForExtendedLayout = []
-
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
 
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
@@ -122,10 +120,11 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
   }
   
   override func viewWillAppear(_ animated: Bool) {
-    navigationController?.navigationBar.backgroundColor = .primaryBackground
+    navigationController?.navigationBar.backgroundColor = .none
     navigationController?.navigationBar.barTintColor = .primaryBackground
     navigationController?.navigationBar.tintColor = .primaryTitle
     UIApplication.shared.keyWindow?.backgroundColor = .primaryBackground
+    print(UIApplication.shared.keyWindow?.backgroundColor)
     UIApplication.shared.statusBarStyle = .lightContent
   }
 
@@ -134,12 +133,16 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
   }
 
   @objc func keyboardWillShow(sender: NSNotification) {
-    self.view.frame.origin.y = -150
+    let info = sender.userInfo
+    let offset = (info![UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue.height
+    self.view.frame.origin.y -= 0.8*offset
     self.amountLabel.transform = CGAffineTransform(scaleX: 0.7, y: 0.7).translatedBy(x: 0, y: 10) //Scale label area
   }
 
   @objc func keyboardWillHide(sender: NSNotification) {
-    self.view.frame.origin.y = 0 // Move view to original position
+    let info = sender.userInfo
+    let offset = (info![UIKeyboardFrameBeginUserInfoKey] as! NSValue).cgRectValue.height
+    self.view.frame.origin.y += 0.8*offset // Move view to original position
     self.amountLabel.transform = .identity //Scale label area
   }
 

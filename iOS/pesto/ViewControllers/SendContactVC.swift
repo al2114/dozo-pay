@@ -18,7 +18,7 @@ class ContactCell: UITableViewCell {
     profileImageView = CircularImageView()
     separatorView = UIView()
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-
+    
     nameLabel.font = .regular
 
     profileImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -65,15 +65,13 @@ class SendContactVC: UIViewController {
 
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    UIApplication.shared.statusBarStyle = .default
-    UIApplication.shared.keyWindow?.backgroundColor = .white
-
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+
     UIView.animate(withDuration: 0.2, animations: {
-      self.navigationController?.navigationBar.backgroundColor = .white
+//      self.navigationController?.navigationBar.backgroundColor = .white
       self.navigationController?.navigationBar.barTintColor = .white
       self.navigationController?.navigationBar.tintColor = .pestoGreen
     })
@@ -85,7 +83,7 @@ class SendContactVC: UIViewController {
     view.backgroundColor = .white
     UIApplication.shared.statusBarStyle = .default
 
-    self.edgesForExtendedLayout = []
+    self.extendedLayoutIncludesOpaqueBars = true
 
     tableView = UITableView()
     tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -185,6 +183,10 @@ extension SendContactVC: UITableViewDelegate {
       API.payUser(withId: contact.uid, amount: intAmount) { success in
         if success {
           let confirmationVC = ConfirmationVC()
+          confirmationVC.willDismiss = {
+            self.navigationController?.popToRootViewController(animated: false)
+          }
+          confirmationVC.descriptionText = "Payment sent"
           confirmationVC.amount = self.amount
           confirmationVC.username = contact.username
           self.present(confirmationVC, animated: true)
@@ -203,3 +205,4 @@ extension SendContactVC: UISearchResultsUpdating {
 //    searchController.searchBar.text
   }
 }
+

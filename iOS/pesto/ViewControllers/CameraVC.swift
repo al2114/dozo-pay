@@ -19,23 +19,33 @@ class CameraVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.edgesForExtendedLayout = []
+//    self.edgesForExtendedLayout = []
 
     // Get the back-facing camera for capturing videos
-    view.backgroundColor = .primaryBackground
+//    view.backgroundColor = .
+    navigationController?.navigationBar.backgroundColor = .none
+
 
     qrReader = QRReader {
       code in
       if !self.processingQRCode {
         self.processingQRCode = true
         if code.hasPrefix("pesto:") {
-          let sendAmountVC = SendAmountVC()
-          var user = User()
+          print("Found matching prefix")
           let splits = code.split(separator: ":", maxSplits: 3, omittingEmptySubsequences: false)
-          user.username = String(splits[1])
-          user.uid = Int32(splits[2])!
-          sendAmountVC.payee = user
-          self.show(sendAmountVC, sender: self)
+          if splits.count == 3, let uid = Int32(splits[2]) {
+            var user = User()
+            user.username = String(splits[1])
+            user.uid = uid
+            let sendAmountVC = SendAmountVC()
+            sendAmountVC.payee = user
+            self.show(sendAmountVC, sender: self)
+          } else {
+            print("Does not match pattern, omitting")
+            self.processingQRCode = false
+          }
+        } else {
+          self.processingQRCode = false
         }
       }
     }

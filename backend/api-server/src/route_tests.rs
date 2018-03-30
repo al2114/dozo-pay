@@ -21,13 +21,16 @@ fn client() -> Client {
     Client::new(rocket::ignite()
         .manage(database_connection)
         .mount("/", routes![
-               super::hello_route,
+               super::index_route,
+               super::file_route,
                super::register_route,
                super::login_route,
                super::topup_route,
                super::transaction_route,
+               super::get_transactions_route,
                super::add_contact_route,
-               super::get_contacts_route
+               super::get_contacts_route,
+               super::get_user_route,
         ])).unwrap()
 }
 

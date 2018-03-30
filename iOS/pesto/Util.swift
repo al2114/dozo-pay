@@ -10,7 +10,8 @@ import UIKit
 import SwiftProtobuf
 
 //let server = "http://localhost:3001"
-let server = "http://54.84.120.127"
+//let server = "http://54.84.120.127"
+let server = "https://pesto-pay.com"
 
 struct Util {
   static var filter = CIFilter(name: "CIQRCodeGenerator")!

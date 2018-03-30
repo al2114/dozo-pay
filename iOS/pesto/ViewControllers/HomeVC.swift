@@ -200,7 +200,6 @@ class HomeVC: UIViewController {
 
     transactionView = UITableView()
     transactionView.translatesAutoresizingMaskIntoConstraints = false
-    transactionView.register(ContactCell.self, forCellReuseIdentifier: "ContactCell")
     transactionView.dataSource = self
     transactionView.register(TransactionCell.self, forCellReuseIdentifier: "TransactionCell")
     transactionView.separatorStyle = .none

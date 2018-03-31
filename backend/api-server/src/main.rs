@@ -5,29 +5,23 @@ extern crate apns;
 use apns::{APNs, APNsClient, Notification};
 extern crate chrono;
 #[macro_use] extern crate diesel;
+use self::diesel::prelude::*;
 extern crate dotenv;
-
+use dotenv::dotenv;
 extern crate protobuf;
-use protobuf::{CodedInputStream};
-use protobuf::{CodedOutputStream};
-
+use protobuf::{CodedInputStream, CodedOutputStream};
 extern crate r2d2;
 extern crate rocket;
 use rocket::State;
+use rocket::response::NamedFile;
 
+use std::env;
 use std::thread;
+use std::io;
+use std::io::Cursor;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::mpsc::{channel, Sender};
-use std::io::Cursor;
-use dotenv::dotenv;
-use std::env;
-
-use self::diesel::prelude::*;
-
-use std::io;
-use std::path::{Path, PathBuf};
-
-use rocket::response::NamedFile;
 
 mod models;
 mod pg_pool;

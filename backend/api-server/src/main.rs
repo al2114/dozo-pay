@@ -460,21 +460,25 @@ fn main() {
         .expect("DATABASE_URL must be set");
     let database_connection = pg_pool::init(&database_url);
 
-    let (tx, rx) = channel::<Notification>();
-    thread::spawn(move || {
-        let apns = APNs::new("apn/apn.crt".to_string(),
-                             "apn/apn.key".to_string(),
-                             false)
-            .expect("APN config unsucessful");
-        let apns_client = apns.new_client()
-            .expect("APN client setup unsucessful");
-        loop {
-            let notification = rx.recv().unwrap();
-            let _ = apns.send(notification, &apns_client).unwrap();
-        }
-    });
+    let notification_client = env::var("PUSH_NOTIFICATIONS").ok().and_then(|_| {
+        let apns_cert_path = env::var("APNS_CERT_PATH").unwrap();
+        let apns_key_path = env::var("APNS_KEY_PATH").unwrap();
+        let (tx, rx) = channel::<Notification>();
+        thread::spawn(move || {
+            let apns = APNs::new(apns_cert_path,
+                                 apns_key_path,
+                                 false)
+                .expect("APN config unsucessful");
+            let apns_client = apns.new_client()
+                .expect("APN client setup unsucessful");
+            loop {
+                let notification = rx.recv().unwrap();
+                let _ = apns.send(notification, &apns_client).unwrap();
+            }
+        });
 
-    let notification_client = NotificationClient(Mutex::new(tx));
+        Some(NotificationClient(Mutex::new(tx)))
+    });
 
     rocket::ignite()
         .manage(database_connection)

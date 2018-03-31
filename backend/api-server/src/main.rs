@@ -40,6 +40,7 @@ use pg_pool::{PgPool, PgPooledConnection};
 mod protos;
 use protos::user_messages::*;
 mod schema;
+mod contexts;
 
 #[cfg(test)]
 mod route_tests;
@@ -503,27 +504,6 @@ fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     Ok(serialize(response)?)
 }
 
-#[derive(Serialize)]
-struct ClaimTemplateContext {
-    username: String,
-    logged_in: bool,
-    currency_symbol: String,
-    amount: String,
-    sender: String,
-}
-
-impl ClaimTemplateContext {
-    pub fn new() -> ClaimTemplateContext {
-        ClaimTemplateContext {
-            username: "".to_string(),
-            logged_in: false,
-            currency_symbol: "£".to_string(),
-            amount: "".to_string(),
-            sender: "".to_string(),
-        }
-    }
-}
-
 fn get_user_with_uid(uid: i32, db_connection: &PgPooledConnection) -> Result<models::User, String> {
     use schema::users::dsl::users as users_sql;
     use models::User;
@@ -551,7 +531,8 @@ fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<T
     // TODO: Use private cookies
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    let mut context = ClaimTemplateContext::new();
+    use contexts::ClaimTemplateContext;
+    let mut context = ClaimTemplateContext::default();
 
     let name = cookies
         .get("user_id")

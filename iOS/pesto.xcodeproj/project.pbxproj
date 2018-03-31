@@ -27,6 +27,7 @@
 		2B4CE3BF20350188006408DC /* Me.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4CE3BE20350188006408DC /* Me.swift */; };
 		2B501624205227AF00B35EB0 /* NiceTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B501623205227AF00B35EB0 /* NiceTextField.swift */; };
 		2B50162620532BEB00B35EB0 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B50162520532BEB00B35EB0 /* NavigationController.swift */; };
+		2B525C5E206D646600BE296C /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B525C5D206D646600BE296C /* Notifications.swift */; };
 		2B6250ED2055D2B80054D0C5 /* user_messages.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6250EC2055D2B80054D0C5 /* user_messages.pb.swift */; };
 		2B7FD7FC203CE9F40076EB74 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */; };
 		2B7FD7FE203CEA090076EB74 /* RegisterNumberVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */; };
@@ -76,6 +77,8 @@
 		2B501620205213D000B35EB0 /* pesto-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pesto-Bridging-Header.h"; sourceTree = "<group>"; };
 		2B501623205227AF00B35EB0 /* NiceTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NiceTextField.swift; sourceTree = "<group>"; };
 		2B50162520532BEB00B35EB0 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
+		2B525C5D206D646600BE296C /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		2B525C5F206D68D700BE296C /* Pesto Pay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Pesto Pay.entitlements"; sourceTree = "<group>"; };
 		2B6250EC2055D2B80054D0C5 /* user_messages.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = user_messages.pb.swift; path = protos/user_messages.pb.swift; sourceTree = "<group>"; };
 		2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterNumberVC.swift; sourceTree = "<group>"; };
@@ -118,6 +121,7 @@
 		2B477790202A0F0F0077415A = {
 			isa = PBXGroup;
 			children = (
+				2B525C5F206D68D700BE296C /* Pesto Pay.entitlements */,
 				2B47779B202A0F0F0077415A /* pesto */,
 				2B47779A202A0F0F0077415A /* Products */,
 				D4F43DD4DAA79E1D365C6F3A /* Frameworks */,
@@ -143,6 +147,7 @@
 				2B4777BA202A3D0F0077415A /* Util.swift */,
 				2B84DFDB204AEFF600691EAA /* QRReader.swift */,
 				2B4CE3BE20350188006408DC /* Me.swift */,
+				2B525C5D206D646600BE296C /* Notifications.swift */,
 				CBA67C43205875BF00BCF7DB /* Config */,
 				CBA67C44205875C800BCF7DB /* Components */,
 				CBA67C45205875CB00BCF7DB /* ViewControllers */,
@@ -269,6 +274,14 @@
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -366,6 +379,7 @@
 				2B4CE3B92034FD19006408DC /* Room.swift in Sources */,
 				CB046909204349C100DF284F /* CircleButton.swift in Sources */,
 				2B4777B1202A32040077415A /* CameraVC.swift in Sources */,
+				2B525C5E206D646600BE296C /* Notifications.swift in Sources */,
 				2B4CE3BD2034FDCC006408DC /* User.swift in Sources */,
 				2B4CE3B32033ACFC006408DC /* API.swift in Sources */,
 				CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */,
@@ -529,6 +543,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Pesto Pay.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5PN76PTM6Y;
 				INFOPLIST_FILE = pesto/Info.plist;
@@ -550,6 +565,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Pesto Pay.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5PN76PTM6Y;
 				INFOPLIST_FILE = pesto/Info.plist;

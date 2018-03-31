@@ -2,7 +2,7 @@
 #![plugin(rocket_codegen)]
 
 extern crate apns;
-use apns::{APNs, APNsClient};
+use apns::{APNs, APNsClient, Notification};
 extern crate chrono;
 #[macro_use] extern crate diesel;
 extern crate dotenv;
@@ -15,6 +15,9 @@ extern crate r2d2;
 extern crate rocket;
 use rocket::State;
 
+use std::thread;
+use std::sync::Mutex;
+use std::sync::mpsc::{channel, Sender};
 use std::io::Cursor;
 use dotenv::dotenv;
 use std::env;
@@ -449,6 +452,13 @@ fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     Ok(serialize(response)?)
 }
 
+struct NotificationClient(Mutex<Sender<Notification>>);
+impl NotificationClient {
+    fn send(&self, notification: Notification) {
+        self.0.lock().unwrap().send(notification).unwrap();
+    }
+}
+
 fn main() {
     dotenv().ok();
 
@@ -456,14 +466,25 @@ fn main() {
         .expect("DATABASE_URL must be set");
     let database_connection = pg_pool::init(&database_url);
 
-    let apns = APNs::new("apn/apn.crt", "apn/apn.key", false)
-        .expect("APN config unsucessful");
-    let apns_client = apns.new_client()
-        .expect("APN client setup unsucessful");
+    let (tx, rx) = channel::<Notification>();
+    thread::spawn(move || {
+        let apns = APNs::new("apn/apn.crt".to_string(),
+                             "apn/apn.key".to_string(),
+                             false)
+            .expect("APN config unsucessful");
+        let apns_client = apns.new_client()
+            .expect("APN client setup unsucessful");
+        loop {
+            let notification = rx.recv().unwrap();
+            let _ = apns.send(notification, &apns_client).unwrap();
+        }
+    });
+
+    let notification_client = NotificationClient(Mutex::new(tx));
 
     rocket::ignite()
         .manage(database_connection)
-        .manage(apns_client)
+        .manage(notification_client)
         .mount("/", routes![
                index_route,
                file_route,

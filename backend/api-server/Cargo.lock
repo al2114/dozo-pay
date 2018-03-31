@@ -30,7 +30,7 @@ dependencies = [
 [[package]]
 name = "apns"
 version = "0.1.0"
-source = "git+https://github.com/sauravm97/apns-rust#f62735ea5b8b545311161ec70d96ca859ffbbd88"
+source = "git+https://github.com/sauravm97/apns-rust#0592f6308adf8577aaba1d9185b44220438d48a2"
 dependencies = [
  "byteorder 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",

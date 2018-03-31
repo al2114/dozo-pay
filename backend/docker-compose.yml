@@ -4,7 +4,7 @@ services:
   api-server:
     image: "registry.gitlab.com/dozo/project/rust-server"
     ports:
-      - "80:3001"
+      - "443:3001"
     volumes:
       - ./api-server:/usr/src/app
     links:

@@ -37,11 +37,11 @@
         <div class="dropdown">
             <a href="#" class="my-2 dropdown-toggle" data-toggle="dropdown">@{{username}} <span class="caret"></span></a>
             <ul class="dropdown-menu">
-                <li><a href="#">Logout</a></li>
+                <li><a href="#" onclick="logout();">Logout</a></li>
             </ul>
         </div>
         {{else}}
-        <a href="#" class="my-2 light">login / register</a>
+        <a href="#" class="my-2 light" onclick="login();">login / register</a>
         {{/if}}
     </nav>
 

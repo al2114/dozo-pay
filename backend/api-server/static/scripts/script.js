@@ -7,6 +7,7 @@ function setCookie(name,value,days) {
     }
     document.cookie = name + "=" + (value || "")  + expires + "; path=/";
 }
+
 function getCookie(name) {
     var nameEQ = name + "=";
     var ca = document.cookie.split(';');
@@ -17,6 +18,18 @@ function getCookie(name) {
     }
     return null;
 }
+
 function eraseCookie(name) {
-    document.cookie = name+'=; Max-Age=-99999999;';
+    console.log("Erasing cookie: " + name)
+    document.cookie = name+'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+}
+
+function logout() {
+    eraseCookie("user_id");
+    window.location.reload(false); 
+}
+
+function login() {
+    setCookie("user_id",18,1);
+    window.location.reload(false); 
 }

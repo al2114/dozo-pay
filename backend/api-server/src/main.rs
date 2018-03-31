@@ -511,43 +511,54 @@ struct ClaimTemplateContext {
     login_text: String,
 }
 
+fn get_user_with_uid(uid: i32, db_connection: &PgPooledConnection) -> Result<models::User, String> {
+    use schema::users::dsl::users as users_sql;
+    use models::User;
+    let user = users_sql
+        .find(uid)
+        .first::<User>(db_connection)
+        .map_err(|_| "User not found")?;
+    Ok(user)
+}
+
+fn get_username_with_uid(uid: i32, db_connection: &PgPooledConnection) -> Result<String, String> {
+    use schema::users::dsl::users as users_sql;
+    use schema::users;
+    let username = users_sql
+        .find(uid)
+        .select(users::username)
+        .first::<String>(db_connection)
+        .map_err(|_| "User not found")?;
+    Ok(username)
+}
+
 #[get("/claims/<claim_id>")]
 fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<Template, String> {
-    //let uid = cookies.get("user_id").map(|c| c.value().parse::<i32>().unwrap_or(0)).unwrap();
-    let login_text = "login / register".to_string();
-
+    // TODO: Handle invalid claim_ids
+    // TODO: Use private cookies
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    //if uid != 0 {
-    //    use schema::users::dsl::users as users_sql;
-    //    use models::User;
-    //    let user = users_sql.find(uid)
-    //        .first::<User>(&db_connection)
-    //        .map_err(|_| "User not found")?;
-    //    login_text = format!("hello, {}", user.username)
-    //}
+    let login_text = cookies
+        .get("user_id")
+        .and_then(|c| c.value().parse().ok())
+        .and_then(|uid| get_username_with_uid(uid, &db_connection).ok())
+        .and_then(|name| Some(name))
+        .unwrap_or("login / register".to_string());
 
     use schema::claims;
-    use models::Claim;
     use schema::claims::dsl::claims as claims_sql;
     use schema::accounts;
+    use schema::users;
 
-    let amount = claims_sql
+    let (sender, amount) = claims_sql
         .find(claim_id)
         .inner_join(accounts::table.on(accounts::uid.eq(claims::account_id)))
-        .select(accounts::balance)
-        .first::<i32>(&db_connection)
-        .map_err(|_| "Unable to find claim")?;
-
-    use schema::users;
-    let sender = claims_sql
-        .find(claim_id)
         .inner_join(users::table.on(users::uid.eq(claims::owner_id)))
-        .select(users::username)
-        .first::<String>(&db_connection)
+        .select((users::username, accounts::balance))
+        .first::<(String, i32)>(&db_connection)
         .map_err(|_| "Unable to find claim")?;
 
-    let mut context = ClaimTemplateContext {
+    let context = ClaimTemplateContext {
         sender: sender,
         currency_symbol: "£".to_string(),
         amount: format!("{:.*}", 2, (amount as f64 / 100.0)),

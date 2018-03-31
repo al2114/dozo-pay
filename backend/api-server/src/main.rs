@@ -505,10 +505,23 @@ fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
 
 #[derive(Serialize)]
 struct ClaimTemplateContext {
+    username: String,
+    logged_in: bool,
     currency_symbol: String,
-    sender: String,
     amount: String,
-    login_text: String,
+    sender: String,
+}
+
+impl ClaimTemplateContext {
+    pub fn new() -> ClaimTemplateContext {
+        ClaimTemplateContext {
+            username: "".to_string(),
+            logged_in: false,
+            currency_symbol: "£".to_string(),
+            amount: "".to_string(),
+            sender: "".to_string(),
+        }
+    }
 }
 
 fn get_user_with_uid(uid: i32, db_connection: &PgPooledConnection) -> Result<models::User, String> {
@@ -538,12 +551,17 @@ fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<T
     // TODO: Use private cookies
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    let login_text = cookies
+    let mut context = ClaimTemplateContext::new();
+
+    let name = cookies
         .get("user_id")
         .and_then(|c| c.value().parse().ok())
-        .and_then(|uid| get_username_with_uid(uid, &db_connection).ok())
-        .and_then(|name| Some(name))
-        .unwrap_or("login / register".to_string());
+        .and_then(|uid| get_username_with_uid(uid, &db_connection).ok());
+
+    if let Some(name) = name {
+        context.logged_in = true;
+        context.username = name;
+    }
 
     use schema::claims;
     use schema::claims::dsl::claims as claims_sql;
@@ -558,33 +576,9 @@ fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<T
         .first::<(String, i32)>(&db_connection)
         .map_err(|_| "Unable to find claim")?;
 
-    let context = ClaimTemplateContext {
-        sender: sender,
-        currency_symbol: "£".to_string(),
-        amount: format!("{:.*}", 2, (amount as f64 / 100.0)),
-        login_text: login_text,
-    };
+    context.sender = sender;
+    context.amount = format!("{:.*}", 2, (amount as f64 / 100.0));
     Ok(Template::render("claim", &context))
-}
-
-#[derive(Serialize)]
-struct TemplateContext {
-    name: String,
-    uid: String,
-}
-
-#[get("/test/<name>")]
-fn test_route(name: String, cookies: Cookies) -> Template {
-    let uid = cookies
-        .get("user_id")
-        .map(|c| c.value().to_string())
-        .unwrap_or("".to_string());
-
-    let context = TemplateContext {
-        name: name,
-        uid: uid,
-    };
-    Template::render("test", &context)
 }
 
 #[post("/claims/create", data = "<input>")]
@@ -791,7 +785,6 @@ fn main() {
                 accept_claim_route,
                 revoke_claim_route,
                 claim_route,
-                test_route
             ],
         )
         .attach(Template::fairing())

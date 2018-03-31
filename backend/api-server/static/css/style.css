@@ -2,12 +2,12 @@ body {
 	font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
 }
 
-a {
+a, .pesto {
 	color: #16a747;
 }
 
 
-a:hover {
+a:hover, .pesto:hover {
 	color: #267540;
 }
 

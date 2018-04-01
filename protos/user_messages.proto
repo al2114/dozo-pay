@@ -15,6 +15,11 @@ message RegisterResponse {
   bool successful = 2;
 }
 
+message RegisterDeviceTokenRequest {
+  int32 user_id = 1;
+  string device_token = 2;
+}
+
 message LoginRequest {
   string username = 1;
   string password = 2;
@@ -100,3 +105,5 @@ message RevokeClaimResponse {
   bool successful = 1;
   models.Claim claim = 2;
 }
+
+message NoResponse {}

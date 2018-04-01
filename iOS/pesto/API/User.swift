@@ -16,11 +16,13 @@ typealias Transaction = Pesto_Models_Transaction
 
 typealias RegisterRequest = Pesto_UserMessages_RegisterRequest
 typealias RegisterResponse = Pesto_UserMessages_RegisterResponse
+typealias RegisterDeviceTokenRequest = Pesto_UserMessages_RegisterDeviceTokenRequest
 typealias LoginRequest = Pesto_UserMessages_LoginRequest
 typealias LoginResponse = Pesto_UserMessages_LoginResponse
 typealias GetContactResponse = Pesto_UserMessages_GetContactsResponse
 typealias AddContactRequest = Pesto_UserMessages_AddContactRequest
 typealias GetTransactionsResponse = Pesto_UserMessages_GetTransactionsResponse
+typealias NoResponse = Pesto_UserMessages_NoResponse
 
 import Foundation
 
@@ -42,6 +44,15 @@ extension API {
     }
 
     completion(user)
+  }
+
+  static func registerDeviceToken(_ deviceToken: String, to user: User) {
+    var registerDeviceTokenRequest = RegisterDeviceTokenRequest()
+    registerDeviceTokenRequest.userID = user.uid
+    registerDeviceTokenRequest.deviceToken = deviceToken
+
+    let route = "register/device_token"
+    Util.post(toRoute: route, withProtoMessage: registerDeviceTokenRequest) { result in }
   }
 
   static func login(withUsername username: String, password: String, completion: @escaping (Bool) -> Void) {

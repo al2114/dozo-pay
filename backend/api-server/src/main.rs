@@ -1,3 +1,4 @@
+#![deny(warnings)]
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 
@@ -505,16 +506,6 @@ fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     Ok(serialize(response)?)
 }
 
-fn get_user_with_uid(uid: i32, db_connection: &PgPooledConnection) -> Result<models::User, String> {
-    use schema::users::dsl::users as users_sql;
-    use models::User;
-    let user = users_sql
-        .find(uid)
-        .first::<User>(db_connection)
-        .map_err(|_| "User not found")?;
-    Ok(user)
-}
-
 fn get_username_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<String, String> {
     use schema::users::dsl::users as users_sql;
     use schema::users;
@@ -546,13 +537,12 @@ fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<T
 
     use schema::claims;
     use schema::claims::dsl::claims as claims_sql;
-    use schema::accounts;
     use schema::users;
 
     let (sender, amount, is_active) = claims_sql
         .find(claim_id)
         .inner_join(users::table.on(users::uid.eq(claims::owner_id)))
-        .select(((users::username, claims::amount, claims::is_active)))
+        .select((users::username, claims::amount, claims::is_active))
         .first::<(String, i32, bool)>(&db_connection)
         .map_err(|_| "Unable to find claim")?;
 
@@ -647,6 +637,13 @@ fn set_claim_received(
         .execute(db_connection)
         .map_err(|_| "Cannot find claim")?;
     Ok(())
+}
+
+#[get("/login")]
+fn login_webpage() -> Template {
+    use std::collections::HashMap;
+    let context: HashMap<&str, &str> = HashMap::new();
+    Template::render("login", context)
 }
 
 #[get("/claims/confirm/<claim_id>")]
@@ -864,6 +861,7 @@ fn main() {
                 accept_claim_route,
                 revoke_claim_route,
                 claim_route,
+                login_webpage,
             ],
         )
         .attach(Template::fairing())

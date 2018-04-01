@@ -1,4 +1,5 @@
 function setCookie(name,value,days) {
+    console.log("Setting cookie " + name +" to "+ value)
     var expires = "";
     if (days) {
         var date = new Date();
@@ -32,4 +33,21 @@ function logout() {
 function login() {
     setCookie("user_id",18,1);
     window.location.reload(false); 
+}
+
+function getURLParameter(name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+}
+
+function submit() {
+    var uid = document.getElementById("login_id").value;
+    setCookie("user_id",uid,1);
+    
+    let redirect = getURLParameter("redirect");
+    if(redirect != null){
+        document.location.href=redirect;
+    }
+    else {
+        document.location.href="/";
+    }
 }

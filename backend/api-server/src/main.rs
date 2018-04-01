@@ -387,6 +387,7 @@ fn transaction_helper(
         &db_connection,
     )?;
 
+    let payer_username = payer.username.clone();
     let payer = protoize_user(payer, account.balance);
     let mut response = TransactionResponse::new();
     response.set_user(payer);
@@ -413,7 +414,7 @@ fn transaction_route(
     if let Some(device_token) = payee.device_token {
         let notification = Notification::builder("pay.pesto.dozo".to_string(), device_token)
             .title("New Transaction")
-            .body("Received £10.00 from @user")
+            .body(format!("Received £{} from @{}", request.amount / 100, payer_username))
             .build();
         apns_client
             .send(notification)

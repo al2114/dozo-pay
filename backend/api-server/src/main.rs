@@ -549,14 +549,14 @@ fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<T
     use schema::accounts;
     use schema::users;
 
-    let (sender, amount) = claims_sql
+    let (sender, amount, is_active) = claims_sql
         .find(claim_id)
-        .inner_join(accounts::table.on(accounts::uid.eq(claims::account_id)))
         .inner_join(users::table.on(users::uid.eq(claims::owner_id)))
-        .select((users::username, accounts::balance))
-        .first::<(String, i32)>(&db_connection)
+        .select(((users::username, claims::amount, claims::is_active)))
+        .first::<(String, i32, bool)>(&db_connection)
         .map_err(|_| "Unable to find claim")?;
 
+    context.is_active = is_active;
     context.sender = sender;
     context.amount = format!("{:.*}", 2, (amount as f64 / 100.0));
     context.claim_id = claim_id;
@@ -586,6 +586,7 @@ fn create_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, St
     let new_claim = models::NewClaim {
         account_id: &account.uid,
         owner_id: &owner_id,
+        amount: &amount,
     };
 
     use schema::claims;
@@ -631,6 +632,23 @@ fn get_account_id_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Res
     Ok(account_id)
 }
 
+fn set_claim_received(
+    claim_id: &i32,
+    receiver_id: &i32,
+    db_connection: &PgPooledConnection,
+) -> Result<(), String> {
+    use schema::claims;
+    use schema::claims::dsl::claims as claims_sql;
+    diesel::update(claims_sql.find(claim_id))
+        .set((
+            claims::receiver_id.eq(receiver_id),
+            claims::is_active.eq(false),
+        ))
+        .execute(db_connection)
+        .map_err(|_| "Cannot find claim")?;
+    Ok(())
+}
+
 #[get("/claims/confirm/<claim_id>")]
 fn confirm_claim_route(
     pool: State<PgPool>,
@@ -642,13 +660,24 @@ fn confirm_claim_route(
 
     let uid: Option<i32> = cookies.get("user_id").and_then(|c| c.value().parse().ok());
 
-    if let Some(uid) = uid {
-        context.is_successful = true;
+    use schema::claims::dsl::claims as claims_sql;
+    use schema::claims;
 
+    let is_active = claims_sql
+        .find(claim_id)
+        .select(claims::is_active)
+        .first::<bool>(&db_connection)
+        .map_err(|_| "Cannot find claim")?;
+
+    // First check if the claim is valid
+    if !is_active {
+        return Ok(Template::render("receipt", context));
+    }
+
+    // Next check if the recipient details are correct
+    if let Some(uid) = uid {
         let account_id = get_account_id_with_uid(&uid, &db_connection)?;
 
-        use schema::claims;
-        use schema::claims::dsl::claims as claims_sql;
         use schema::accounts;
         use schema::users;
 
@@ -661,6 +690,7 @@ fn confirm_claim_route(
             .map_err(|_| "Unable to find claim")?;
 
         let _ = execute_transaction(&claim_account_id, &account_id, &amount, &db_connection)?;
+        set_claim_received(&claim_id, &uid, &db_connection)?;
 
         use schema::accounts::dsl::accounts as accounts_sql;
 
@@ -672,13 +702,12 @@ fn confirm_claim_route(
 
         let receiver_name = get_username_with_uid(&uid, &db_connection)?;
 
-        context.receipt_id = format!("{}", claim_id + 400000000000);
+        context.receipt_id = format!("{}", claim_id as i64 + 400000000000);
         context.sender = sender_name;
         context.receiver = receiver_name;
         context.new_balance = format!("{:.*}", 2, (new_balance as f64 / 100.0));
         context.amount = format!("{:.*}", 2, (amount as f64 / 100.0));
-    } else {
-        return Ok(Template::render("receipt", context));
+        context.is_successful = true;
     }
 
     Ok(Template::render("receipt", context))
@@ -725,6 +754,7 @@ fn accept_claim(
         .map_err(|_| "Unable to find receiver account")?;
 
     let _ = execute_transaction(&account_id, &receiver.account_id, &balance, &db_connection)?;
+    set_claim_received(&claim_id, &receiver_id, &db_connection)?;
 
     let claim = diesel::update(claims_sql.find(claim_id))
         .set((

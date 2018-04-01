@@ -5,6 +5,7 @@ pub struct ClaimTemplateContext {
     pub currency_symbol: String,
     pub amount: String,
     pub sender: String,
+    pub is_active: bool,
     pub claim_id: i32,
 }
 
@@ -16,6 +17,7 @@ impl Default for ClaimTemplateContext {
             currency_symbol: "£".to_string(),
             amount: "".to_string(),
             sender: "".to_string(),
+            is_active: false,
             claim_id: 0,
         }
     }

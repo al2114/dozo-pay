@@ -111,6 +111,12 @@ a:hover, .pesto:hover {
 	background-color: #16a747;
 }
 
+
+.claimed, .claimed:hover, .claimed:active {
+	background-color: #ddd;
+	color: #aaa;
+}
+
 .center-block {
     margin-left:auto;
     margin-right:auto;

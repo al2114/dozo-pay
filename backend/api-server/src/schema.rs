@@ -14,6 +14,7 @@ table! {
         receiver_id -> Nullable<Int4>,
         is_active -> Bool,
         created_at -> Timestamp,
+        amount -> Int4,
     }
 }
 

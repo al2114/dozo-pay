@@ -85,6 +85,7 @@ pub struct Claim {
     pub receiver_id: Option<i32>,
     pub is_active: bool,
     pub created_at: NaiveDateTime,
+    pub amount: i32,
 }
 
 #[derive(Insertable)]
@@ -92,4 +93,5 @@ pub struct Claim {
 pub struct NewClaim<'a> {
     pub account_id: &'a i32,
     pub owner_id: &'a i32,
+    pub amount: &'a i32,
 }

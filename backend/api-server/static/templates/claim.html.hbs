@@ -55,7 +55,15 @@
                     <p class="text-center light align-middle">receive</p>
                     <h1 class="text-center highlight">{{currency_symbol}}{{amount}}</h1>
                     <p class="text-center">from <span class="highlight">@{{sender}}</span></p>
-                    <a href="confirm/{{claim_id}}" class="btn center-block btn-pesto">Confirm</a>
+                    {{#if is_active}}
+                        {{#if logged_in}}
+                        <a href="/claims/confirm/{{claim_id}}" class="btn center-block btn-pesto">Confirm</a>
+                        {{else}}
+                        <a href="/login?redirect=%2Fclaims%2Fconfirm%2F{{claim_id}}" class="btn center-block btn-pesto">Confirm</a>
+                        {{/if}}
+                    {{else}}
+                    <div class="btn disabled center-block btn-pesto claimed">Claimed</div>
+                    {{/if}}
                 </div>
             </div>
         </div>

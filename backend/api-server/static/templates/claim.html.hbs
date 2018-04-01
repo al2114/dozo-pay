@@ -35,29 +35,27 @@
 
         {{#if logged_in}}
         <div class="dropdown">
-            <a href="#" class="my-2 dropdown-toggle" data-toggle="dropdown">@{{username}} <span class="caret"></span></a>
+            <a href="#" class="my-2 dropdown-toggle pesto" data-toggle="dropdown">@{{username}} <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="#" onclick="logout();">Logout</a></li>
             </ul>
         </div>
         {{else}}
-        <a href="#" class="my-2 light" onclick="login();">login / register</a>
+        <a href="#" class="my-2 light pesto" onclick="login();">login / register</a>
         {{/if}}
     </nav>
 
     <div class="container main">
         <div class="row justify-content-center">
-            <div class="logo col-3 col-sm-2 col-lg-1 justify-content-center">
-                <img src="/assets/pesto-logo.svg" class="center-block"/>
-            </div>
+            <div class="logo col-3 col-sm-2 col-lg-1 justify-content-center"></div>
         </div>
         <div class="row justify-content-center">
             <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
                 <div class="claim-contents text-center">
-                    <p class="text-center light align-middle">received</p>
+                    <p class="text-center light align-middle">receive</p>
                     <h1 class="text-center highlight">{{currency_symbol}}{{amount}}</h1>
                     <p class="text-center">from <span class="highlight">@{{sender}}</span></p>
-                    <button type="button" class="btn btn-pesto center-block">Claim</button>
+                    <a href="confirm/{{claim_id}}" class="btn center-block btn-pesto">Confirm</a>
                 </div>
             </div>
         </div>

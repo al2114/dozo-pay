@@ -41,6 +41,7 @@ mod protos;
 use protos::user_messages::*;
 mod schema;
 mod contexts;
+use contexts::*;
 
 #[cfg(test)]
 mod route_tests;
@@ -514,7 +515,7 @@ fn get_user_with_uid(uid: i32, db_connection: &PgPooledConnection) -> Result<mod
     Ok(user)
 }
 
-fn get_username_with_uid(uid: i32, db_connection: &PgPooledConnection) -> Result<String, String> {
+fn get_username_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<String, String> {
     use schema::users::dsl::users as users_sql;
     use schema::users;
     let username = users_sql
@@ -531,13 +532,12 @@ fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<T
     // TODO: Use private cookies
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use contexts::ClaimTemplateContext;
     let mut context = ClaimTemplateContext::default();
 
     let name = cookies
         .get("user_id")
         .and_then(|c| c.value().parse().ok())
-        .and_then(|uid| get_username_with_uid(uid, &db_connection).ok());
+        .and_then(|uid| get_username_with_uid(&uid, &db_connection).ok());
 
     if let Some(name) = name {
         context.logged_in = true;
@@ -559,6 +559,7 @@ fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<T
 
     context.sender = sender;
     context.amount = format!("{:.*}", 2, (amount as f64 / 100.0));
+    context.claim_id = claim_id;
     Ok(Template::render("claim", &context))
 }
 
@@ -615,6 +616,72 @@ fn create_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, St
     response.set_successful(true);
     response.set_claim(protoize_claim(claim, owner, None, account_balance));
     Ok(serialize(response)?)
+}
+
+fn get_account_id_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<i32, String> {
+    use schema::users;
+    use schema::users::dsl::users as users_sql;
+
+    let account_id = users_sql
+        .find(uid)
+        .select(users::account_id)
+        .first::<i32>(db_connection)
+        .map_err(|_| "Unable to find user account")?;
+
+    Ok(account_id)
+}
+
+#[get("/claims/confirm/<claim_id>")]
+fn confirm_claim_route(
+    pool: State<PgPool>,
+    claim_id: i32,
+    cookies: Cookies,
+) -> Result<Template, String> {
+    let db_connection = pool.get().expect("failed to obtain database connection");
+    let mut context = ReceiptTemplateContext::default();
+
+    let uid: Option<i32> = cookies.get("user_id").and_then(|c| c.value().parse().ok());
+
+    if let Some(uid) = uid {
+        context.is_successful = true;
+
+        let account_id = get_account_id_with_uid(&uid, &db_connection)?;
+
+        use schema::claims;
+        use schema::claims::dsl::claims as claims_sql;
+        use schema::accounts;
+        use schema::users;
+
+        let (sender_name, claim_account_id, amount) = claims_sql
+            .find(claim_id)
+            .inner_join(accounts::table.on(accounts::uid.eq(claims::account_id)))
+            .inner_join(users::table.on(users::uid.eq(claims::owner_id)))
+            .select((users::username, claims::account_id, accounts::balance))
+            .first::<(String, i32, i32)>(&db_connection)
+            .map_err(|_| "Unable to find claim")?;
+
+        let _ = execute_transaction(&claim_account_id, &account_id, &amount, &db_connection)?;
+
+        use schema::accounts::dsl::accounts as accounts_sql;
+
+        let new_balance = accounts_sql
+            .find(account_id)
+            .select(accounts::balance)
+            .first::<i32>(&db_connection)
+            .map_err(|_| "Unable to find account")?;
+
+        let receiver_name = get_username_with_uid(&uid, &db_connection)?;
+
+        context.receipt_id = format!("{}", claim_id + 400000000000);
+        context.sender = sender_name;
+        context.receiver = receiver_name;
+        context.new_balance = format!("{:.*}", 2, (new_balance as f64 / 100.0));
+        context.amount = format!("{:.*}", 2, (amount as f64 / 100.0));
+    } else {
+        return Ok(Template::render("receipt", context));
+    }
+
+    Ok(Template::render("receipt", context))
 }
 
 #[post("/claims/accept", data = "<input>")]
@@ -762,6 +829,7 @@ fn main() {
                 add_contact_route,
                 get_contacts_route,
                 get_user_route,
+                confirm_claim_route,
                 create_claim_route,
                 accept_claim_route,
                 revoke_claim_route,

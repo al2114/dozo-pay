@@ -17,10 +17,10 @@ use protobuf::{CodedInputStream, CodedOutputStream};
 extern crate r2d2;
 extern crate rocket;
 use rocket::State;
-use rocket::http::Cookies;
+use rocket::http::{Cookie, Cookies};
 use rocket::response::NamedFile;
 extern crate rocket_contrib;
-use rocket_contrib::Template;
+use rocket_contrib::{Json, Template};
 #[macro_use]
 extern crate serde_derive;
 
@@ -472,7 +472,44 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
     Ok(serialize(response)?)
 }
 
-#[post("/login", data = "<input>")]
+#[derive(Deserialize)]
+pub struct Login {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Serialize)]
+pub struct Success {
+    pub successful: bool,
+}
+
+#[post("/login", format = "application/json", data = "<input>")]
+fn web_login_route(mut cookies: Cookies, pool: State<PgPool>, input: Json<Login>) -> Json<Success> {
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    let username = &input.username.to_string();
+    let password = &input.password.to_string(); //TODO: SHA encryption
+
+    use schema::users;
+    use models::User;
+
+    let user = users::table
+        .filter(users::username.eq(username))
+        .first::<User>(&db_connection)
+        .ok();
+
+    let mut response = Success { successful: false };
+
+    if let Some(user) = user {
+        if user.password.trim() == password.to_string() {
+            cookies.add_private(Cookie::new("credentials", format!("{}", user.uid)));
+            response.successful = true;
+        }
+    }
+    Json(response)
+}
+
+#[post("/login", rank = 2, data = "<input>")]
 fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<LoginRequest>(input)?;
 
@@ -518,7 +555,11 @@ fn get_username_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Resul
 }
 
 #[get("/claims/<claim_id>")]
-fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<Template, String> {
+fn claim_route(
+    pool: State<PgPool>,
+    claim_id: i32,
+    mut cookies: Cookies,
+) -> Result<Template, String> {
     // TODO: Handle invalid claim_ids
     // TODO: Use private cookies
     let db_connection = pool.get().expect("failed to obtain database connection");
@@ -526,7 +567,7 @@ fn claim_route(pool: State<PgPool>, claim_id: i32, cookies: Cookies) -> Result<T
     let mut context = ClaimTemplateContext::default();
 
     let name = cookies
-        .get("user_id")
+        .get_private("credentials")
         .and_then(|c| c.value().parse().ok())
         .and_then(|uid| get_username_with_uid(&uid, &db_connection).ok());
 
@@ -650,12 +691,14 @@ fn login_webpage() -> Template {
 fn confirm_claim_route(
     pool: State<PgPool>,
     claim_id: i32,
-    cookies: Cookies,
+    mut cookies: Cookies,
 ) -> Result<Template, String> {
     let db_connection = pool.get().expect("failed to obtain database connection");
     let mut context = ReceiptTemplateContext::default();
 
-    let uid: Option<i32> = cookies.get("user_id").and_then(|c| c.value().parse().ok());
+    let uid: Option<i32> = cookies
+        .get_private("credentials")
+        .and_then(|c| c.value().parse().ok());
 
     use schema::claims::dsl::claims as claims_sql;
     use schema::claims;
@@ -827,6 +870,12 @@ fn spawn_notification_client() -> Option<NotificationClient> {
     None
 }
 
+#[get("/test")]
+fn test_route(mut cookies: Cookies) -> String {
+    cookies.add_private(Cookie::new("foo", "bar"));
+    "yay".to_string()
+}
+
 fn main() {
     dotenv().ok();
 
@@ -862,6 +911,8 @@ fn main() {
                 revoke_claim_route,
                 claim_route,
                 login_webpage,
+                web_login_route,
+                test_route
             ],
         )
         .attach(Template::fairing())

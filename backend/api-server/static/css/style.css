@@ -185,3 +185,8 @@ a:hover, .pesto:hover {
 .no-margin {
 	margin: 0px;
 }
+
+.hidden {
+	display: none;
+	visibility: hidden;
+}

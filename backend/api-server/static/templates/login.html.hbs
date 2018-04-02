@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!--  Meta tags for social media -->
-
-    <!-- <meta property="og:title" content="{{currency_symbol}}{{amount}} from @{{sender}}"> -->
     <meta property="og:image" content="https://al2114.github.io/dozo-site/claim/assets/og-image.jpg">
     <meta property="og:url" content="https://al2114.github.io/dozo-site/claim/index.html">
     <meta name="twitter:card" content="https://al2114.github.io/dozo-site/claim/assets/og-image.jpg">
@@ -15,17 +13,13 @@
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
 
-    <!-- <title>{{currency_symbol}}{{amount}} from @{{sender}} | Pesto Pay</title> -->
     <title>Pesto Pay</title>
 </head>
 <body>
-
      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- <a class="navbar-brand light small" href="#">Login/Register</a> -->
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
@@ -33,36 +27,39 @@
                 </li>
             </ul>
         </div>
-
-        <!-- {{#if logged_in}} -->
         <div class="dropdown">
             <a href="#" class="my-2 dropdown-toggle pesto" data-toggle="dropdown">@{{username}} <span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="#" onclick="logout();">Logout</a></li>
             </ul>
         </div>
-        <!-- {{else}} -->
-        <!-- <a href="#" class="my-2 light pesto" onclick="login();">login / register</a> -->
-        <!-- {{/if}} -->
     </nav>
-
     <div class="container main">
-            <div class="row justify-content-center">
-                <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
-                    <!-- <form name="form_name" class="form_class" > -->
-                        <h2>Login</h2>
-                        <label>user id:</label>
-                        <input type="text" id="login_id" name="login_id" />
-                        <input type="button" value="Login" onclick="submit()"/>
-                    <!-- </form> -->
-                </div>
+        <div class="row justify-content-center">
+            <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
+                <h2>Login</h2>
+                <form id="login-form">
+                    <div class="error-message alert alert-danger hidden">
+                        Invalid username or password
+                    </div>
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" class="form-control" id="username"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" class="form-control" id="password"/>    
+                    </div>
+                    <input type="submit" class="btn btn-default"/>
+
+                </form>
             </div>
+        </div>
     </div>
 
     <script src="/scripts/jquery-3.3.1.min.js"></script>
     <script src="/scripts/popper.min.js"></script>
     <script src="/scripts/bootstrap.min.js"></script>
-    <script src="/scripts/protos/bundle.js"></script>
     <script src="/scripts/script.js"></script>
 </body>
 </html>

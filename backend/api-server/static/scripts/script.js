@@ -26,7 +26,7 @@ function eraseCookie(name) {
 }
 
 function logout() {
-    eraseCookie("user_id");
+    eraseCookie("credentials");
     window.location.reload(false); 
 }
 
@@ -39,15 +39,41 @@ function getURLParameter(name) {
   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
 
-function submit() {
-    var uid = document.getElementById("login_id").value;
-    setCookie("user_id",uid,1);
-    
-    let redirect = getURLParameter("redirect");
-    if(redirect != null){
-        document.location.href=redirect;
+function makeHttpObject() {
+  try {return new XMLHttpRequest();}
+  catch (error) {}
+  try {return new ActiveXObject("Msxml2.XMLHTTP");}
+  catch (error) {}
+  try {return new ActiveXObject("Microsoft.XMLHTTP");}
+  catch (error) {}
+
+  throw new Error("Could not create HTTP request object.");
+}
+
+$("form").submit(function() { 
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+    let loginRequest = {
+        username: username,
+        password: password
+    };
+
+    var request = makeHttpObject();
+    request.open('POST', '/login', false);
+    request.setRequestHeader("Content-type", "application/json");
+    request.send(JSON.stringify(loginRequest));
+    let response = JSON.parse(request.responseText)
+    if(response['successful']){
+        let redirect = getURLParameter("redirect");
+        if(redirect != null){
+            document.location.href=redirect;
+        }
+        else {
+            document.location.href="/";
+        }
     }
     else {
-        document.location.href="/";
+        $(".hidden").removeClass("hidden");
     }
-}
+    return false;
+});

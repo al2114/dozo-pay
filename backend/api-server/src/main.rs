@@ -361,7 +361,7 @@ fn get_user_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> 
 fn transaction_helper(
     pool: State<PgPool>,
     input: Vec<u8>,
-) -> Result<(TransactionResponse, models::User), String> {
+) -> Result<(TransactionResponse, (models::User, String, i32)), String> {
     let request = deserialize::<TransactionRequest>(input)?;
     let payer_id = request.get_payer_id();
     let payee_id = request.get_payee_id();
@@ -393,7 +393,7 @@ fn transaction_helper(
     response.set_user(payer);
     response.set_transaction_id(transaction.uid);
     response.set_successful(true);
-    Ok((response, payee))
+    Ok((response, (payee, payer_username, request.amount)))
 }
 
 #[cfg(not(feature = "notifications"))]
@@ -410,11 +410,15 @@ fn transaction_route(
     apns_client: State<APNsClient>,
     input: Vec<u8>,
 ) -> Result<Vec<u8>, String> {
-    let (response, payee) = transaction_helper(pool, input)?;
+    let (response, (payee, payer_username, amount)) = transaction_helper(pool, input)?;
     if let Some(device_token) = payee.device_token {
         let notification = Notification::builder("pay.pesto.dozo".to_string(), device_token)
             .title("New Transaction")
-            .body(format!("Received £{} from @{}", request.amount / 100, payer_username))
+            .body(format!(
+                "Received £{} from @{}",
+                amount / 100,
+                payer_username
+            ))
             .build();
         apns_client
             .send(notification)

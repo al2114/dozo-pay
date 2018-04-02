@@ -20,7 +20,7 @@ use rocket::State;
 use rocket::http::{Cookie, Cookies};
 use rocket::response::NamedFile;
 extern crate rocket_contrib;
-use rocket_contrib::{Json, Template};
+use rocket_contrib::Template;
 #[macro_use]
 extern crate serde_derive;
 
@@ -483,34 +483,12 @@ pub struct Success {
     pub successful: bool,
 }
 
-#[post("/login", format = "application/json", data = "<input>")]
-fn web_login_route(mut cookies: Cookies, pool: State<PgPool>, input: Json<Login>) -> Json<Success> {
-    let db_connection = pool.get().expect("failed to obtain database connection");
-
-    let username = &input.username.to_string();
-    let password = &input.password.to_string(); //TODO: SHA encryption
-
-    use schema::users;
-    use models::User;
-
-    let user = users::table
-        .filter(users::username.eq(username))
-        .first::<User>(&db_connection)
-        .ok();
-
-    let mut response = Success { successful: false };
-
-    if let Some(user) = user {
-        if user.password.trim() == password.to_string() {
-            cookies.add_private(Cookie::new("credentials", format!("{}", user.uid)));
-            response.successful = true;
-        }
-    }
-    Json(response)
-}
-
-#[post("/login", rank = 2, data = "<input>")]
-fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+#[post("/login", data = "<input>")]
+fn login_route(
+    mut cookies: Cookies,
+    pool: State<PgPool>,
+    input: Vec<u8>,
+) -> Result<Vec<u8>, String> {
     let request = deserialize::<LoginRequest>(input)?;
 
     let username = request.get_username();
@@ -532,11 +510,20 @@ fn login_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
 
     let mut response = LoginResponse::new();
 
-    if user.password == password {
+    println!(
+        "db pass: ({}), provided pass: ({})",
+        user.password.trim(),
+        password
+    );
+
+    if user.password.trim() == password {
+        println!("sup");
         let user = protoize_user(user, account.balance);
+        cookies.add_private(Cookie::new("credentials", format!("{}", user.uid)));
         response.set_user(user);
         response.set_successful(true);
     } else {
+        println!("dup");
         response.set_successful(false);
     }
 
@@ -555,7 +542,7 @@ fn get_username_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Resul
 }
 
 #[get("/claims/<claim_id>")]
-fn claim_route(
+fn claim_page(
     pool: State<PgPool>,
     claim_id: i32,
     mut cookies: Cookies,
@@ -681,14 +668,14 @@ fn set_claim_received(
 }
 
 #[get("/login")]
-fn login_webpage() -> Template {
+fn login_page() -> Template {
     use std::collections::HashMap;
     let context: HashMap<&str, &str> = HashMap::new();
     Template::render("login", context)
 }
 
 #[get("/claims/confirm/<claim_id>")]
-fn confirm_claim_route(
+fn receipt_page(
     pool: State<PgPool>,
     claim_id: i32,
     mut cookies: Cookies,
@@ -870,12 +857,6 @@ fn spawn_notification_client() -> Option<NotificationClient> {
     None
 }
 
-#[get("/test")]
-fn test_route(mut cookies: Cookies) -> String {
-    cookies.add_private(Cookie::new("foo", "bar"));
-    "yay".to_string()
-}
-
 fn main() {
     dotenv().ok();
 
@@ -905,14 +886,12 @@ fn main() {
                 add_contact_route,
                 get_contacts_route,
                 get_user_route,
-                confirm_claim_route,
-                create_claim_route,
                 accept_claim_route,
+                create_claim_route,
                 revoke_claim_route,
-                claim_route,
-                login_webpage,
-                web_login_route,
-                test_route
+                claim_page,
+                receipt_page,
+                login_page
             ],
         )
         .attach(Template::fairing())

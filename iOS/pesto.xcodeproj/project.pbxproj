@@ -28,6 +28,7 @@
 		2B501624205227AF00B35EB0 /* NiceTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B501623205227AF00B35EB0 /* NiceTextField.swift */; };
 		2B50162620532BEB00B35EB0 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B50162520532BEB00B35EB0 /* NavigationController.swift */; };
 		2B525C5E206D646600BE296C /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B525C5D206D646600BE296C /* Notifications.swift */; };
+		2B525C612073641500BE296C /* PasscodeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B525C602073641500BE296C /* PasscodeVC.swift */; };
 		2B6250ED2055D2B80054D0C5 /* user_messages.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6250EC2055D2B80054D0C5 /* user_messages.pb.swift */; };
 		2B7FD7FC203CE9F40076EB74 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */; };
 		2B7FD7FE203CEA090076EB74 /* RegisterNumberVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */; };
@@ -79,6 +80,7 @@
 		2B50162520532BEB00B35EB0 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		2B525C5D206D646600BE296C /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		2B525C5F206D68D700BE296C /* Pesto Pay.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Pesto Pay.entitlements"; sourceTree = "<group>"; };
+		2B525C602073641500BE296C /* PasscodeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasscodeVC.swift; sourceTree = "<group>"; };
 		2B6250EC2055D2B80054D0C5 /* user_messages.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = user_messages.pb.swift; path = protos/user_messages.pb.swift; sourceTree = "<group>"; };
 		2B7FD7FB203CE9F40076EB74 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterNumberVC.swift; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 				2B7FD7FD203CEA090076EB74 /* RegisterNumberVC.swift */,
 				2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */,
 				2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */,
+				2B525C602073641500BE296C /* PasscodeVC.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -376,6 +379,7 @@
 			files = (
 				2B47779D202A0F0F0077415A /* AppDelegate.swift in Sources */,
 				2B4777B7202A363D0077415A /* SendContactVC.swift in Sources */,
+				2B525C612073641500BE296C /* PasscodeVC.swift in Sources */,
 				2B4CE3B92034FD19006408DC /* Room.swift in Sources */,
 				CB046909204349C100DF284F /* CircleButton.swift in Sources */,
 				2B4777B1202A32040077415A /* CameraVC.swift in Sources */,

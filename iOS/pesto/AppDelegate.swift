@@ -24,18 +24,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     UIApplication.shared.statusBarStyle = .lightContent
     window = UIWindow(frame: UIScreen.main.bounds)
-    let loginVC = LoginVC()
-    Util.switchTo(viewController: loginVC, window: window)
+    let passcodeVC = PasscodeVC()
+    Util.switchTo(viewController: passcodeVC, window: window)
     window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()
-
-    API.getMe(withId: 4) { me in
-      if let me = me {
-        User.updateMe(withUser: me)
-        let homeVC = HomeVC()
-        Util.switchTo(viewController: homeVC, window: self.window)
-      }
-    }
 
     UNUserNotificationCenter.current().delegate = self
     registerForPushNotifications(withApplication: application)

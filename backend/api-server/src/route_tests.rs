@@ -69,7 +69,7 @@ fn test_register_user() {
     )
 }
 
-fn add_contact(client: &Client, user_id: i32, contact_username: &str) -> AddContactResponse {
+fn add_contact(client: &Client, user_id: i32, contact_username: &str) -> SuccessResponse {
     let mut request = AddContactRequest::new();
     request.set_user_id(user_id);
     request.set_contact_username(contact_username.to_string());
@@ -80,7 +80,7 @@ fn add_contact(client: &Client, user_id: i32, contact_username: &str) -> AddCont
         .header(ContentType::Form)
         .dispatch();
 
-    super::deserialize::<AddContactResponse>(response.body_bytes().unwrap()).unwrap()
+    super::deserialize::<SuccessResponse>(response.body_bytes().unwrap()).unwrap()
 }
 
 #[test]

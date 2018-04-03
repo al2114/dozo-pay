@@ -856,10 +856,8 @@ fn revoke_claim_route(
 }
 
 #[get("/priv/pesto/debugger")]
-fn debugger_page() -> Result<Template, String> {
-    use std::collections::HashMap;
-    let context: HashMap<&str, &str> = HashMap::new();
-    Ok(Template::render("debugger", &context))
+fn debugger_page() -> NamedFile {
+    NamedFile::open(Path::new("priv/debugger.html"))
 }
 
 #[cfg(feature = "notifications")]

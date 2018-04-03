@@ -86,9 +86,9 @@ class PasscodeVC: UIViewController {
         textField.attributedText = formattedText
 
         if formattedText.string.replacingOccurrences(of: "_", with: "").count == 4 {
-          API.getPasscode {
-            passcode in
-            if passcode == formattedText.string {
+          API.checkPasscode(formattedText.string) {
+            success in
+            if success {
               self.nextVC()
             }
           }

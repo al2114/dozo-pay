@@ -9,9 +9,9 @@
 import UIKit
 import SwiftProtobuf
 
-//let server = "http://localhost:3001"
+let server = "http://localhost:3001"
 //let server = "http://54.84.120.127"
-let server = "https://pesto-pay.com"
+//let server = "https://pesto-pay.com"
 
 struct Util {
   static var filter = CIFilter(name: "CIQRCodeGenerator")!
@@ -224,7 +224,11 @@ extension Pesto_UserMessages_TopupRequest: RequestResponsePair {
 }
 
 extension Pesto_UserMessages_AddContactRequest: RequestResponsePair {
-  typealias ResponseType = Pesto_UserMessages_AddContactResponse
+  typealias ResponseType = Pesto_UserMessages_SuccessResponse
+}
+
+extension Pesto_UserMessages_CheckPasscodeRequest: RequestResponsePair {
+  typealias ResponseType = Pesto_UserMessages_SuccessResponse
 }
 
 extension UIViewController {

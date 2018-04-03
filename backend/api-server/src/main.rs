@@ -187,11 +187,12 @@ fn execute_transaction(
         .map_err(|e| e.description)
 }
 
-#[get("/passcode")]
-fn get_passcode_route() -> Result<Vec<u8>, String> {
+#[post("/check-passcode", data = "<input>")]
+fn check_passcode_route(input: Vec<u8>) -> Result<Vec<u8>, String> {
+    let request = deserialize::<CheckPasscodeRequest>(input)?;
     let passcode = "3192".to_string();
-    let mut response = GetPasscodeResponse::new();
-    response.set_passcode(passcode);
+    let mut response = SuccessResponse::new();
+    response.set_successful(passcode == request.get_passcode());
     Ok(serialize(response)?)
 }
 
@@ -224,7 +225,7 @@ fn add_contact_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, Str
         .execute(&db_connection)
         .map_err(|_| "Error inserting new account")?;
 
-    let mut response = AddContactResponse::new();
+    let mut response = SuccessResponse::new();
     response.set_successful(true);
     Ok(serialize(response)?)
 }
@@ -886,7 +887,7 @@ fn main() {
             routes![
                 index_route,
                 file_route,
-                get_passcode_route,
+                check_passcode_route,
                 register_route,
                 login_route,
                 topup_route,

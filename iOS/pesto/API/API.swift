@@ -12,15 +12,21 @@ typealias TransactionResponse = Pesto_UserMessages_TransactionResponse
 typealias TopupRequest = Pesto_UserMessages_TopupRequest
 typealias TopupResponse = Pesto_UserMessages_TopupResponse
 
-typealias GetPasscodeResponse = Pesto_UserMessages_GetPasscodeResponse
+typealias CheckPasscodeRequest = Pesto_UserMessages_CheckPasscodeRequest
+typealias SuccessResponse = Pesto_UserMessages_SuccessResponse
 
 struct API {
-  static func getPasscode(completion: @escaping (String) -> Void) {
-    let route = "passcode"
-    Util.get(toRoute: route) {
-      (result: Result<GetPasscodeResponse>?) in
+  static func checkPasscode(_ passcode: String, completion: @escaping (Bool) -> Void) {
+    var checkPasscodeRequest = CheckPasscodeRequest()
+    checkPasscodeRequest.passcode = passcode
+
+    let route = "check-passcode"
+    Util.post(toRoute: route, withProtoMessage: checkPasscodeRequest) {
+      result in
       if case let .ok(response)? = result {
-        completion(response.passcode)
+        completion(response.successful)
+      } else {
+        completion(false)
       }
     }
   }

@@ -20,7 +20,6 @@ typealias LoginRequest = Pesto_UserMessages_LoginRequest
 typealias LoginResponse = Pesto_UserMessages_LoginResponse
 typealias GetContactResponse = Pesto_UserMessages_GetContactsResponse
 typealias AddContactRequest = Pesto_UserMessages_AddContactRequest
-typealias AddContactResponse = Pesto_UserMessages_AddContactResponse
 typealias GetTransactionsResponse = Pesto_UserMessages_GetTransactionsResponse
 
 import Foundation

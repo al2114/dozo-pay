@@ -2189,7 +2189,7 @@ impl ::protobuf::reflect::ProtobufValue for AddContactRequest {
 }
 
 #[derive(PartialEq,Clone,Default)]
-pub struct AddContactResponse {
+pub struct SuccessResponse {
     // message fields
     pub successful: bool,
     // special fields
@@ -2198,20 +2198,20 @@ pub struct AddContactResponse {
 }
 
 // see codegen.rs for the explanation why impl Sync explicitly
-unsafe impl ::std::marker::Sync for AddContactResponse {}
+unsafe impl ::std::marker::Sync for SuccessResponse {}
 
-impl AddContactResponse {
-    pub fn new() -> AddContactResponse {
+impl SuccessResponse {
+    pub fn new() -> SuccessResponse {
         ::std::default::Default::default()
     }
 
-    pub fn default_instance() -> &'static AddContactResponse {
-        static mut instance: ::protobuf::lazy::Lazy<AddContactResponse> = ::protobuf::lazy::Lazy {
+    pub fn default_instance() -> &'static SuccessResponse {
+        static mut instance: ::protobuf::lazy::Lazy<SuccessResponse> = ::protobuf::lazy::Lazy {
             lock: ::protobuf::lazy::ONCE_INIT,
-            ptr: 0 as *const AddContactResponse,
+            ptr: 0 as *const SuccessResponse,
         };
         unsafe {
-            instance.get(AddContactResponse::new)
+            instance.get(SuccessResponse::new)
         }
     }
 
@@ -2239,7 +2239,7 @@ impl AddContactResponse {
     }
 }
 
-impl ::protobuf::Message for AddContactResponse {
+impl ::protobuf::Message for SuccessResponse {
     fn is_initialized(&self) -> bool {
         true
     }
@@ -2310,12 +2310,12 @@ impl ::protobuf::Message for AddContactResponse {
     }
 }
 
-impl ::protobuf::MessageStatic for AddContactResponse {
-    fn new() -> AddContactResponse {
-        AddContactResponse::new()
+impl ::protobuf::MessageStatic for SuccessResponse {
+    fn new() -> SuccessResponse {
+        SuccessResponse::new()
     }
 
-    fn descriptor_static(_: ::std::option::Option<AddContactResponse>) -> &'static ::protobuf::reflect::MessageDescriptor {
+    fn descriptor_static(_: ::std::option::Option<SuccessResponse>) -> &'static ::protobuf::reflect::MessageDescriptor {
         static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
             lock: ::protobuf::lazy::ONCE_INIT,
             ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
@@ -2325,11 +2325,11 @@ impl ::protobuf::MessageStatic for AddContactResponse {
                 let mut fields = ::std::vec::Vec::new();
                 fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBool>(
                     "successful",
-                    AddContactResponse::get_successful_for_reflect,
-                    AddContactResponse::mut_successful_for_reflect,
+                    SuccessResponse::get_successful_for_reflect,
+                    SuccessResponse::mut_successful_for_reflect,
                 ));
-                ::protobuf::reflect::MessageDescriptor::new::<AddContactResponse>(
-                    "AddContactResponse",
+                ::protobuf::reflect::MessageDescriptor::new::<SuccessResponse>(
+                    "SuccessResponse",
                     fields,
                     file_descriptor_proto()
                 )
@@ -2338,20 +2338,20 @@ impl ::protobuf::MessageStatic for AddContactResponse {
     }
 }
 
-impl ::protobuf::Clear for AddContactResponse {
+impl ::protobuf::Clear for SuccessResponse {
     fn clear(&mut self) {
         self.clear_successful();
         self.unknown_fields.clear();
     }
 }
 
-impl ::std::fmt::Debug for AddContactResponse {
+impl ::std::fmt::Debug for SuccessResponse {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for AddContactResponse {
+impl ::protobuf::reflect::ProtobufValue for SuccessResponse {
     fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
         ::protobuf::reflect::ProtobufValueRef::Message(self)
     }
@@ -2724,7 +2724,7 @@ impl ::protobuf::reflect::ProtobufValue for GetTransactionsResponse {
 }
 
 #[derive(PartialEq,Clone,Default)]
-pub struct GetPasscodeResponse {
+pub struct CheckPasscodeRequest {
     // message fields
     pub passcode: ::std::string::String,
     // special fields
@@ -2733,20 +2733,20 @@ pub struct GetPasscodeResponse {
 }
 
 // see codegen.rs for the explanation why impl Sync explicitly
-unsafe impl ::std::marker::Sync for GetPasscodeResponse {}
+unsafe impl ::std::marker::Sync for CheckPasscodeRequest {}
 
-impl GetPasscodeResponse {
-    pub fn new() -> GetPasscodeResponse {
+impl CheckPasscodeRequest {
+    pub fn new() -> CheckPasscodeRequest {
         ::std::default::Default::default()
     }
 
-    pub fn default_instance() -> &'static GetPasscodeResponse {
-        static mut instance: ::protobuf::lazy::Lazy<GetPasscodeResponse> = ::protobuf::lazy::Lazy {
+    pub fn default_instance() -> &'static CheckPasscodeRequest {
+        static mut instance: ::protobuf::lazy::Lazy<CheckPasscodeRequest> = ::protobuf::lazy::Lazy {
             lock: ::protobuf::lazy::ONCE_INIT,
-            ptr: 0 as *const GetPasscodeResponse,
+            ptr: 0 as *const CheckPasscodeRequest,
         };
         unsafe {
-            instance.get(GetPasscodeResponse::new)
+            instance.get(CheckPasscodeRequest::new)
         }
     }
 
@@ -2785,7 +2785,7 @@ impl GetPasscodeResponse {
     }
 }
 
-impl ::protobuf::Message for GetPasscodeResponse {
+impl ::protobuf::Message for CheckPasscodeRequest {
     fn is_initialized(&self) -> bool {
         true
     }
@@ -2852,12 +2852,12 @@ impl ::protobuf::Message for GetPasscodeResponse {
     }
 }
 
-impl ::protobuf::MessageStatic for GetPasscodeResponse {
-    fn new() -> GetPasscodeResponse {
-        GetPasscodeResponse::new()
+impl ::protobuf::MessageStatic for CheckPasscodeRequest {
+    fn new() -> CheckPasscodeRequest {
+        CheckPasscodeRequest::new()
     }
 
-    fn descriptor_static(_: ::std::option::Option<GetPasscodeResponse>) -> &'static ::protobuf::reflect::MessageDescriptor {
+    fn descriptor_static(_: ::std::option::Option<CheckPasscodeRequest>) -> &'static ::protobuf::reflect::MessageDescriptor {
         static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
             lock: ::protobuf::lazy::ONCE_INIT,
             ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
@@ -2867,11 +2867,11 @@ impl ::protobuf::MessageStatic for GetPasscodeResponse {
                 let mut fields = ::std::vec::Vec::new();
                 fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
                     "passcode",
-                    GetPasscodeResponse::get_passcode_for_reflect,
-                    GetPasscodeResponse::mut_passcode_for_reflect,
+                    CheckPasscodeRequest::get_passcode_for_reflect,
+                    CheckPasscodeRequest::mut_passcode_for_reflect,
                 ));
-                ::protobuf::reflect::MessageDescriptor::new::<GetPasscodeResponse>(
-                    "GetPasscodeResponse",
+                ::protobuf::reflect::MessageDescriptor::new::<CheckPasscodeRequest>(
+                    "CheckPasscodeRequest",
                     fields,
                     file_descriptor_proto()
                 )
@@ -2880,20 +2880,20 @@ impl ::protobuf::MessageStatic for GetPasscodeResponse {
     }
 }
 
-impl ::protobuf::Clear for GetPasscodeResponse {
+impl ::protobuf::Clear for CheckPasscodeRequest {
     fn clear(&mut self) {
         self.clear_passcode();
         self.unknown_fields.clear();
     }
 }
 
-impl ::std::fmt::Debug for GetPasscodeResponse {
+impl ::std::fmt::Debug for CheckPasscodeRequest {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for GetPasscodeResponse {
+impl ::protobuf::reflect::ProtobufValue for CheckPasscodeRequest {
     fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
         ::protobuf::reflect::ProtobufValueRef::Message(self)
     }
@@ -4407,15 +4407,15 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \rtransactionId\x12\x1e\n\nsuccessful\x18\x03\x20\x01(\x08R\nsuccessful\
     \"W\n\x11AddContactRequest\x12\x17\n\x07user_id\x18\x01\x20\x01(\x05R\
     \x06userId\x12)\n\x10contact_username\x18\x02\x20\x01(\tR\x0fcontactUser\
-    name\"4\n\x12AddContactResponse\x12\x1e\n\nsuccessful\x18\x01\x20\x01(\
-    \x08R\nsuccessful\"H\n\x13GetContactsResponse\x121\n\x08contacts\x18\x01\
-    \x20\x03(\x0b2\x15.pesto.models.ContactR\x08contacts\"X\n\x17GetTransact\
-    ionsResponse\x12=\n\x0ctransactions\x18\x01\x20\x03(\x0b2\x19.pesto.mode\
-    ls.TransactionR\x0ctransactions\"1\n\x13GetPasscodeResponse\x12\x1a\n\
-    \x08passcode\x18\x01\x20\x01(\tR\x08passcode\"G\n\x12CreateClaimRequest\
-    \x12\x16\n\x06amount\x18\x01\x20\x01(\x05R\x06amount\x12\x19\n\x08owner_\
-    id\x18\x02\x20\x01(\x05R\x07ownerId\"`\n\x13CreateClaimResponse\x12\x1e\
-    \n\nsuccessful\x18\x01\x20\x01(\x08R\nsuccessful\x12)\n\x05claim\x18\x02\
+    name\"1\n\x0fSuccessResponse\x12\x1e\n\nsuccessful\x18\x01\x20\x01(\x08R\
+    \nsuccessful\"H\n\x13GetContactsResponse\x121\n\x08contacts\x18\x01\x20\
+    \x03(\x0b2\x15.pesto.models.ContactR\x08contacts\"X\n\x17GetTransactions\
+    Response\x12=\n\x0ctransactions\x18\x01\x20\x03(\x0b2\x19.pesto.models.T\
+    ransactionR\x0ctransactions\"2\n\x14CheckPasscodeRequest\x12\x1a\n\x08pa\
+    sscode\x18\x01\x20\x01(\tR\x08passcode\"G\n\x12CreateClaimRequest\x12\
+    \x16\n\x06amount\x18\x01\x20\x01(\x05R\x06amount\x12\x19\n\x08owner_id\
+    \x18\x02\x20\x01(\x05R\x07ownerId\"`\n\x13CreateClaimResponse\x12\x1e\n\
+    \nsuccessful\x18\x01\x20\x01(\x08R\nsuccessful\x12)\n\x05claim\x18\x02\
     \x20\x01(\x0b2\x13.pesto.models.ClaimR\x05claim\"=\n\x10GetClaimResponse\
     \x12)\n\x05claim\x18\x02\x20\x01(\x0b2\x13.pesto.models.ClaimR\x05claim\
     \"P\n\x12AcceptClaimRequest\x12\x19\n\x08claim_id\x18\x01\x20\x01(\x05R\
@@ -4510,8 +4510,8 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x04\x08\x02\x01\x04\x12\x043\x022\x14\n\x0c\n\x05\x04\x08\x02\x01\x05\
     \x12\x033\x02\x08\n\x0c\n\x05\x04\x08\x02\x01\x01\x12\x033\t\x19\n\x0c\n\
     \x05\x04\x08\x02\x01\x03\x12\x033\x1c\x1d\n\n\n\x02\x04\t\x12\x046\08\
-    \x01\n\n\n\x03\x04\t\x01\x12\x036\x08\x1a\n\x0b\n\x04\x04\t\x02\0\x12\
-    \x037\x02\x16\n\r\n\x05\x04\t\x02\0\x04\x12\x047\x026\x1c\n\x0c\n\x05\
+    \x01\n\n\n\x03\x04\t\x01\x12\x036\x08\x17\n\x0b\n\x04\x04\t\x02\0\x12\
+    \x037\x02\x16\n\r\n\x05\x04\t\x02\0\x04\x12\x047\x026\x19\n\x0c\n\x05\
     \x04\t\x02\0\x05\x12\x037\x02\x06\n\x0c\n\x05\x04\t\x02\0\x01\x12\x037\
     \x07\x11\n\x0c\n\x05\x04\t\x02\0\x03\x12\x037\x14\x15\n\n\n\x02\x04\n\
     \x12\x04:\0<\x01\n\n\n\x03\x04\n\x01\x12\x03:\x08\x1b\n\x0b\n\x04\x04\n\
@@ -4522,9 +4522,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x02\0\x12\x03?\x02/\n\x0c\n\x05\x04\x0b\x02\0\x04\x12\x03?\x02\n\n\x0c\
     \n\x05\x04\x0b\x02\0\x06\x12\x03?\x0b\x1d\n\x0c\n\x05\x04\x0b\x02\0\x01\
     \x12\x03?\x1e*\n\x0c\n\x05\x04\x0b\x02\0\x03\x12\x03?-.\n\n\n\x02\x04\
-    \x0c\x12\x04B\0D\x01\n\n\n\x03\x04\x0c\x01\x12\x03B\x08\x1b\n\x0b\n\x04\
+    \x0c\x12\x04B\0D\x01\n\n\n\x03\x04\x0c\x01\x12\x03B\x08\x1c\n\x0b\n\x04\
     \x04\x0c\x02\0\x12\x03C\x02\x16\n\r\n\x05\x04\x0c\x02\0\x04\x12\x04C\x02\
-    B\x1d\n\x0c\n\x05\x04\x0c\x02\0\x05\x12\x03C\x02\x08\n\x0c\n\x05\x04\x0c\
+    B\x1e\n\x0c\n\x05\x04\x0c\x02\0\x05\x12\x03C\x02\x08\n\x0c\n\x05\x04\x0c\
     \x02\0\x01\x12\x03C\t\x11\n\x0c\n\x05\x04\x0c\x02\0\x03\x12\x03C\x14\x15\
     \n\n\n\x02\x04\r\x12\x04F\0I\x01\n\n\n\x03\x04\r\x01\x12\x03F\x08\x1a\n\
     \x0b\n\x04\x04\r\x02\0\x12\x03G\x02\x13\n\r\n\x05\x04\r\x02\0\x04\x12\

@@ -52,7 +52,7 @@ message AddContactRequest {
   string contact_username = 2;
 }
 
-message AddContactResponse {
+message SuccessResponse {
   bool successful = 1;
 }
 
@@ -64,7 +64,7 @@ message GetTransactionsResponse {
   repeated models.Transaction transactions = 1;
 }
 
-message GetPasscodeResponse {
+message CheckPasscodeRequest {
   string passcode = 1;
 }
 

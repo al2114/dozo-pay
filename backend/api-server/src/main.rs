@@ -527,12 +527,6 @@ fn login_route(
         .map_err(|_| "User not found")?;
 
     let mut response = LoginResponse::new();
-
-    println!(
-        "db pass: ({}), provided pass: ({})",
-        user.password, password
-    );
-
     if user.password == password {
         let user = protoize_user(user, account.balance);
         cookies.add_private(Cookie::new("credentials", format!("{}", user.uid)));

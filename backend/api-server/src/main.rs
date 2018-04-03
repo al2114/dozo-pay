@@ -4,29 +4,30 @@
 
 #[cfg(feature = "notifications")]
 extern crate apns;
-#[cfg(feature = "notifications")]
-use apns::{APNs, APNsClient, Notification};
 extern crate chrono;
 #[macro_use]
 extern crate diesel;
-use self::diesel::prelude::*;
 extern crate dotenv;
-use dotenv::dotenv;
 extern crate protobuf;
-use protobuf::{CodedInputStream, CodedOutputStream};
 extern crate r2d2;
+extern crate ring;
 extern crate rocket;
-use rocket::State;
-use rocket::http::{Cookie, Cookies};
-use rocket::response::NamedFile;
 extern crate rocket_contrib;
-use rocket_contrib::Template;
+extern crate rustc_serialize;
 #[macro_use]
 extern crate serde_derive;
 
-use std::env;
 #[cfg(feature = "notifications")]
-use std::thread;
+use apns::{APNs, APNsClient, Notification};
+use diesel::prelude::*;
+use dotenv::dotenv;
+use protobuf::{CodedInputStream, CodedOutputStream};
+use rocket::State;
+use rocket::http::{Cookie, Cookies};
+use rocket::response::NamedFile;
+use rocket_contrib::Template;
+
+use std::env;
 use std::io;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
@@ -34,15 +35,19 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 #[cfg(feature = "notifications")]
 use std::sync::mpsc::{channel, Sender};
+#[cfg(feature = "notifications")]
+use std::thread;
 
-mod models;
+mod contexts;
+use contexts::*;
 mod pg_pool;
 use pg_pool::{PgPool, PgPooledConnection};
 mod protos;
 use protos::user_messages::*;
+mod passwords;
+use passwords::encrypt_password;
+mod models;
 mod schema;
-mod contexts;
-use contexts::*;
 
 #[cfg(test)]
 mod route_tests;
@@ -443,6 +448,9 @@ fn topup_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
 #[post("/register", data = "<input>")]
 fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let request = deserialize::<RegisterRequest>(input)?;
+    let username = request.get_username();
+    let password = request.get_password();
+    let password = &encrypt_password(&username, &password);
 
     let new_account = models::NewAccount { balance: &0 };
 
@@ -460,8 +468,8 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
         phone_no: request.get_phone_no(),
         picture_url: None,
         account_id: &account.uid,
-        username: request.get_username(),
-        password: request.get_password(),
+        username: username,
+        password: password,
         device_token: None,
     };
 
@@ -502,6 +510,7 @@ fn login_route(
 
     let username = request.get_username();
     let password = request.get_password();
+    let password = encrypt_password(&username, &password);
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
@@ -521,18 +530,15 @@ fn login_route(
 
     println!(
         "db pass: ({}), provided pass: ({})",
-        user.password.trim(),
-        password
+        user.password, password
     );
 
-    if user.password.trim() == password {
-        println!("sup");
+    if user.password == password {
         let user = protoize_user(user, account.balance);
         cookies.add_private(Cookie::new("credentials", format!("{}", user.uid)));
         response.set_user(user);
         response.set_successful(true);
     } else {
-        println!("dup");
         response.set_successful(false);
     }
 

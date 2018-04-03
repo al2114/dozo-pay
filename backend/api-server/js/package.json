@@ -2,7 +2,7 @@
   "name": "protos",
   "version": "1.0.0",
   "description": "",
-  "main": "protos.js",
+  "main": "src/protos.js",
   "dependencies": {
     "jquery": "^3.3.1",
     "protobufjs": "^6.8.6"

@@ -1,85 +1,4 @@
 (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
-var protobuf = require("./protos.js");
-var $ = require("jquery")
-
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
-}
-
-function makeHttpObject() {
-    try {return new XMLHttpRequest();}
-    catch (error) {}
-    try {return new ActiveXObject("Msxml2.XMLHTTP");}
-    catch (error) {}
-    try {return new ActiveXObject("Microsoft.XMLHTTP");}
-    catch (error) {}
-
-    throw new Error("Could not create HTTP request object.");
-}
-
-const LoginRequest = protobuf.pesto.user_messages.LoginRequest;
-const LoginResponse = protobuf.pesto.user_messages.LoginResponse;
-
-$("#login-form").submit(function() {
-    var username = document.getElementById("username").value;
-    var password = document.getElementById("password").value;
-    let loginRequest= new LoginRequest({
-        username: username,
-        password: password
-    });
-    let data = LoginRequest.encode(loginRequest).finish();
-    var request = makeHttpObject();
-    request.open('POST', '/login', true);
-    request.responseType = "arraybuffer";
-
-    request.onload = function(e){
-        try{
-            let response = LoginResponse.decode(new Uint8Array(request.response));
-            if(response.successful){
-                let redirect = getURLParameter("redirect");
-                if(redirect != null){
-                    document.location.href=redirect;
-                } else {
-                    document.location.href="/";
-                }
-                return;
-            }
-        } catch(e) {}
-        $(".hidden").removeClass("hidden");
-    };
-
-    request.send(data);
-    return false;
-});
-//$("#login-form").submit(function() {
-//    var username = document.getElementById("username").value;
-//    var password = document.getElementById("password").value;
-//    let requestBody = new LoginRequest({
-//        username: username,
-//        password: password
-//    });
-//    var request = makeHttpObject();
-//    request.open('POST', '/login', false);
-//    request.send(JSON.stringify(loginRequest));
-//    let response = JSON.parse(request.responseText);
-//    console.log(response);
-//    //if(response['successful']){
-//    //    let redirect = getURLParameter("redirect");
-//    //    if(redirect != null){
-//    //        document.location.href=redirect;
-//    //    }
-//    //    else {
-//    //        document.location.href="/";
-//    //    }
-//    //}
-//    //else {
-//    //    $(".hidden").removeClass("hidden");
-//    //}
-//    return false;
-//});
-
-
-},{"./protos.js":21,"jquery":9}],2:[function(require,module,exports){
 "use strict";
 module.exports = asPromise;
 
@@ -133,7 +52,7 @@ function asPromise(fn, ctx/*, varargs */) {
     });
 }
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 "use strict";
 
 /**
@@ -274,7 +193,7 @@ base64.test = function test(string) {
     return /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(string);
 };
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 module.exports = EventEmitter;
 
@@ -352,7 +271,7 @@ EventEmitter.prototype.emit = function emit(evt) {
     return this;
 };
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 module.exports = factory(factory);
@@ -689,7 +608,7 @@ function readUintBE(buf, pos) {
           | buf[pos + 3]) >>> 0;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 module.exports = inquire;
 
@@ -708,7 +627,7 @@ function inquire(moduleName) {
     return null;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 module.exports = pool;
 
@@ -758,7 +677,7 @@ function pool(alloc, slice, size) {
     };
 }
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 /**
@@ -865,7 +784,7 @@ utf8.write = function utf8_write(string, buffer, offset) {
     return offset - start;
 };
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
@@ -11231,13 +11150,13 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // minimal library entry point.
 
 "use strict";
 module.exports = require("./src/index-minimal");
 
-},{"./src/index-minimal":11}],11:[function(require,module,exports){
+},{"./src/index-minimal":10}],10:[function(require,module,exports){
 "use strict";
 var protobuf = exports;
 
@@ -11275,7 +11194,7 @@ function configure() {
 protobuf.Writer._configure(protobuf.BufferWriter);
 configure();
 
-},{"./reader":12,"./reader_buffer":13,"./roots":14,"./rpc":15,"./util/minimal":18,"./writer":19,"./writer_buffer":20}],12:[function(require,module,exports){
+},{"./reader":11,"./reader_buffer":12,"./roots":13,"./rpc":14,"./util/minimal":17,"./writer":18,"./writer_buffer":19}],11:[function(require,module,exports){
 "use strict";
 module.exports = Reader;
 
@@ -11684,7 +11603,7 @@ Reader._configure = function(BufferReader_) {
     });
 };
 
-},{"./util/minimal":18}],13:[function(require,module,exports){
+},{"./util/minimal":17}],12:[function(require,module,exports){
 "use strict";
 module.exports = BufferReader;
 
@@ -11730,7 +11649,7 @@ BufferReader.prototype.string = function read_string_buffer() {
  * @returns {Buffer} Value read
  */
 
-},{"./reader":12,"./util/minimal":18}],14:[function(require,module,exports){
+},{"./reader":11,"./util/minimal":17}],13:[function(require,module,exports){
 "use strict";
 module.exports = {};
 
@@ -11750,7 +11669,7 @@ module.exports = {};
  * var root = protobuf.roots["myroot"];
  */
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 /**
@@ -11788,7 +11707,7 @@ var rpc = exports;
 
 rpc.Service = require("./rpc/service");
 
-},{"./rpc/service":16}],16:[function(require,module,exports){
+},{"./rpc/service":15}],15:[function(require,module,exports){
 "use strict";
 module.exports = Service;
 
@@ -11932,7 +11851,7 @@ Service.prototype.end = function end(endedByRPC) {
     return this;
 };
 
-},{"../util/minimal":18}],17:[function(require,module,exports){
+},{"../util/minimal":17}],16:[function(require,module,exports){
 "use strict";
 module.exports = LongBits;
 
@@ -12134,7 +12053,7 @@ LongBits.prototype.length = function length() {
          : part2 < 128 ? 9 : 10;
 };
 
-},{"../util/minimal":18}],18:[function(require,module,exports){
+},{"../util/minimal":17}],17:[function(require,module,exports){
 (function (global){
 "use strict";
 var util = exports;
@@ -12543,7 +12462,7 @@ util._configure = function() {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./longbits":17,"@protobufjs/aspromise":2,"@protobufjs/base64":3,"@protobufjs/eventemitter":4,"@protobufjs/float":5,"@protobufjs/inquire":6,"@protobufjs/pool":7,"@protobufjs/utf8":8}],19:[function(require,module,exports){
+},{"./longbits":16,"@protobufjs/aspromise":1,"@protobufjs/base64":2,"@protobufjs/eventemitter":3,"@protobufjs/float":4,"@protobufjs/inquire":5,"@protobufjs/pool":6,"@protobufjs/utf8":7}],18:[function(require,module,exports){
 "use strict";
 module.exports = Writer;
 
@@ -13004,7 +12923,7 @@ Writer._configure = function(BufferWriter_) {
     BufferWriter = BufferWriter_;
 };
 
-},{"./util/minimal":18}],20:[function(require,module,exports){
+},{"./util/minimal":17}],19:[function(require,module,exports){
 "use strict";
 module.exports = BufferWriter;
 
@@ -13087,7 +13006,61 @@ BufferWriter.prototype.string = function write_string_buffer(value) {
  * @returns {Buffer} Finished buffer
  */
 
-},{"./util/minimal":18,"./writer":19}],21:[function(require,module,exports){
+},{"./util/minimal":17,"./writer":18}],20:[function(require,module,exports){
+var protobuf = require("./protos.js");
+var $ = require("jquery")
+
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+}
+
+function makeHttpObject() {
+    try {return new XMLHttpRequest();}
+    catch (error) {}
+    try {return new ActiveXObject("Msxml2.XMLHTTP");}
+    catch (error) {}
+    try {return new ActiveXObject("Microsoft.XMLHTTP");}
+    catch (error) {}
+
+    throw new Error("Could not create HTTP request object.");
+}
+
+const LoginRequest = protobuf.pesto.user_messages.LoginRequest;
+const LoginResponse = protobuf.pesto.user_messages.LoginResponse;
+
+$("#login-form").submit(function() {
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+    let loginRequest= new LoginRequest({
+        username: username,
+        password: password
+    });
+    let data = LoginRequest.encode(loginRequest).finish();
+    var request = makeHttpObject();
+    request.open('POST', '/login', true);
+    request.responseType = "arraybuffer";
+
+    request.onload = function(e){
+        try{
+            let response = LoginResponse.decode(new Uint8Array(request.response));
+            if(response.successful){
+                let redirect = getURLParameter("redirect");
+                if(redirect != null){
+                    document.location.href=redirect;
+                } else {
+                    document.location.href="/";
+                }
+                return;
+            }
+        } catch(e) {}
+        $(".hidden").removeClass("hidden");
+    };
+
+    request.send(data);
+    return false;
+});
+
+},{"./protos.js":21,"jquery":8}],21:[function(require,module,exports){
 /*eslint-disable block-scoped-var, no-redeclare, no-control-regex, no-prototype-builtins*/
 "use strict";
 
@@ -19265,4 +19238,4 @@ $root.google = (function() {
 
 module.exports = $root;
 
-},{"protobufjs/minimal":10}]},{},[1]);
+},{"protobufjs/minimal":9}]},{},[20]);

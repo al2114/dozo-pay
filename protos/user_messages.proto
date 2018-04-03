@@ -64,6 +64,10 @@ message GetTransactionsResponse {
   repeated models.Transaction transactions = 1;
 }
 
+message GetPasscodeResponse {
+  string passcode = 1;
+}
+
 message CreateClaimRequest {
   int32 amount = 1;
   int32 owner_id = 2;

@@ -187,6 +187,14 @@ fn execute_transaction(
         .map_err(|e| e.description)
 }
 
+#[get("/passcode")]
+fn get_passcode_route() -> Result<Vec<u8>, String> {
+    let passcode = "3192".to_string();
+    let mut response = GetPasscodeResponse::new();
+    response.set_passcode(passcode);
+    Ok(serialize(response)?)
+}
+
 #[post("/contacts", data = "<input>")]
 fn add_contact_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let requests = deserialize::<AddContactRequest>(input)?;

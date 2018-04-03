@@ -1,0 +1,94 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+        <title>Pesto Pay</title>
+    </head>
+    <body>
+
+         <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="my-2 dropdown-toggle pesto" data-toggle="dropdown">@{{username}} <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" onclick="logout();">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container main">
+
+            {{#if is_successful}}
+            <h2 class="text-center highlight">Sucessful</h2>
+            <div class="row justify-content-center">
+                <div class="success-image col-4 col-sm-3 col-lg-2 justify-content-center"></div>
+            </div>
+            {{else}}
+            <h2 class="text-center text" style="margin-top: 20px;">Failed</h2>
+            <div class="row justify-content-center">
+                <div class="failed-image col-4 col-sm-3 col-lg-2 justify-content-center"></div>
+            </div>
+            {{/if}}
+            {{#if is_successful}}
+            <div class="row justify-content-center">
+                <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
+                    <div class="claim-contents text-center">
+                        <!-- <h1 class="text-center highlight">{{currency_symbol}}{{amount}}</h1> -->
+
+                        <h1 class="text-center highlight">{{currency_symbol}}{{amount}}</h1>
+                        <!-- <p class="text-center light align-middle small">transfered into your account</p> -->
+                        <span class="text small light">transfered into your account</span>
+                        <div class="balance">
+                            <div class="divider"></div>
+                            <span class="text smaller">New balance: {{currency_symbol}}{{new_balance}}</span>
+                            <div class="divider"></div>
+                        </div>
+                        <div class="receipt">
+                            <span>Receipt confirmation details</span>
+                            <ul>
+                                <li>receipt id: {{receipt_id}}</li>
+                                <li>sender: {{sender}}</li>
+                                <li>receiver: {{receiver}}</li>
+                                <li>amount : {{currency_symbol}}{{amount}}</li>
+                            </ul>
+                        </div>
+                        <div class="home">
+                            <a href="/">Back to homepage</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{else}}
+            <div class="row justify-content-center">
+                <h2 class="light message text small no-margin">Something went wrong!</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="home">
+                    <a href="/" class="text">Back to homepage</a>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+
+        <script src="/scripts/jquery-3.3.1.min.js"></script>
+        <script src="/scripts/popper.min.js"></script>
+        <script src="/scripts/bootstrap.min.js"></script>
+        <script src="/scripts/script.js"></script>
+    </body>
+    </html>

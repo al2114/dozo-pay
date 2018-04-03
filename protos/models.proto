@@ -3,12 +3,6 @@ syntax = "proto3";
 package pesto.models;
 import "google/protobuf/timestamp.proto";
 
-message Claim {
-  string identifier = 1;
-  string name = 2;
-  User owner = 3;
-}
-
 message User {
   int32 uid = 1;
   string phone_no = 2;
@@ -20,6 +14,13 @@ message User {
 message Profile {
   int32 uid = 1;
   string username = 2;
+}
+
+message Claim {
+  int32 uid = 1;
+  int32 amount = 2;
+  User owner = 3;
+  User receiver = 4;
 }
 
 message Room {

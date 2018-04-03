@@ -18,7 +18,7 @@ test:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - cd ./.docker-compose
     - python -m compose -f ../backend/docker-compose.test.yml up -d db
-    - python -m compose -f ../backend/docker-compose.test.yml run api-server bash -c "DATABASE_URL=$DATABASE_URL ./test_server.sh"
+    - python -m compose -f ../backend/docker-compose.test.yml run api-server bash -c "DATABASE_URL=$DATABASE_URL SALT_PREFIX=$SALT_PREFIX ./test_server.sh"
   #dependencies:
   #- build_release
 

@@ -886,6 +886,7 @@ fn main() {
             routes![
                 index_route,
                 file_route,
+                get_passcode_route,
                 register_route,
                 login_route,
                 topup_route,

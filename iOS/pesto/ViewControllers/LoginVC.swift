@@ -83,6 +83,14 @@ class LoginVC: UIViewController {
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
 
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+
+    API.getMe(withId: 4) { me in
+      if let me = me {
+        User.updateMe(withUser: me)
+        let homeVC = HomeVC()
+        Util.switchTo(viewController: homeVC)
+      }
+    }
   }
 
   deinit {

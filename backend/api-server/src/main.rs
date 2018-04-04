@@ -8,6 +8,8 @@ extern crate chrono;
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
+#[macro_use]
+extern crate error_chain;
 extern crate protobuf;
 extern crate r2d2;
 extern crate ring;
@@ -32,6 +34,8 @@ use std::path::{Path, PathBuf};
 
 mod contexts;
 use contexts::*;
+mod errors;
+use errors::*;
 mod pg_pool;
 use pg_pool::{PgPool, PgPooledConnection};
 mod protos;
@@ -85,7 +89,7 @@ fn file_route(file: PathBuf) -> Option<NamedFile> {
 fn update_balances(
     transaction: &models::Transaction,
     db_connection: &PgPooledConnection,
-) -> Result<(bool, models::Account), String> {
+) -> Result<(bool, models::Account)> {
     use models::Account;
     use schema::accounts;
     use schema::accounts::dsl::accounts as accounts_sql;
@@ -93,31 +97,19 @@ fn update_balances(
     let payer_account_query = accounts_sql.find(transaction.payer_id);
     let mut payer_account = payer_account_query
         .first::<Account>(db_connection)
-        .map_err(|_| "Account not found")?;
+        .chain_err(|| "Account not found")?;
     if payer_account.balance >= transaction.amount {
         payer_account = diesel::update(payer_account_query)
             .set(accounts::balance.eq(accounts::balance - transaction.amount))
             .get_result::<Account>(db_connection)
-            .map_err(|_| "Decrement update failed")?;
+            .chain_err(|| "Decrement update failed")?;
         diesel::update(accounts_sql.find(transaction.payee_id))
             .set(accounts::balance.eq(accounts::balance + transaction.amount))
             .execute(db_connection)
-            .map_err(|_| "Increment update failed")?;
+            .chain_err(|| "Increment update failed")?;
         Ok((true, payer_account))
     } else {
         Ok((false, payer_account))
-    }
-}
-
-struct Err {
-    description: String,
-}
-use diesel::result::Error;
-impl From<Error> for Err {
-    fn from(_: Error) -> Err {
-        Err {
-            description: "".to_string(),
-        }
     }
 }
 
@@ -126,7 +118,7 @@ fn execute_transaction(
     payee_id: &i32,
     amount: &i32,
     db_connection: &PgPooledConnection,
-) -> Result<(models::Account, models::Transaction), String> {
+) -> Result<(models::Account, models::Transaction)> {
     let new_transaction = models::NewTransaction {
         payer_id: &payer_id,
         payee_id: &payee_id,
@@ -136,32 +128,25 @@ fn execute_transaction(
     use models::Transaction;
     use schema::transactions;
 
-    db_connection
-        .transaction::<_, Err, _>(|| {
-            let mut transaction = diesel::insert_into(transactions::table)
-                .values(&new_transaction)
+    db_connection.transaction(|| {
+        let mut transaction = diesel::insert_into(transactions::table)
+            .values(&new_transaction)
+            .get_result::<Transaction>(db_connection)
+            .chain_err(|| "Error inserting new transaction")?;
+
+        let (success, account) = update_balances(&transaction, db_connection)?;
+
+        if success {
+            use schema::transactions::dsl::transactions as transactions_sql;
+
+            transaction = diesel::update(transactions_sql.find(transaction.uid))
+                .set(transactions::is_successful.eq(true))
                 .get_result::<Transaction>(db_connection)
-                .map_err(|_| Err {
-                    description: "Error inserting new transaction".to_string(),
-                })?;
+                .chain_err(|| "Error updating failed flag")?;
+        }
 
-            let (success, account) =
-                update_balances(&transaction, db_connection).map_err(|d| Err { description: d })?;
-
-            if success {
-                use schema::transactions::dsl::transactions as transactions_sql;
-
-                transaction = diesel::update(transactions_sql.find(transaction.uid))
-                    .set(transactions::is_successful.eq(true))
-                    .get_result::<Transaction>(db_connection)
-                    .map_err(|_| Err {
-                        description: "Error updating failed flag".to_string(),
-                    })?;
-            }
-
-            Ok((account, transaction))
-        })
-        .map_err(|e| e.description)
+        Ok((account, transaction))
+    })
 }
 
 #[post("/check-passcode", data = "<request>")]
@@ -189,7 +174,7 @@ fn add_contact_route(
         .filter(users::username.eq(contact_username))
         .select(users::uid)
         .first::<i32>(&db_connection)
-        .map_err(|_| "Contact not found")?;
+        .chain_err(|| "Contact not found")?;
 
     let new_contact = models::NewContact {
         user_id: &user_id,
@@ -200,7 +185,7 @@ fn add_contact_route(
     diesel::insert_into(contacts::table)
         .values(&new_contact)
         .execute(&db_connection)
-        .map_err(|_| "Error inserting new account")?;
+        .chain_err(|| "Error inserting new account")?;
 
     let mut response = SuccessResponse::new();
     response.set_successful(true);
@@ -229,7 +214,7 @@ fn get_contacts_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<GetConta
         .filter(contacts::user_id.eq(user_id))
         .inner_join(users::table.on(contacts::contact_id.eq(users::uid)))
         .load::<(Contact, User)>(&db_connection)
-        .map_err(|_| "Unable to find contacts")?;
+        .chain_err(|| "Unable to find contacts")?;
 
     let contacts = results
         .into_iter()
@@ -280,20 +265,20 @@ fn get_transactions_route(
         .inner_join(transactions::table.on(transactions::payee_id.eq(users::account_id)))
         .select(transactions::uid)
         .load::<i32>(&db_connection)
-        .map_err(|_| "Transactions not found")?;
+        .chain_err(|| "Transactions not found")?;
 
     let to_tids = users_sql
         .find(user_id)
         .inner_join(transactions::table.on(transactions::payer_id.eq(users::account_id)))
         .select(transactions::uid)
         .load::<i32>(&db_connection)
-        .map_err(|_| "Transactions not found")?;
+        .chain_err(|| "Transactions not found")?;
 
     let from_results = transactions::table
         .filter(transactions::uid.eq_any(from_tids))
         .inner_join(users::table.on(transactions::payer_id.eq(users::account_id)))
         .load::<(Transaction, User)>(&db_connection)
-        .map_err(|_| "Transactions not found")?
+        .chain_err(|| "Transactions not found")?
         .into_iter()
         .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::FROM));
 
@@ -301,7 +286,7 @@ fn get_transactions_route(
         .filter(transactions::uid.eq_any(to_tids))
         .inner_join(users::table.on(transactions::payee_id.eq(users::account_id)))
         .load::<(Transaction, User)>(&db_connection)
-        .map_err(|_| "Transactions not found")?
+        .chain_err(|| "Transactions not found")?
         .into_iter()
         .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::TO));
 
@@ -333,7 +318,7 @@ fn get_user_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<protos::mode
         .find(user_id)
         .inner_join(accounts::table.on(users::account_id.eq(accounts::uid)))
         .first::<(User, Account)>(&db_connection)
-        .map_err(|_| "User not found")?;
+        .chain_err(|| "User not found")?;
 
     Ok(Proto(protoize_user(user, account.balance)))
 }
@@ -341,7 +326,7 @@ fn get_user_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<protos::mode
 fn transaction_helper(
     pool: State<PgPool>,
     request: Proto<TransactionRequest>,
-) -> Result<(Proto<TransactionResponse>, (models::User, String, i32)), String> {
+) -> Result<(Proto<TransactionResponse>, (models::User, String, i32))> {
     let payer_id = request.get_payer_id();
     let payee_id = request.get_payee_id();
 
@@ -352,12 +337,11 @@ fn transaction_helper(
     let payer = users_sql
         .find(payer_id)
         .first::<User>(&db_connection)
-        .map_err(|_| "User not found")?;
-
+        .chain_err(|| "User not found")?;
     let payee = users_sql
         .find(payee_id)
         .first::<User>(&db_connection)
-        .map_err(|_| "User not found")?;
+        .chain_err(|| "User not found")?;
 
     let (account, transaction) = execute_transaction(
         &payer.account_id,
@@ -425,13 +409,13 @@ fn topup_route(pool: State<PgPool>, request: Proto<TopupRequest>) -> ProtoResult
     let master_account = diesel::update(accounts_sql.find(master_id))
         .set(accounts::balance.eq(accounts::balance + request.get_amount()))
         .get_result::<Account>(&db_connection)
-        .map_err(|_| "Master account does not exist")?;
+        .chain_err(|| "Master account does not exist")?;
 
     let (user, mut user_account) = users_sql
         .find(request.get_uid())
         .inner_join(accounts::table.on(users::account_id.eq(accounts::uid)))
         .first::<(User, Account)>(&db_connection)
-        .map_err(|_| "User not found")?;
+        .chain_err(|| "User not found")?;
 
     let (_, transaction) = execute_transaction(
         &master_account.uid,
@@ -443,7 +427,7 @@ fn topup_route(pool: State<PgPool>, request: Proto<TopupRequest>) -> ProtoResult
     user_account = accounts_sql
         .find(user.account_id)
         .first::<Account>(&db_connection)
-        .map_err(|_| "User does not have an account after transaction")?;
+        .chain_err(|| "User does not have an account after transaction")?;
 
     let user = protoize_user(user, user_account.balance);
 
@@ -472,7 +456,7 @@ fn register_route(
     let account = diesel::insert_into(accounts::table)
         .values(&new_account)
         .get_result::<Account>(&db_connection)
-        .map_err(|_| "Error inserting new account")?;
+        .chain_err(|| "Error inserting new account")?;
 
     let new_user = models::NewUser {
         phone_no: request.get_phone_no(),
@@ -489,7 +473,7 @@ fn register_route(
     let user = diesel::insert_into(users::table)
         .values(&new_user)
         .get_result::<User>(&db_connection)
-        .map_err(|_| "Error inserting new user")?;
+        .chain_err(|| "Error inserting new user")?;
 
     let user = protoize_user(user, 0);
 
@@ -542,7 +526,7 @@ fn login_route(
         .filter(users::username.eq(username))
         .inner_join(accounts::table.on(users::account_id.eq(accounts::uid)))
         .first::<(User, Account)>(&db_connection)
-        .map_err(|_| "User not found")?;
+        .chain_err(|| "User not found")?;
 
     let mut response = LoginResponse::new();
     if user.password == password {
@@ -557,23 +541,19 @@ fn login_route(
     Ok(Proto(response))
 }
 
-fn get_username_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<String, String> {
+fn get_username_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<String> {
     use schema::users;
     use schema::users::dsl::users as users_sql;
     let username = users_sql
         .find(uid)
         .select(users::username)
         .first::<String>(db_connection)
-        .map_err(|_| "User not found")?;
+        .chain_err(|| "User not found")?;
     Ok(username)
 }
 
 #[get("/claims/<claim_id>")]
-fn claim_page(
-    pool: State<PgPool>,
-    claim_id: i32,
-    mut cookies: Cookies,
-) -> Result<Template, String> {
+fn claim_page(pool: State<PgPool>, claim_id: i32, mut cookies: Cookies) -> Result<Template> {
     // TODO: Handle invalid claim_ids
     // TODO: Use private cookies
     let db_connection = pool.get().expect("failed to obtain database connection");
@@ -599,7 +579,7 @@ fn claim_page(
         .inner_join(users::table.on(users::uid.eq(claims::owner_id)))
         .select((users::username, claims::amount, claims::is_active))
         .first::<(String, i32, bool)>(&db_connection)
-        .map_err(|_| "Unable to find claim")?;
+        .chain_err(|| "Unable to find claim")?;
 
     context.is_active = is_active;
     context.sender = sender;
@@ -627,7 +607,7 @@ fn create_claim_route(
     let account = diesel::insert_into(accounts::table)
         .values(&new_account)
         .get_result::<Account>(&db_connection)
-        .map_err(|_| "Error inserting new account")?;
+        .chain_err(|| "Error inserting new account")?;
 
     let new_claim = models::NewClaim {
         account_id: &account.uid,
@@ -644,11 +624,11 @@ fn create_claim_route(
     let owner = users_sql
         .find(owner_id)
         .first::<User>(&db_connection)
-        .map_err(|_| "Unable to find user")?;
+        .chain_err(|| "Unable to find user")?;
     let claim = diesel::insert_into(claims::table)
         .values(&new_claim)
         .get_result::<Claim>(&db_connection)
-        .map_err(|_| "Error inserting new claim")?;
+        .chain_err(|| "Error inserting new claim")?;
 
     let _ = execute_transaction(&owner.account_id, &account.uid, &amount, &db_connection)?;
 
@@ -656,7 +636,7 @@ fn create_claim_route(
         .find(account.uid)
         .select(accounts::balance)
         .first::<i32>(&db_connection)
-        .map_err(|_| "Unable to find account")?;
+        .chain_err(|| "Unable to find account")?;
 
     let mut response = CreateClaimResponse::new();
     response.set_successful(true);
@@ -664,7 +644,7 @@ fn create_claim_route(
     Ok(Proto(response))
 }
 
-fn get_account_id_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<i32, String> {
+fn get_account_id_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<i32> {
     use schema::users;
     use schema::users::dsl::users as users_sql;
 
@@ -672,7 +652,7 @@ fn get_account_id_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Res
         .find(uid)
         .select(users::account_id)
         .first::<i32>(db_connection)
-        .map_err(|_| "Unable to find user account")?;
+        .chain_err(|| "Unable to find user account")?;
 
     Ok(account_id)
 }
@@ -681,7 +661,7 @@ fn set_claim_received(
     claim_id: &i32,
     receiver_id: &i32,
     db_connection: &PgPooledConnection,
-) -> Result<(), String> {
+) -> Result<()> {
     use schema::claims;
     use schema::claims::dsl::claims as claims_sql;
     diesel::update(claims_sql.find(claim_id))
@@ -690,7 +670,7 @@ fn set_claim_received(
             claims::is_active.eq(false),
         ))
         .execute(db_connection)
-        .map_err(|_| "Cannot find claim")?;
+        .chain_err(|| "Cannot find claim")?;
     Ok(())
 }
 
@@ -702,11 +682,7 @@ fn login_page() -> Template {
 }
 
 #[get("/claims/confirm/<claim_id>")]
-fn receipt_page(
-    pool: State<PgPool>,
-    claim_id: i32,
-    mut cookies: Cookies,
-) -> Result<Template, String> {
+fn receipt_page(pool: State<PgPool>, claim_id: i32, mut cookies: Cookies) -> Result<Template> {
     let db_connection = pool.get().expect("failed to obtain database connection");
     let mut context = ReceiptTemplateContext::default();
 
@@ -721,7 +697,7 @@ fn receipt_page(
         .find(claim_id)
         .select(claims::is_active)
         .first::<bool>(&db_connection)
-        .map_err(|_| "Cannot find claim")?;
+        .chain_err(|| "Cannot find claim")?;
 
     // First check if the claim is valid
     if !is_active {
@@ -741,7 +717,7 @@ fn receipt_page(
             .inner_join(users::table.on(users::uid.eq(claims::owner_id)))
             .select((users::username, claims::account_id, accounts::balance))
             .first::<(String, i32, i32)>(&db_connection)
-            .map_err(|_| "Unable to find claim")?;
+            .chain_err(|| "Unable to find claim")?;
 
         let _ = execute_transaction(&claim_account_id, &account_id, &amount, &db_connection)?;
         set_claim_received(&claim_id, &uid, &db_connection)?;
@@ -752,7 +728,7 @@ fn receipt_page(
             .find(account_id)
             .select(accounts::balance)
             .first::<i32>(&db_connection)
-            .map_err(|_| "Unable to find account")?;
+            .chain_err(|| "Unable to find account")?;
 
         let receiver_name = get_username_with_uid(&uid, &db_connection)?;
 
@@ -788,7 +764,7 @@ fn accept_claim(
     db_connection: &PgPooledConnection,
     claim_id: i32,
     receiver_id: i32,
-) -> Result<protos::models::Claim, String> {
+) -> Result<protos::models::Claim> {
     use models::Claim;
     use schema::accounts;
     use schema::claims;
@@ -799,14 +775,14 @@ fn accept_claim(
         .inner_join(accounts::table.on(accounts::uid.eq(claims::account_id)))
         .select((claims::account_id, accounts::balance))
         .first::<(i32, i32)>(db_connection)
-        .map_err(|_| "Unable to find claim")?;
+        .chain_err(|| "Unable to find claim")?;
 
     use models::User;
     use schema::users::dsl::users as users_sql;
     let receiver = users_sql
         .find(receiver_id)
         .first::<User>(db_connection)
-        .map_err(|_| "Unable to find receiver account")?;
+        .chain_err(|| "Unable to find receiver account")?;
 
     let _ = execute_transaction(&account_id, &receiver.account_id, &balance, &db_connection)?;
     set_claim_received(&claim_id, &receiver_id, &db_connection)?;
@@ -817,12 +793,12 @@ fn accept_claim(
             claims::is_active.eq(false),
         ))
         .get_result::<Claim>(db_connection)
-        .map_err(|_| "Unable to update claim")?;
+        .chain_err(|| "Unable to update claim")?;
 
     let owner = users_sql
         .find(claim.owner_id)
         .first::<User>(db_connection)
-        .map_err(|_| "Unable to find claim owner")?;
+        .chain_err(|| "Unable to find claim owner")?;
 
     let claim = protoize_claim(claim, owner, Some(receiver), balance);
     Ok(claim)
@@ -844,7 +820,7 @@ fn revoke_claim_route(
         .find(claim_id)
         .select(claims::owner_id)
         .first::<i32>(&db_connection)
-        .map_err(|_| "Unable to find claim")?;
+        .chain_err(|| "Unable to find claim")?;
 
     let claim = accept_claim(&db_connection, claim_id, owner_id)?;
 

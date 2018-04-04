@@ -29,7 +29,6 @@ use rocket::response::NamedFile;
 use rocket_contrib::Template;
 
 use std::env;
-use std::io;
 use std::path::{Path, PathBuf};
 
 mod contexts;
@@ -69,16 +68,16 @@ fn protoize_claim(
     let mut proto_claim = protos::models::Claim::new();
     proto_claim.set_uid(claim.uid);
     proto_claim.set_owner(protoize_user(owner, 0));
-    if let Some(receiver) = receiver {
+    receiver.map(|receiver| {
         proto_claim.set_receiver(protoize_user(receiver, 0));
-    }
+    });
     proto_claim.set_amount(amount);
     proto_claim
 }
 
 #[get("/")]
-fn index_route() -> io::Result<NamedFile> {
-    NamedFile::open("static/index.html")
+fn index_route() -> Result<NamedFile> {
+    NamedFile::open("static/index.html").chain_err(|| "Error opening index.html")
 }
 
 #[get("/<file..>", rank = 2)]
@@ -165,7 +164,8 @@ fn add_contact_route(
     let user_id = request.get_user_id();
     let contact_username = request.get_contact_username();
 
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use schema::users;
     use schema::users::dsl::users as users_sql;
@@ -202,7 +202,8 @@ fn protoize_contact(contact: models::Contact, username: String) -> protos::model
 
 #[get("/contacts/<user_id>")]
 fn get_contacts_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<GetContactsResponse> {
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use models::Contact;
     use schema::contacts;
@@ -251,7 +252,8 @@ fn get_transactions_route(
     pool: State<PgPool>,
     user_id: i32,
 ) -> ProtoResult<GetTransactionsResponse> {
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use models::User;
     use schema::users;
@@ -305,7 +307,8 @@ fn get_transactions_route(
 
 #[get("/users/<user_id>")]
 fn get_user_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<protos::models::User> {
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use models::User;
     use schema::users;
@@ -333,7 +336,9 @@ fn transaction_helper(
     use models::User;
     use schema::users::dsl::users as users_sql;
 
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
+
     let payer = users_sql
         .find(payer_id)
         .first::<User>(&db_connection)
@@ -395,7 +400,8 @@ fn transaction_route(
 
 #[post("/topup", data = "<request>")]
 fn topup_route(pool: State<PgPool>, request: Proto<TopupRequest>) -> ProtoResult<TopupResponse> {
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use models::User;
     use schema::users;
@@ -448,7 +454,8 @@ fn register_route(
 
     let new_account = models::NewAccount { balance: &0 };
 
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use models::Account;
     use schema::accounts;
@@ -491,7 +498,8 @@ fn register_device_token_route(
     let user_id = request.get_user_id();
     let device_token = request.get_device_token();
 
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use schema::users;
     use schema::users::dsl::users as users_sql;
@@ -514,7 +522,8 @@ fn login_route(
     let password = request.get_password();
     let password = encrypt_password(&username, &password);
 
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use models::User;
     use schema::users;
@@ -556,7 +565,8 @@ fn get_username_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Resul
 fn claim_page(pool: State<PgPool>, claim_id: i32, mut cookies: Cookies) -> Result<Template> {
     // TODO: Handle invalid claim_ids
     // TODO: Use private cookies
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     let mut context = ClaimTemplateContext::default();
 
@@ -598,7 +608,8 @@ fn create_claim_route(
 
     let new_account = models::NewAccount { balance: &0 };
 
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use models::Account;
     use schema::accounts;
@@ -683,7 +694,8 @@ fn login_page() -> Template {
 
 #[get("/claims/confirm/<claim_id>")]
 fn receipt_page(pool: State<PgPool>, claim_id: i32, mut cookies: Cookies) -> Result<Template> {
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
     let mut context = ReceiptTemplateContext::default();
 
     let uid: Option<i32> = cookies
@@ -751,7 +763,8 @@ fn accept_claim_route(
     let claim_id = request.get_claim_id();
     let receiver_id = request.get_receiver_id();
 
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
     let claim = accept_claim(&db_connection, claim_id, receiver_id)?;
 
     let mut response = AcceptClaimResponse::new();
@@ -811,7 +824,8 @@ fn revoke_claim_route(
 ) -> ProtoResult<AcceptClaimResponse> {
     let claim_id = request.get_claim_id();
 
-    let db_connection = pool.get().expect("failed to obtain database connection");
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
 
     use schema::claims;
     use schema::claims::dsl::claims as claims_sql;

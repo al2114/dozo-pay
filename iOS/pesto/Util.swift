@@ -9,9 +9,9 @@
 import UIKit
 import SwiftProtobuf
 
-let server = "http://localhost:3001"
-//let server = "http://54.84.120.127"
-//let server = "https://pesto-pay.com"
+//let server = "http://localhost:3001"
+//let server = "http://192.168.1.108:3001"
+let server = "https://pesto-pay.com"
 
 struct Util {
   static var filter = CIFilter(name: "CIQRCodeGenerator")!
@@ -207,28 +207,32 @@ protocol RequestResponsePair: SwiftProtobuf.Message {
   associatedtype ResponseType: SwiftProtobuf.Message
 }
 
-extension Pesto_UserMessages_RegisterRequest: RequestResponsePair {
-  typealias ResponseType = Pesto_UserMessages_RegisterResponse
+extension RegisterRequest: RequestResponsePair {
+  typealias ResponseType = RegisterResponse
 }
 
-extension Pesto_UserMessages_LoginRequest: RequestResponsePair {
-  typealias ResponseType = Pesto_UserMessages_LoginResponse
+extension RegisterDeviceTokenRequest: RequestResponsePair {
+  typealias ResponseType = NoResponse
 }
 
-extension Pesto_UserMessages_TransactionRequest: RequestResponsePair {
-  typealias ResponseType = Pesto_UserMessages_TransactionResponse
+extension LoginRequest: RequestResponsePair {
+  typealias ResponseType = LoginResponse
 }
 
-extension Pesto_UserMessages_TopupRequest: RequestResponsePair {
-  typealias ResponseType = Pesto_UserMessages_TopupResponse
+extension TransactionRequest: RequestResponsePair {
+  typealias ResponseType = TransactionResponse
 }
 
-extension Pesto_UserMessages_AddContactRequest: RequestResponsePair {
-  typealias ResponseType = Pesto_UserMessages_SuccessResponse
+extension TopupRequest: RequestResponsePair {
+  typealias ResponseType = TopupResponse
 }
 
-extension Pesto_UserMessages_CheckPasscodeRequest: RequestResponsePair {
-  typealias ResponseType = Pesto_UserMessages_SuccessResponse
+extension AddContactRequest: RequestResponsePair {
+  typealias ResponseType = SuccessResponse
+}
+
+extension CheckPasscodeRequest: RequestResponsePair {
+  typealias ResponseType = SuccessResponse
 }
 
 extension UIViewController {

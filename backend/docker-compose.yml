@@ -9,7 +9,10 @@ services:
       - ./api-server:/usr/src/app
     links:
       - db
-    command: bash -c "./wait-for-it.sh db:5432 -q -- diesel setup && cargo watch -x 'run --features tls'"
+    environment:
+      - OPENSSL_LIB_DIR=/usr/src/app/openssl/lib
+      - OPENSSL_INCLUDE_DIR=/usr/src/app/openssl/include
+    command: bash -c "./wait-for-it.sh db:5432 -q -- diesel setup && cargo watch -x 'run --features \"tls notifications\"'"
   db:
     image: "postgres:9"
     ports:

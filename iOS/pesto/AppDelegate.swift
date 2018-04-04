@@ -30,7 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window?.makeKeyAndVisible()
 
     UNUserNotificationCenter.current().delegate = self
-    registerForPushNotifications(withApplication: application)
 
     return true
   }
@@ -39,7 +38,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) {
       (granted, error) in
       guard granted else { return }
-      application.registerForRemoteNotifications()
+      DispatchQueue.main.async {
+        application.registerForRemoteNotifications()
+      }
     }
   }
 
@@ -72,7 +73,10 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     let deviceToken = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 
     print(deviceToken)
-//    Api.registerDeviceToken(deviceToken)
+    User.getMe { user in
+      API.registerDeviceToken(deviceToken, to: user)
+      return nil
+    }
   }
 
   func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {

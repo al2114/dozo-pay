@@ -31,12 +31,6 @@ use std::env;
 use std::io;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
-#[cfg(feature = "notifications")]
-use std::sync::Mutex;
-#[cfg(feature = "notifications")]
-use std::sync::mpsc::{channel, Sender};
-#[cfg(feature = "notifications")]
-use std::thread;
 
 mod contexts;
 use contexts::*;
@@ -364,8 +358,10 @@ fn get_user_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> 
     Ok(serialize(user)?)
 }
 
-#[post("/pay", data = "<input>")]
-fn transaction_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+fn transaction_helper(
+    pool: State<PgPool>,
+    input: Vec<u8>,
+) -> Result<(TransactionResponse, (models::User, String, i32)), String> {
     let request = deserialize::<TransactionRequest>(input)?;
     let payer_id = request.get_payer_id();
     let payee_id = request.get_payee_id();
@@ -391,12 +387,44 @@ fn transaction_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, Str
         &db_connection,
     )?;
 
+    let payer_username = payer.username.clone();
     let payer = protoize_user(payer, account.balance);
     let mut response = TransactionResponse::new();
     response.set_user(payer);
     response.set_transaction_id(transaction.uid);
     response.set_successful(true);
-    Ok(serialize(response)?)
+    Ok((response, (payee, payer_username, request.amount)))
+}
+
+#[cfg(not(feature = "notifications"))]
+#[post("/pay", data = "<input>")]
+fn transaction_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+    let (response, _) = transaction_helper(pool, input)?;
+    serialize(response)
+}
+
+#[cfg(feature = "notifications")]
+#[post("/pay", data = "<input>")]
+fn transaction_route(
+    pool: State<PgPool>,
+    apns_client: State<APNsClient>,
+    input: Vec<u8>,
+) -> Result<Vec<u8>, String> {
+    let (response, (payee, payer_username, amount)) = transaction_helper(pool, input)?;
+    if let Some(device_token) = payee.device_token {
+        let notification = Notification::builder("pay.pesto.dozo".to_string(), device_token)
+            .title("New Transaction")
+            .body(format!(
+                "Received £{} from @{}",
+                amount / 100,
+                payer_username
+            ))
+            .build();
+        apns_client
+            .send(notification)
+            .map_err(|_| "Notification send failed")?;
+    }
+    serialize(response)
 }
 
 #[post("/topup", data = "<input>")]
@@ -454,10 +482,10 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
 
     let new_account = models::NewAccount { balance: &0 };
 
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
     use schema::accounts;
     use models::Account;
-
-    let db_connection = pool.get().expect("failed to obtain database connection");
 
     let account = diesel::insert_into(accounts::table)
         .values(&new_account)
@@ -489,15 +517,23 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
     Ok(serialize(response)?)
 }
 
-#[derive(Deserialize)]
-pub struct Login {
-    pub username: String,
-    pub password: String,
-}
+#[post("/register/device_token", data = "<input>")]
+fn register_device_token_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
+    let request = deserialize::<RegisterDeviceTokenRequest>(input)?;
+    let user_id = request.get_user_id();
+    let device_token = request.get_device_token();
 
-#[derive(Serialize)]
-pub struct Success {
-    pub successful: bool,
+    let db_connection = pool.get().expect("failed to obtain database connection");
+
+    use schema::users::dsl::users as users_sql;
+    use schema::users;
+
+    diesel::update(users_sql.find(user_id))
+        .set(users::device_token.eq(Some(device_token)))
+        .execute(&db_connection)
+        .map_err(|_| "User not found")?;
+
+    Ok(serialize(NoResponse::new())?)
 }
 
 #[post("/login", data = "<input>")]
@@ -835,35 +871,19 @@ fn revoke_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, St
 }
 
 #[cfg(feature = "notifications")]
-struct NotificationClient(Mutex<Sender<Notification>>);
-#[cfg(not(feature = "notifications"))]
-struct NotificationClient;
-#[cfg(feature = "notifications")]
-impl NotificationClient {
-    fn send(&self, notification: Notification) {
-        self.0.lock().unwrap().send(notification).unwrap();
-    }
-}
-
-#[cfg(feature = "notifications")]
-fn spawn_notification_client() -> Option<NotificationClient> {
+fn spawn_notification_client() -> APNsClient {
     let apns_cert_path = env::var("APNS_CERT_PATH").unwrap();
     let apns_key_path = env::var("APNS_KEY_PATH").unwrap();
-    let (tx, rx) = channel::<Notification>();
-    thread::spawn(move || {
-        let apns = APNs::new(apns_cert_path, apns_key_path, false).expect("APN config unsucessful");
-        let apns_client = apns.new_client().expect("APN client setup unsucessful");
-        loop {
-            let notification = rx.recv().unwrap();
-            let _ = apns.send(notification, &apns_client).unwrap();
-        }
-    });
+    let apns = APNs::new(&apns_cert_path, &apns_key_path, false).expect("APN config unsucessful");
+    let apns_client = apns.new_client().expect("APN client setup unsucessful");
 
-    Some(NotificationClient(Mutex::new(tx)))
+    apns_client
 }
 #[cfg(not(feature = "notifications"))]
-fn spawn_notification_client() -> Option<NotificationClient> {
-    None
+struct APNsClient;
+#[cfg(not(feature = "notifications"))]
+fn spawn_notification_client() -> APNsClient {
+    APNsClient {}
 }
 
 fn main() {
@@ -872,12 +892,7 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let database_connection = pg_pool::init(&database_url);
 
-    let notification_client: Option<NotificationClient>;
-    if cfg!(feature = "notifications") {
-        notification_client = spawn_notification_client();
-    } else {
-        notification_client = None;
-    }
+    let notification_client = spawn_notification_client();
 
     rocket::ignite()
         .manage(database_connection)
@@ -889,6 +904,7 @@ fn main() {
                 file_route,
                 check_passcode_route,
                 register_route,
+                register_device_token_route,
                 login_route,
                 topup_route,
                 transaction_route,

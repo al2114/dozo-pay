@@ -92,7 +92,7 @@ class RegisterPasswordVC: UIViewController {
     registerAliasVC.phoneNumber = phoneNumber
 
     let password = passwordField.textField.text ?? ""
-    registerAliasVC.encryptedPassword = password
+    registerAliasVC.password = password
     self.show(registerAliasVC, sender: self)
   }
 

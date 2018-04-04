@@ -856,8 +856,8 @@ fn revoke_claim_route(
 }
 
 #[get("/priv/pesto/debugger")]
-fn debugger_page() -> NamedFile {
-    NamedFile::open(Path::new("priv/debugger.html"))
+fn debugger_page() -> Option<NamedFile> {
+    NamedFile::open(Path::new("priv/debugger.html")).ok()
 }
 
 #[cfg(feature = "notifications")]

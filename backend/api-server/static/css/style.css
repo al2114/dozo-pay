@@ -33,7 +33,7 @@ a:hover, .pesto:hover {
 
 .logo {
 	margin-top: 8vh;
-	margin-bottom: 8vh;
+	/*margin-bottom: 8vh;*/
 	background: pink;
 	width: 8vh;
 	height: 8vh;

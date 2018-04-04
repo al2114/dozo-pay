@@ -1,5 +1,5 @@
-use super::schema::users;
 use super::chrono::NaiveDateTime;
+use super::schema::users;
 #[derive(Queryable)]
 pub struct User {
     pub uid: i32,

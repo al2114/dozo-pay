@@ -1,11 +1,11 @@
 use super::rocket;
-use rocket::local::Client;
 use rocket::http::ContentType;
+use rocket::local::Client;
 
 use std::env;
 
-use dotenv::dotenv;
 use super::protos::user_messages::*;
+use dotenv::dotenv;
 
 fn client() -> Client {
     dotenv().ok();

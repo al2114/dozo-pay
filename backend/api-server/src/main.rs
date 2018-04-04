@@ -349,11 +349,11 @@ fn transaction_helper(
     use schema::users::dsl::users as users_sql;
 
     let db_connection = pool.get().expect("failed to obtain database connection");
-
     let payer = users_sql
         .find(payer_id)
         .first::<User>(&db_connection)
         .map_err(|_| "User not found")?;
+
     let payee = users_sql
         .find(payee_id)
         .first::<User>(&db_connection)
@@ -645,7 +645,6 @@ fn create_claim_route(
         .find(owner_id)
         .first::<User>(&db_connection)
         .map_err(|_| "Unable to find user")?;
-
     let claim = diesel::insert_into(claims::table)
         .values(&new_claim)
         .get_result::<Claim>(&db_connection)
@@ -856,6 +855,11 @@ fn revoke_claim_route(
     Ok(Proto(response))
 }
 
+#[get("/priv/pesto/debugger")]
+fn debugger_page() -> Option<NamedFile> {
+    NamedFile::open(Path::new("priv/debugger.html")).ok()
+}
+
 #[cfg(feature = "notifications")]
 fn spawn_notification_client() -> APNsClient {
     let apns_cert_path = env::var("APNS_CERT_PATH").unwrap();
@@ -903,7 +907,8 @@ fn main() {
                 revoke_claim_route,
                 claim_page,
                 receipt_page,
-                login_page
+                login_page,
+                debugger_page
             ],
         )
         .attach(Template::fairing())

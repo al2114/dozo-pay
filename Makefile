@@ -11,8 +11,8 @@ swift: protos/models.proto protos/user_messages.proto
 	protoc --proto_path protos/ --swift_out iOS/pesto/protos/ $^
 
 js: protos/models.proto protos/user_messages.proto
-	mkdir -p backend/api-server/static/scripts/protos/
-	pbjs -t static-module -w commonjs $^ -o backend/api-server/static/scripts/protos/protos.js
+	mkdir -p backend/api-server/js/src/
+	pbjs -t static-module -w commonjs $^ -o backend/api-server/js/src/protos.js
 
 clean:
 	rm -r backend/api-server/src/protos/

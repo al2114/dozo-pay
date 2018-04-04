@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--  Meta tags for social media -->
+    <meta property="og:image" content="https://al2114.github.io/dozo-site/claim/assets/og-image.jpg">
+    <meta property="og:url" content="https://al2114.github.io/dozo-site/claim/index.html">
+    <meta name="twitter:card" content="https://al2114.github.io/dozo-site/claim/assets/og-image.jpg">
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    <title>Pesto Pay</title>
+</head>
+<body>
+     <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container main">
+            <div class="row justify-content-center">
+            <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
+                <h2>POST Register user</h2>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label>phone no:</label>
+                        <input type="text" class="form-control" id="register-phone"/>
+                    </div>
+                    <div class="form-group">
+                        <label>username:</label>
+                        <input type="text" class="form-control" id="register-username"/>    
+                    </div>
+                    <div class="form-group">
+                        <label>password:</label>
+                        <input type="text" class="form-control" id="register-password"/>    
+                    </div>
+                    <input type="submit" class="btn btn-default"/>
+                </form>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
+                <h2>POST Topup</h2>
+                <form id="topup-form">
+                    <div class="form-group">
+                        <label>user id:</label>
+                        <input type="text" class="form-control" id="topup-uid"/>
+                    </div>
+                    <div class="form-group">
+                        <label>amount:</label>
+                        <input type="text" class="form-control" id="topup-amount"/>    
+                    </div>
+                    <input type="submit" class="btn btn-default"/>
+                </form>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
+                <h2>POST Make transaction</h2>
+                <form id="transaction-form">
+                    <div class="form-group">
+                        <label>sender id:</label>
+                        <input type="text" class="form-control" id="transaction-sender"/>
+                    </div>
+                    <div class="form-group">
+                        <label>receiver id:</label>
+                        <input type="text" class="form-control" id="transaction-receiver"/>
+                    </div>
+                    <div class="form-group">
+                        <label>amount:</label>
+                        <input type="text" class="form-control" id="transaction-amount"/>    
+                    </div>
+                    <input type="submit" class="btn btn-default"/>
+                </form>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="claim-card col-10 col-md-8 col-lg-6 align-self-center">
+                <h2>POST Create claim</h2>
+                <form id="claim-form">
+                    <div class="form-group">
+                        <label>user id:</label>
+                        <input type="text" class="form-control" id="claim-uid"/>
+                    </div>
+                    <div class="form-group">
+                        <label>amount:</label>
+                        <input type="text" class="form-control" id="claim-amount"/>
+                    </div>
+                    <input type="submit" class="btn btn-default"/>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/scripts/jquery-3.3.1.min.js"></script>
+    <script src="/scripts/popper.min.js"></script>
+    <script src="/scripts/bootstrap.min.js"></script>
+    <script src="/scripts/script.js"></script>
+    <script src="/scripts/debug.bundle.js"></script>
+</body>
+</html>

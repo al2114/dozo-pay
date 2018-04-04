@@ -113,7 +113,6 @@ class ConfirmationVC: UIViewController {
     User.getMe { me in
       let balance = Util.amountToCurrencyString(Double(me.balance) / 100)
       balanceLabel.text = "Balance: \(balance)"
-      return nil
     }
     balanceLabel.textColor = .lightGray
     balanceLabel.font = UIFont.light.withSize(16)

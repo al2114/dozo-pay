@@ -235,6 +235,10 @@ extension CheckPasscodeRequest: RequestResponsePair {
   typealias ResponseType = SuccessResponse
 }
 
+extension CreateClaimRequest: RequestResponsePair {
+  typealias ResponseType = CreateClaimResponse
+}
+
 extension UIViewController {
   var topAnchor: NSLayoutYAxisAnchor {
     if #available(iOS 11.0, *) {

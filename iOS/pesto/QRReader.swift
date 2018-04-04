@@ -101,9 +101,9 @@ extension QRReader: AVCaptureMetadataOutputObjectsDelegate {
       return
     }
 
-    guard let videoPreviewLayer = self.layer as? AVCaptureVideoPreviewLayer else { return }
+//    guard let videoPreviewLayer = self.layer as? AVCaptureVideoPreviewLayer else { return }
 
-    let barCodeObject = videoPreviewLayer.transformedMetadataObject(for: metadataObj)
+//    let barCodeObject = videoPreviewLayer.transformedMetadataObject(for: metadataObj)
 //    qrCodeFrameView.frame = barCodeObject!.bounds
 
 //    label.backgroundColor = .black

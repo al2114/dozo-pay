@@ -9,28 +9,23 @@
 extension User {
   static var me: User?
 
-  static func getMe(handler: @escaping (User) -> User?) {
+  static func getMe(handler: @escaping (User) -> Void) {
     if let me = me {
-      updateMe(withUser: me, handler: handler)
+      handler(me)
     }
   }
 
-  static func updateMeFromServer(handler: @escaping (User) -> User?) {
+  static func updateMeFromServer(handler: @escaping (User) -> Void) {
     print("update from server")
     if let oldMe = me {
       API.getMe(withOldMe: oldMe) {
         user in
-        self.me = user
-        updateMe(withUser: user, handler: handler)
+        updateMe(withUser: user)
       }
     }
   }
 
-  static func updateMe(withUser user: User, handler: ((User) -> User?)? = nil) {
-    if let newMe = handler?(user) {
-      me = newMe
-    } else {
-      me = user
-    }
+  static func updateMe(withUser user: User) {
+    me = user
   }
 }

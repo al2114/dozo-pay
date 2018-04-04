@@ -12,7 +12,7 @@ class RegisterAliasVC: UIViewController {
   var aliasField: NiceTextField!
   var completeButton: UIButton!
   var phoneNumber: String!
-  var encryptedPassword: String!
+  var password: String!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -87,7 +87,7 @@ class RegisterAliasVC: UIViewController {
     var newUser = User()
     newUser.phoneNo = phoneNumber
     newUser.username = aliasField.textField.text ?? ""
-    API.register(user: newUser, withPassword: encryptedPassword) { user in
+    API.register(user: newUser, withPassword: password) { user in
     }
 //    API.completeRegistration(ofUser: newUser, withAlias: alias) {
 //      user in

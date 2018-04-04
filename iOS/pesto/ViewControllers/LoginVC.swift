@@ -128,8 +128,7 @@ class LoginVC: UIViewController {
   @objc func login() {
     let username = idField.textField.text ?? ""
     let password = passwordField.textField.text ?? ""
-    let encryptedPassword = Crypto.encrypt(text: password)
-    API.login(withUsername: username, password: encryptedPassword) {
+    API.login(withUsername: username, password: password) {
       success in
       if success {
         DispatchQueue.main.async {

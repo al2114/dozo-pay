@@ -1,11 +1,12 @@
-use super::rocket;
-use rocket::local::Client;
+use dotenv::dotenv;
+use rocket;
 use rocket::http::ContentType;
+use rocket::local::Client;
 
 use std::env;
 
-use dotenv::dotenv;
-use super::protos::user_messages::*;
+use protos::user_messages::*;
+use serde_rocket_protobuf::Proto;
 
 fn client() -> Client {
     dotenv().ok();
@@ -43,7 +44,7 @@ fn register_user(
     phone_no: &str,
     username: &str,
     password: &str,
-) -> RegisterResponse {
+) -> Proto<RegisterResponse> {
     let mut request = RegisterRequest::new();
     request.set_phone_no(phone_no.to_string());
     request.set_username(username.to_string());
@@ -51,11 +52,11 @@ fn register_user(
 
     let mut response = client
         .post("/register")
-        .body(super::serialize(request).unwrap())
+        .body(Proto(request).serialize().unwrap().into_inner())
         .header(ContentType::Form)
         .dispatch();
 
-    super::deserialize::<RegisterResponse>(response.body_bytes().unwrap()).unwrap()
+    Proto::<RegisterResponse>::deserialize(&response.body_bytes().unwrap()).unwrap()
 }
 
 #[test]
@@ -69,18 +70,18 @@ fn test_register_user() {
     )
 }
 
-fn add_contact(client: &Client, user_id: i32, contact_username: &str) -> SuccessResponse {
+fn add_contact(client: &Client, user_id: i32, contact_username: &str) -> Proto<SuccessResponse> {
     let mut request = AddContactRequest::new();
     request.set_user_id(user_id);
     request.set_contact_username(contact_username.to_string());
 
     let mut response = client
         .post("/contacts")
-        .body(super::serialize(request).unwrap())
+        .body(Proto(request).serialize().unwrap().into_inner())
         .header(ContentType::Form)
         .dispatch();
 
-    super::deserialize::<SuccessResponse>(response.body_bytes().unwrap()).unwrap()
+    Proto::<SuccessResponse>::deserialize(&response.body_bytes().unwrap()).unwrap()
 }
 
 #[test]
@@ -97,13 +98,13 @@ fn test_add_contact() {
     assert_eq!(add_contact_response.get_successful(), true);
 }
 
-fn get_contacts(client: &Client, user_id: i32) -> GetContactsResponse {
+fn get_contacts(client: &Client, user_id: i32) -> Proto<GetContactsResponse> {
     let mut response = client
         .get(format!("/contacts/{}", user_id))
         .header(ContentType::Form)
         .dispatch();
 
-    super::deserialize::<GetContactsResponse>(response.body_bytes().unwrap()).unwrap()
+    Proto::<GetContactsResponse>::deserialize(&response.body_bytes().unwrap()).unwrap()
 }
 
 #[test]

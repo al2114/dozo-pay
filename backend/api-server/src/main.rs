@@ -21,7 +21,6 @@ extern crate serde_derive;
 use apns::{APNs, APNsClient, Notification};
 use diesel::prelude::*;
 use dotenv::dotenv;
-use protobuf::{CodedInputStream, CodedOutputStream};
 use rocket::State;
 use rocket::http::{Cookie, Cookies};
 use rocket::response::NamedFile;
@@ -29,7 +28,6 @@ use rocket_contrib::Template;
 
 use std::env;
 use std::io;
-use std::io::Cursor;
 use std::path::{Path, PathBuf};
 
 mod contexts;
@@ -42,31 +40,11 @@ mod passwords;
 use passwords::encrypt_password;
 mod models;
 mod schema;
+mod serde_rocket_protobuf;
+use serde_rocket_protobuf::{Proto, ProtoResult};
 
 #[cfg(test)]
 mod route_tests;
-
-fn deserialize<T: ::protobuf::MessageStatic>(data: Vec<u8>) -> Result<T, String> {
-    let mut proto = T::new();
-    let mut cis = CodedInputStream::from_bytes(&data);
-    proto
-        .merge_from(&mut cis)
-        .map_err(|_| "Protobuf parse error")?;
-    Ok(proto)
-}
-
-fn serialize<T: ::protobuf::MessageStatic>(proto: T) -> Result<Vec<u8>, String> {
-    let mut data = Vec::<u8>::new();
-    {
-        let mut buf = Cursor::new(&mut data);
-        let mut cos = CodedOutputStream::new(&mut buf);
-        proto
-            .write_to(&mut cos)
-            .map_err(|_| "Protobuf write error")?;
-        cos.flush().map_err(|_| "CodecOutputStream flush error")?;
-    }
-    Ok(data)
-}
 
 fn protoize_user(user: models::User, balance: i32) -> protos::models::User {
     let mut proto_user = protos::models::User::new();
@@ -108,9 +86,9 @@ fn update_balances(
     transaction: &models::Transaction,
     db_connection: &PgPooledConnection,
 ) -> Result<(bool, models::Account), String> {
-    use schema::accounts::dsl::accounts as accounts_sql;
-    use schema::accounts;
     use models::Account;
+    use schema::accounts;
+    use schema::accounts::dsl::accounts as accounts_sql;
 
     let payer_account_query = accounts_sql.find(transaction.payer_id);
     let mut payer_account = payer_account_query
@@ -155,8 +133,8 @@ fn execute_transaction(
         amount: &amount,
     };
 
-    use schema::transactions;
     use models::Transaction;
+    use schema::transactions;
 
     db_connection
         .transaction::<_, Err, _>(|| {
@@ -186,26 +164,26 @@ fn execute_transaction(
         .map_err(|e| e.description)
 }
 
-#[post("/check-passcode", data = "<input>")]
-fn check_passcode_route(input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<CheckPasscodeRequest>(input)?;
+#[post("/check-passcode", data = "<request>")]
+fn check_passcode_route(request: Proto<CheckPasscodeRequest>) -> ProtoResult<SuccessResponse> {
     let passcode = "3192".to_string();
     let mut response = SuccessResponse::new();
     response.set_successful(passcode == request.get_passcode());
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
-#[post("/contacts", data = "<input>")]
-fn add_contact_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let requests = deserialize::<AddContactRequest>(input)?;
-
-    let user_id = requests.get_user_id();
-    let contact_username = requests.get_contact_username();
+#[post("/contacts", data = "<request>")]
+fn add_contact_route(
+    pool: State<PgPool>,
+    request: Proto<AddContactRequest>,
+) -> ProtoResult<SuccessResponse> {
+    let user_id = request.get_user_id();
+    let contact_username = request.get_contact_username();
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::users::dsl::users as users_sql;
     use schema::users;
+    use schema::users::dsl::users as users_sql;
 
     let contact_id = users_sql
         .filter(users::username.eq(contact_username))
@@ -226,7 +204,7 @@ fn add_contact_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, Str
 
     let mut response = SuccessResponse::new();
     response.set_successful(true);
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
 fn protoize_contact(contact: models::Contact, username: String) -> protos::models::Contact {
@@ -238,14 +216,14 @@ fn protoize_contact(contact: models::Contact, username: String) -> protos::model
 }
 
 #[get("/contacts/<user_id>")]
-fn get_contacts_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> {
+fn get_contacts_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<GetContactsResponse> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::contacts;
     use models::Contact;
+    use schema::contacts;
 
-    use schema::users;
     use models::User;
+    use schema::users;
 
     let results = contacts::table
         .filter(contacts::user_id.eq(user_id))
@@ -261,7 +239,7 @@ fn get_contacts_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, Stri
     let mut response = GetContactsResponse::new();
     response.set_contacts(contacts);
 
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
 fn protoize_transaction(
@@ -284,15 +262,18 @@ fn protoize_transaction(
 }
 
 #[get("/transactions/<user_id>")]
-fn get_transactions_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> {
+fn get_transactions_route(
+    pool: State<PgPool>,
+    user_id: i32,
+) -> ProtoResult<GetTransactionsResponse> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::users::dsl::users as users_sql;
-    use schema::users;
     use models::User;
+    use schema::users;
+    use schema::users::dsl::users as users_sql;
 
-    use schema::transactions;
     use models::Transaction;
+    use schema::transactions;
 
     let from_tids = users_sql
         .find(user_id)
@@ -334,19 +315,19 @@ fn get_transactions_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, 
 
     let mut response = GetTransactionsResponse::new();
     response.set_transactions(transactions);
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
 #[get("/users/<user_id>")]
-fn get_user_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> {
+fn get_user_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<protos::models::User> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::users::dsl::users as users_sql;
-    use schema::users;
     use models::User;
+    use schema::users;
+    use schema::users::dsl::users as users_sql;
 
-    use schema::accounts;
     use models::Account;
+    use schema::accounts;
 
     let (user, account) = users_sql
         .find(user_id)
@@ -354,20 +335,18 @@ fn get_user_route(pool: State<PgPool>, user_id: i32) -> Result<Vec<u8>, String> 
         .first::<(User, Account)>(&db_connection)
         .map_err(|_| "User not found")?;
 
-    let user = protoize_user(user, account.balance);
-    Ok(serialize(user)?)
+    Ok(Proto(protoize_user(user, account.balance)))
 }
 
 fn transaction_helper(
     pool: State<PgPool>,
-    input: Vec<u8>,
-) -> Result<(TransactionResponse, (models::User, String, i32)), String> {
-    let request = deserialize::<TransactionRequest>(input)?;
+    request: Proto<TransactionRequest>,
+) -> Result<(Proto<TransactionResponse>, (models::User, String, i32)), String> {
     let payer_id = request.get_payer_id();
     let payee_id = request.get_payee_id();
 
-    use schema::users::dsl::users as users_sql;
     use models::User;
+    use schema::users::dsl::users as users_sql;
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
@@ -393,24 +372,27 @@ fn transaction_helper(
     response.set_user(payer);
     response.set_transaction_id(transaction.uid);
     response.set_successful(true);
-    Ok((response, (payee, payer_username, request.amount)))
+    Ok((Proto(response), (payee, payer_username, request.amount)))
 }
 
 #[cfg(not(feature = "notifications"))]
-#[post("/pay", data = "<input>")]
-fn transaction_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let (response, _) = transaction_helper(pool, input)?;
-    serialize(response)
+#[post("/pay", data = "<request>")]
+fn transaction_route(
+    pool: State<PgPool>,
+    request: Proto<TransactionRequest>,
+) -> ProtoResult<TransactionResponse> {
+    let (response, _) = transaction_helper(pool, request)?;
+    Ok(response)
 }
 
 #[cfg(feature = "notifications")]
-#[post("/pay", data = "<input>")]
+#[post("/pay", data = "<request>")]
 fn transaction_route(
     pool: State<PgPool>,
     apns_client: State<APNsClient>,
-    input: Vec<u8>,
-) -> Result<Vec<u8>, String> {
-    let (response, (payee, payer_username, amount)) = transaction_helper(pool, input)?;
+    request: Proto<TransactionRequest>,
+) -> ProtoResult<TransactionResponse> {
+    let (response, (payee, payer_username, amount)) = transaction_helper(pool, request)?;
     if let Some(device_token) = payee.device_token {
         let notification = Notification::builder("pay.pesto.dozo".to_string(), device_token)
             .title("New Transaction")
@@ -424,22 +406,20 @@ fn transaction_route(
             .send(notification)
             .map_err(|_| "Notification send failed")?;
     }
-    serialize(response)
+    Ok(response)
 }
 
-#[post("/topup", data = "<input>")]
-fn topup_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<TopupRequest>(input)?;
-
+#[post("/topup", data = "<request>")]
+fn topup_route(pool: State<PgPool>, request: Proto<TopupRequest>) -> ProtoResult<TopupResponse> {
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::users::dsl::users as users_sql;
-    use schema::users;
     use models::User;
+    use schema::users;
+    use schema::users::dsl::users as users_sql;
 
-    use schema::accounts::dsl::accounts as accounts_sql;
-    use schema::accounts;
     use models::Account;
+    use schema::accounts;
+    use schema::accounts::dsl::accounts as accounts_sql;
 
     let master_id = 0;
     let master_account = diesel::update(accounts_sql.find(master_id))
@@ -470,12 +450,14 @@ fn topup_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
     let mut response = TopupResponse::new();
     response.set_user(user);
     response.set_successful(transaction.is_successful);
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
-#[post("/register", data = "<input>")]
-fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<RegisterRequest>(input)?;
+#[post("/register", data = "<request>")]
+fn register_route(
+    pool: State<PgPool>,
+    request: Proto<RegisterRequest>,
+) -> ProtoResult<RegisterResponse> {
     let username = request.get_username();
     let password = request.get_password();
     let password = &encrypt_password(&username, &password);
@@ -484,8 +466,8 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::accounts;
     use models::Account;
+    use schema::accounts;
 
     let account = diesel::insert_into(accounts::table)
         .values(&new_account)
@@ -501,8 +483,8 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
         device_token: None,
     };
 
-    use schema::users;
     use models::User;
+    use schema::users;
 
     let user = diesel::insert_into(users::table)
         .values(&new_user)
@@ -514,47 +496,47 @@ fn register_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String
     let mut response = RegisterResponse::new();
     response.set_user(user);
     response.set_successful(true);
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
-#[post("/register/device_token", data = "<input>")]
-fn register_device_token_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<RegisterDeviceTokenRequest>(input)?;
+#[post("/register/device_token", data = "<request>")]
+fn register_device_token_route(
+    pool: State<PgPool>,
+    request: Proto<RegisterDeviceTokenRequest>,
+) -> ProtoResult<NoResponse> {
     let user_id = request.get_user_id();
     let device_token = request.get_device_token();
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::users::dsl::users as users_sql;
     use schema::users;
+    use schema::users::dsl::users as users_sql;
 
     diesel::update(users_sql.find(user_id))
         .set(users::device_token.eq(Some(device_token)))
         .execute(&db_connection)
         .map_err(|_| "User not found")?;
 
-    Ok(serialize(NoResponse::new())?)
+    Ok(Proto(NoResponse::new()))
 }
 
-#[post("/login", data = "<input>")]
+#[post("/login", data = "<request>")]
 fn login_route(
     mut cookies: Cookies,
     pool: State<PgPool>,
-    input: Vec<u8>,
-) -> Result<Vec<u8>, String> {
-    let request = deserialize::<LoginRequest>(input)?;
-
+    request: Proto<LoginRequest>,
+) -> ProtoResult<LoginResponse> {
     let username = request.get_username();
     let password = request.get_password();
     let password = encrypt_password(&username, &password);
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::users;
     use models::User;
+    use schema::users;
 
-    use schema::accounts;
     use models::Account;
+    use schema::accounts;
 
     let (user, account) = users::table
         .filter(users::username.eq(username))
@@ -572,12 +554,12 @@ fn login_route(
         response.set_successful(false);
     }
 
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
 fn get_username_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<String, String> {
-    use schema::users::dsl::users as users_sql;
     use schema::users;
+    use schema::users::dsl::users as users_sql;
     let username = users_sql
         .find(uid)
         .select(users::username)
@@ -626,10 +608,11 @@ fn claim_page(
     Ok(Template::render("claim", &context))
 }
 
-#[post("/claims/create", data = "<input>")]
-fn create_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<CreateClaimRequest>(input)?;
-
+#[post("/claims/create", data = "<request>")]
+fn create_claim_route(
+    pool: State<PgPool>,
+    request: Proto<CreateClaimRequest>,
+) -> ProtoResult<CreateClaimResponse> {
     let amount = request.get_amount();
     let owner_id = request.get_owner_id();
 
@@ -637,9 +620,9 @@ fn create_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, St
 
     let db_connection = pool.get().expect("failed to obtain database connection");
 
-    use schema::accounts::dsl::accounts as accounts_sql;
-    use schema::accounts;
     use models::Account;
+    use schema::accounts;
+    use schema::accounts::dsl::accounts as accounts_sql;
 
     let account = diesel::insert_into(accounts::table)
         .values(&new_account)
@@ -652,11 +635,11 @@ fn create_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, St
         amount: &amount,
     };
 
-    use schema::claims;
     use models::Claim;
+    use schema::claims;
 
-    use schema::users::dsl::users as users_sql;
     use models::User;
+    use schema::users::dsl::users as users_sql;
 
     let owner = users_sql
         .find(owner_id)
@@ -679,7 +662,7 @@ fn create_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, St
     let mut response = CreateClaimResponse::new();
     response.set_successful(true);
     response.set_claim(protoize_claim(claim, owner, None, account_balance));
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
 fn get_account_id_with_uid(uid: &i32, db_connection: &PgPooledConnection) -> Result<i32, String> {
@@ -732,8 +715,8 @@ fn receipt_page(
         .get_private("credentials")
         .and_then(|c| c.value().parse().ok());
 
-    use schema::claims::dsl::claims as claims_sql;
     use schema::claims;
+    use schema::claims::dsl::claims as claims_sql;
 
     let is_active = claims_sql
         .find(claim_id)
@@ -785,9 +768,11 @@ fn receipt_page(
     Ok(Template::render("receipt", context))
 }
 
-#[post("/claims/accept", data = "<input>")]
-fn accept_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<AcceptClaimRequest>(input)?;
+#[post("/claims/accept", data = "<request>")]
+fn accept_claim_route(
+    pool: State<PgPool>,
+    request: Proto<AcceptClaimRequest>,
+) -> ProtoResult<AcceptClaimResponse> {
     let claim_id = request.get_claim_id();
     let receiver_id = request.get_receiver_id();
 
@@ -797,8 +782,7 @@ fn accept_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, St
     let mut response = AcceptClaimResponse::new();
     response.set_claim(claim);
     response.set_successful(true);
-
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
 fn accept_claim(
@@ -806,10 +790,10 @@ fn accept_claim(
     claim_id: i32,
     receiver_id: i32,
 ) -> Result<protos::models::Claim, String> {
-    use schema::claims;
     use models::Claim;
-    use schema::claims::dsl::claims as claims_sql;
     use schema::accounts;
+    use schema::claims;
+    use schema::claims::dsl::claims as claims_sql;
 
     let (account_id, balance) = claims_sql
         .find(claim_id)
@@ -845,9 +829,11 @@ fn accept_claim(
     Ok(claim)
 }
 
-#[post("/claims/revoke", data = "<input>")]
-fn revoke_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, String> {
-    let request = deserialize::<RevokeClaimRequest>(input)?;
+#[post("/claims/revoke", data = "<request>")]
+fn revoke_claim_route(
+    pool: State<PgPool>,
+    request: Proto<RevokeClaimRequest>,
+) -> ProtoResult<AcceptClaimResponse> {
     let claim_id = request.get_claim_id();
 
     let db_connection = pool.get().expect("failed to obtain database connection");
@@ -867,7 +853,7 @@ fn revoke_claim_route(pool: State<PgPool>, input: Vec<u8>) -> Result<Vec<u8>, St
     response.set_claim(claim);
     response.set_successful(true);
 
-    Ok(serialize(response)?)
+    Ok(Proto(response))
 }
 
 #[cfg(feature = "notifications")]

@@ -172,7 +172,7 @@ fn check_passcode_route(request: Proto<CheckPasscodeRequest>) -> ProtoResult<Suc
     Ok(Proto(response))
 }
 
-#[post("/contact", data = "<request>")]
+#[post("/contacts", data = "<request>")]
 fn add_contact_route(
     pool: State<PgPool>,
     request: Proto<AddContactRequest>,

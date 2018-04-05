@@ -77,6 +77,27 @@ class SendContactVC: UIViewController {
     })
   }
 
+  @objc func addContact () {
+    let alert = UIAlertController(title: "Add a new contact", message: nil, preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+    alert.addTextField(configurationHandler: {textfield in
+      textfield.placeholder = "Enter username"
+    })
+    alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { action in
+      if let name = alert.textFields?.first?.text {
+        API.addContact(withUsername: name, completion: { successful in
+          if successful {
+            API.getContacts { contacts in
+              self.contacts = [contacts]
+              self.tableView.reloadData()
+            }
+          }
+        })
+      }
+    }))
+    present(alert, animated: true)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -84,6 +105,17 @@ class SendContactVC: UIViewController {
     UIApplication.shared.statusBarStyle = .default
 
     self.extendedLayoutIncludesOpaqueBars = true
+
+    let addContactButton = UIButton()
+    addContactButton.setImage(#imageLiteral(resourceName: "addContact").withRenderingMode(.alwaysTemplate), for: .normal)
+    addContactButton.addTarget(self, action: #selector(addContact), for: .touchUpInside)
+    let addContactBarItem = UIBarButtonItem(customView: addContactButton)
+    let width = addContactBarItem.customView?.widthAnchor.constraint(equalToConstant: 24)
+    width?.isActive = true
+    let height = addContactBarItem.customView?.heightAnchor.constraint(equalToConstant: 24)
+    height?.isActive = true
+
+    self.navigationItem.rightBarButtonItem = addContactBarItem
 
     tableView = UITableView()
     tableView.translatesAutoresizingMaskIntoConstraints = false

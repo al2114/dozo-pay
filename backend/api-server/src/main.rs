@@ -38,7 +38,7 @@ mod schema;
 mod serde_rocket_protobuf;
 
 #[cfg(test)]
-mod route_tests;
+mod tests;
 
 #[cfg(feature = "notifications")]
 fn spawn_notification_client() -> APNsClient {

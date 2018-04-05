@@ -15,7 +15,6 @@ pub fn claim(
     claim: models::Claim,
     owner: models::User,
     receiver: Option<models::User>,
-    amount: i32,
 ) -> protos::models::Claim {
     let mut proto_claim = protos::models::Claim::new();
     proto_claim.set_uid(claim.uid);
@@ -23,7 +22,7 @@ pub fn claim(
     receiver.map(|receiver| {
         proto_claim.set_receiver(profile(receiver));
     });
-    proto_claim.set_amount(amount);
+    proto_claim.set_amount(claim.amount);
     proto_claim
 }
 
@@ -47,15 +46,15 @@ pub fn transaction(
         models::AccountHolder::User(user) => {
             proto_transaction.set_user_account_holder(profile(user));
             proto_transaction.set_account_holder_type(protos::models::AccountHolderType::USER);
-        } //models::AccountHolder::Claim(model_claim, claim_owner, claim_receiver, claim_amount) => {
-          //proto_transaction.set_claim_account_holder(claim(
-          //model_claim,
-          //claim_owner,
-          //claim_receiver,
-          //claim_amount,
-          //));
-          //proto_transaction.set_account_holder_type(protos::models::AccountHolderType::CLAIM);
-          //}
+        }
+        models::AccountHolder::Claim(model_claim, claim_owner, claim_receiver) => {
+            proto_transaction.set_claim_account_holder(claim(
+                model_claim,
+                claim_owner,
+                claim_receiver,
+            ));
+            proto_transaction.set_account_holder_type(protos::models::AccountHolderType::CLAIM);
+        }
     };
     proto_transaction.set_transaction_type(transaction_type);
     proto_transaction.set_amount(transaction.amount);

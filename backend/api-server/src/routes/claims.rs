@@ -1,4 +1,3 @@
-use super::transactions;
 use diesel;
 use diesel::prelude::*;
 use errors::*;
@@ -26,7 +25,6 @@ fn create_claim_route(
 
     use models::Account;
     use schema::accounts;
-    use schema::accounts::dsl::accounts as accounts_sql;
 
     let account = diesel::insert_into(accounts::table)
         .values(&new_account)
@@ -54,17 +52,11 @@ fn create_claim_route(
         .get_result::<Claim>(&db_connection)
         .chain_err(|| "Error inserting new claim")?;
 
-    let _ = transactions::execute(&owner.account_id, &account.uid, &amount, &db_connection)?;
-
-    let account_balance = accounts_sql
-        .find(account.uid)
-        .select(accounts::balance)
-        .first::<i32>(&db_connection)
-        .chain_err(|| "Unable to find account")?;
+    let _ = super::transactions::execute(&owner.account_id, &account.uid, &amount, &db_connection)?;
 
     let mut response = CreateClaimResponse::new();
     response.set_successful(true);
-    response.set_claim(protoize::claim(claim, owner, None, account_balance));
+    response.set_claim(protoize::claim(claim, owner, None));
     Ok(Proto(response))
 }
 
@@ -110,7 +102,8 @@ fn accept_claim(
         .first::<User>(db_connection)
         .chain_err(|| "Unable to find receiver account")?;
 
-    let _ = transactions::execute(&account_id, &receiver.account_id, &balance, &db_connection)?;
+    let _ =
+        super::transactions::execute(&account_id, &receiver.account_id, &balance, &db_connection)?;
     set_received(&claim_id, &receiver_id, &db_connection)?;
 
     let claim = diesel::update(claims_sql.find(claim_id))
@@ -126,7 +119,7 @@ fn accept_claim(
         .first::<User>(db_connection)
         .chain_err(|| "Unable to find claim owner")?;
 
-    let claim = protoize::claim(claim, owner, Some(receiver), balance);
+    let claim = protoize::claim(claim, owner, Some(receiver));
     Ok(claim)
 }
 
@@ -174,3 +167,34 @@ pub fn set_received(
         .chain_err(|| "Cannot find claim")?;
     Ok(())
 }
+
+//pub fn get_claims(
+//claim_ids: Vec<i32>,
+//db_connection: &PgPooledConnection,
+//) -> Result<Vec<(models::Claim, models::User, Option<models::User>)>> {
+//use models::Claim;
+//use schema::claims;
+
+//use models::User;
+//use schema::users;
+
+//Ok(claims::table
+//.filter(claims::uid.eq_any(claim_ids.clone()))
+//.order(sql_functions::idx(claim_ids.clone(), claims::uid))
+//.inner_join(users::table.on(claims::owner_id.eq(users::uid)))
+//.load::<(Claim, User)>(db_connection)
+//.chain_err(|| "Claim join with owners failed")?
+//.into_iter()
+//.zip(
+//claims::table
+//.filter(claims::uid.eq_any(claim_ids.clone()))
+//.order(sql_functions::idx(claim_ids, claims::uid))
+//.left_outer_join(users::table.on(claims::receiver_id.eq(users::uid.nullable())))
+//.select(users::all_columns.nullable())
+//.load::<Option<User>>(db_connection)
+//.chain_err(|| "Claim join with receivers failed")?
+//.into_iter(),
+//)
+//.map(|((claim, owner), receiver)| (claim, owner, receiver))
+//.collect())
+//}

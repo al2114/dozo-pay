@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use errors::*;
 use models;
 use passwords::encrypt_password;
-use pg_pool::PgPool;
+use pg_pool::{PgPool, PgPooledConnection};
 use protoize;
 use protos;
 use protos::user_messages::{LoginRequest, LoginResponse, NoResponse, RegisterDeviceTokenRequest,
@@ -11,6 +11,7 @@ use protos::user_messages::{LoginRequest, LoginResponse, NoResponse, RegisterDev
 use rocket::State;
 use rocket::http::{Cookie, Cookies};
 use serde_rocket_protobuf::{Proto, ProtoResult};
+use sql_functions;
 
 #[post("/register", data = "<request>")]
 fn register_route(
@@ -138,4 +139,34 @@ fn get_user_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<protos::mode
         .chain_err(|| "User not found")?;
 
     Ok(Proto(protoize::user(user, account.balance)))
+}
+
+pub fn get_users(
+    user_ids: Vec<i32>,
+    db_connection: &PgPooledConnection,
+) -> Result<Vec<models::User>> {
+    use models::User;
+    use schema::users;
+    users::table
+        .filter(users::uid.eq_any(user_ids.clone()))
+        .order(sql_functions::idx(user_ids, users::uid))
+        .load::<User>(db_connection)
+        .chain_err(|| "Error loading users")
+}
+
+pub fn get_option_users(
+    user_ids: Vec<Option<i32>>,
+    db_connection: &PgPooledConnection,
+) -> Result<Vec<Option<models::User>>> {
+    let mut result: Vec<Option<models::User>> = (0..user_ids.len()).map(|_| None).collect();
+    let (indices, items) = user_ids
+        .into_iter()
+        .enumerate()
+        .filter_map(|(i, o)| o.and_then(|x| Some((i, x))))
+        .unzip::<_, _, Vec<_>, Vec<_>>();
+    let items = get_users(items, db_connection)?;
+    for (i, v) in indices.into_iter().zip(items.into_iter()) {
+        result[i] = Some(v);
+    }
+    Ok(result)
 }

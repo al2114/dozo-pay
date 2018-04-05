@@ -107,6 +107,9 @@ pub fn get_transactions_route(
     use models::Transaction;
     use schema::transactions;
 
+    use models::Claim;
+    use schema::claims;
+
     let from_tids = users_sql
         .find(user_id)
         .inner_join(transactions::table.on(transactions::payee_id.eq(users::account_id)))
@@ -121,8 +124,8 @@ pub fn get_transactions_route(
         .load::<i32>(&db_connection)
         .chain_err(|| "Transactions not found")?;
 
-    let from_results = transactions::table
-        .filter(transactions::uid.eq_any(from_tids))
+    let from_users = transactions::table
+        .filter(transactions::uid.eq_any(from_tids.clone()))
         .inner_join(users::table.on(transactions::payer_id.eq(users::account_id)))
         .load::<(Transaction, User)>(&db_connection)
         .chain_err(|| "Transactions not found")?
@@ -135,8 +138,37 @@ pub fn get_transactions_route(
             )
         });
 
-    let to_results = transactions::table
-        .filter(transactions::uid.eq_any(to_tids))
+    let (from_claim_transactions, from_claims) = transactions::table
+        .filter(transactions::uid.eq_any(from_tids))
+        .inner_join(claims::table.on(transactions::payer_id.eq(claims::account_id)))
+        .load::<(Transaction, Claim)>(&db_connection)
+        .chain_err(|| "Transactions not found")?
+        .into_iter()
+        .unzip::<_, _, Vec<_>, Vec<_>>();
+    let (from_claim_owner_ids, from_claim_receiver_ids) = from_claims
+        .iter()
+        .map(|c| (c.owner_id, c.receiver_id))
+        .unzip::<_, _, Vec<_>, Vec<_>>();
+    let from_claim_owners = super::users::get_users(from_claim_owner_ids, &db_connection)
+        .chain_err(|| "Error getting claim owners")?;
+    let from_claim_receivers =
+        super::users::get_option_users(from_claim_receiver_ids, &db_connection)
+            .chain_err(|| "Error getting claim receivers")?;
+    let from_claims = from_claim_transactions
+        .into_iter()
+        .zip(from_claims.into_iter())
+        .zip(from_claim_owners.into_iter())
+        .zip(from_claim_receivers.into_iter())
+        .map(|(((t, c), o), r)| {
+            protoize::transaction(
+                t,
+                models::AccountHolder::Claim(c, o, r),
+                protos::models::Transaction_Type::FROM,
+            )
+        });
+
+    let to_users = transactions::table
+        .filter(transactions::uid.eq_any(to_tids.clone()))
         .inner_join(users::table.on(transactions::payee_id.eq(users::account_id)))
         .load::<(Transaction, User)>(&db_connection)
         .chain_err(|| "Transactions not found")?
@@ -149,7 +181,39 @@ pub fn get_transactions_route(
             )
         });
 
-    let mut transactions = from_results.chain(to_results).collect::<Vec<_>>();
+    let (to_claim_transactions, to_claims) = transactions::table
+        .filter(transactions::uid.eq_any(to_tids))
+        .inner_join(claims::table.on(transactions::payee_id.eq(claims::account_id)))
+        .load::<(Transaction, Claim)>(&db_connection)
+        .chain_err(|| "Transactions not found")?
+        .into_iter()
+        .unzip::<_, _, Vec<_>, Vec<_>>();
+    let (to_claim_owner_ids, to_claim_receiver_ids) = to_claims
+        .iter()
+        .map(|c| (c.owner_id, c.receiver_id))
+        .unzip::<_, _, Vec<_>, Vec<_>>();
+    let to_claim_owners = super::users::get_users(to_claim_owner_ids, &db_connection)
+        .chain_err(|| "Error getting claim owners")?;
+    let to_claim_receivers = super::users::get_option_users(to_claim_receiver_ids, &db_connection)
+        .chain_err(|| "Error getting claim receivers")?;
+    let to_claims = to_claim_transactions
+        .into_iter()
+        .zip(to_claims.into_iter())
+        .zip(to_claim_owners.into_iter())
+        .zip(to_claim_receivers.into_iter())
+        .map(|(((t, c), o), r)| {
+            protoize::transaction(
+                t,
+                models::AccountHolder::Claim(c, o, r),
+                protos::models::Transaction_Type::TO,
+            )
+        });
+
+    let mut transactions = from_users
+        .chain(from_claims)
+        .chain(to_users)
+        .chain(to_claims)
+        .collect::<Vec<_>>();
     transactions.sort_by(|a, b| {
         b.get_timestamp()
             .get_seconds()

@@ -98,6 +98,6 @@ pub struct NewClaim<'a> {
 
 pub enum AccountHolder {
     User(User),
-    //Claim(Claim, User, Option<User>, i32),
+    Claim(Claim, User, Option<User>),
     //Room(Room)
 }

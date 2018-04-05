@@ -36,6 +36,7 @@ mod protos;
 mod routes;
 mod schema;
 mod serde_rocket_protobuf;
+mod sql_functions;
 
 #[cfg(test)]
 mod tests;

@@ -6,6 +6,7 @@ use rocket::local::Client;
 use std::env;
 
 use protos::user_messages::*;
+use routes;
 use serde_rocket_protobuf::Proto;
 
 fn client() -> Client {
@@ -22,21 +23,11 @@ fn client() -> Client {
         .begin_test_transaction()
         .unwrap();
 
-    Client::new(rocket::ignite().manage(database_connection).mount(
-        "/",
-        routes![
-            super::index_route,
-            super::file_route,
-            super::register_route,
-            super::login_route,
-            super::topup_route,
-            super::transaction_route,
-            super::get_transactions_route,
-            super::add_contact_route,
-            super::get_contacts_route,
-            super::get_user_route,
-        ],
-    )).unwrap()
+    Client::new(
+        rocket::ignite()
+            .manage(database_connection)
+            .mount("/", routes::all_routes()),
+    ).unwrap()
 }
 
 fn register_user(

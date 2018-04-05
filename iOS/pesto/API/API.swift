@@ -7,6 +7,7 @@
 //
 
 typealias Id = Int32
+typealias Amount = Int32
 typealias TransactionRequest = Pesto_UserMessages_TransactionRequest
 typealias TransactionResponse = Pesto_UserMessages_TransactionResponse
 typealias TopupRequest = Pesto_UserMessages_TopupRequest
@@ -31,7 +32,7 @@ struct API {
     }
   }
 
-  static func payUser(withId payeeId: Id, amount: Int32, completion: @escaping (Bool) -> Void) {
+  static func payUser(withId payeeId: Id, amount: Amount, completion: @escaping (Bool) -> Void) {
     User.getMe { me in
       var transactionRequest = TransactionRequest()
       transactionRequest.amount = amount
@@ -48,11 +49,10 @@ struct API {
           completion(false)
         }
       }
-      return nil
     }
   }
 
-  static func topup(amount: Int32, completion: @escaping (Bool) -> Void) {
+  static func topup(amount: Amount, completion: @escaping (Bool) -> Void) {
     User.getMe { me in
       var topupRequest = TopupRequest()
       topupRequest.uid = me.uid
@@ -68,7 +68,6 @@ struct API {
           completion(false)
         }
       }
-      return nil
     }
   }
 
@@ -84,10 +83,9 @@ struct API {
 
   }
 
-  static func getBalance(completion: @escaping (Int32) -> Void) {
+  static func getBalance(completion: @escaping (Amount) -> Void) {
     User.getMe { me in
       completion(me.balance)
-      return nil
     }
   }
 }

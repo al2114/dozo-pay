@@ -120,7 +120,6 @@ extension API {
           completion([])
         }
       }
-      return nil
     }
   }
 
@@ -134,7 +133,6 @@ extension API {
           completion([])
         }
       }
-      return nil
     }
   }
 
@@ -152,7 +150,6 @@ extension API {
           completion(false)
         }
       }
-      return nil
     }
   }
 

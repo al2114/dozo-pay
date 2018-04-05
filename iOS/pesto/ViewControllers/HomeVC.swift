@@ -114,7 +114,6 @@ class HomeVC: UIViewController {
       let qrImage = Util.qrCode(from: "pesto:\(me.username):\(me.uid)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
       qrCodeImageView.contentMode = .scaleAspectFit
       qrCodeImageView.image = qrImage
-      return nil
     }
 
     balanceView = UIView()
@@ -233,7 +232,6 @@ class HomeVC: UIViewController {
     UIApplication.shared.statusBarStyle = .lightContent
     User.getMe{ me in
       self.makeUpdates(withUser: me)
-      return nil
     }
     API.getTransactions { transactions in
       self.transactions = transactions
@@ -297,7 +295,6 @@ class HomeVC: UIViewController {
         shouldReload = false
         User.updateMeFromServer { me in
           self.makeUpdates(withUser: me)
-          return nil
         }
       }
 

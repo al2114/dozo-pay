@@ -104,6 +104,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     shareButton.isEnabled = false
     shareButton.tintColor = .white
     shareButton.setImage(#imageLiteral(resourceName: "circleShare").withRenderingMode(.alwaysTemplate), for: .normal)
+    shareButton.addTarget(self, action: #selector(share), for: .touchUpInside)
     view.addSubview(shareButton)
     NSLayoutConstraint.activate([
       shareButton.rightAnchor.constraint(equalTo: view.centerXAnchor, constant: -40),
@@ -111,7 +112,6 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       shareButton.widthAnchor.constraint(equalToConstant: 36),
       shareButton.heightAnchor.constraint(equalTo: sendButton.widthAnchor),
       ])
-
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -124,7 +124,6 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     navigationController?.navigationBar.barTintColor = .primaryBackground
     navigationController?.navigationBar.tintColor = .primaryTitle
     UIApplication.shared.keyWindow?.backgroundColor = .primaryBackground
-    print(UIApplication.shared.keyWindow?.backgroundColor)
     UIApplication.shared.statusBarStyle = .lightContent
   }
 
@@ -148,7 +147,6 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
 
   @objc func send() {
     let amount = Util.currencyStringToAmount(amountField.text!)
-//    let intAmount = Int32(amount * 100)
     if let payee = payee {
       API.payUser(withId: payee.uid, amount: amount) { success in
         if success {
@@ -162,6 +160,17 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       let sendVC = SendContactVC()
       sendVC.amount = Double(amount)/100.0
       self.show(sendVC, sender: self)
+    }
+  }
+
+  @objc func share() {
+    //TODO: Generate claim only on selection of acitivity;
+    let amount = Util.currencyStringToAmount(amountField.text!)
+    API.createClaim(for: amount) { claim in
+      let activityViewController = UIActivityViewController(
+        activityItems: ["https://pesto-pay.com/claims/\(claim.uid)"],
+        applicationActivities: nil)
+      self.present(activityViewController, animated: true, completion: nil)
     }
   }
 
@@ -188,6 +197,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(0, 1))
       }
       sendButton.isEnabled = amount != 0
+      shareButton.isEnabled = amount != 0
       if(amount == 0) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1,(result.count)-1))
       }

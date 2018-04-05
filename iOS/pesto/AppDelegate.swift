@@ -15,7 +15,6 @@ typealias JSON = [String: Any]
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
 
-
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     if let notification = launchOptions?[.remoteNotification] as? JSON {
       let _ = notification["aps"] as! JSON
@@ -24,8 +23,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     UIApplication.shared.statusBarStyle = .lightContent
     window = UIWindow(frame: UIScreen.main.bounds)
-    let passcodeVC = PasscodeVC()
-    Util.switchTo(viewController: passcodeVC, window: window)
+//    let passcodeVC = PasscodeVC()
+//    Util.switchTo(viewController: passcodeVC, window: window)
+    let loginVC = LoginVC()
+    Util.switchTo(viewController: loginVC, window: window)
     window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()
 
@@ -75,7 +76,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     print(deviceToken)
     User.getMe { user in
       API.registerDeviceToken(deviceToken, to: user)
-      return nil
     }
   }
 

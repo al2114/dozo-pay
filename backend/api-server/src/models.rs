@@ -95,3 +95,9 @@ pub struct NewClaim<'a> {
     pub owner_id: &'a i32,
     pub amount: &'a i32,
 }
+
+pub enum AccountHolder {
+    User(User),
+    //Claim(Claim, User, Option<User>, i32),
+    //Room(Room)
+}

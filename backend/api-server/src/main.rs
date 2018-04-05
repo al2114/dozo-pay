@@ -42,38 +42,13 @@ use protos::user_messages::*;
 mod passwords;
 use passwords::encrypt_password;
 mod models;
+mod protoize;
 mod schema;
 mod serde_rocket_protobuf;
 use serde_rocket_protobuf::{Proto, ProtoResult};
 
 #[cfg(test)]
 mod route_tests;
-
-fn protoize_user(user: models::User, balance: i32) -> protos::models::User {
-    let mut proto_user = protos::models::User::new();
-    proto_user.set_uid(user.uid);
-    proto_user.set_phone_no(user.phone_no);
-    proto_user.set_picture_url(user.picture_url.unwrap_or("".to_string()));
-    proto_user.set_balance(balance);
-    proto_user.set_username(user.username);
-    proto_user
-}
-
-fn protoize_claim(
-    claim: models::Claim,
-    owner: models::User,
-    receiver: Option<models::User>,
-    amount: i32,
-) -> protos::models::Claim {
-    let mut proto_claim = protos::models::Claim::new();
-    proto_claim.set_uid(claim.uid);
-    proto_claim.set_owner(protoize_user(owner, 0));
-    receiver.map(|receiver| {
-        proto_claim.set_receiver(protoize_user(receiver, 0));
-    });
-    proto_claim.set_amount(amount);
-    proto_claim
-}
 
 #[get("/")]
 fn index_route() -> Result<NamedFile> {
@@ -192,14 +167,6 @@ fn add_contact_route(
     Ok(Proto(response))
 }
 
-fn protoize_contact(contact: models::Contact, username: String) -> protos::models::Contact {
-    let mut proto_contact = protos::models::Contact::new();
-    proto_contact.set_uid(contact.contact_id);
-    proto_contact.set_username(username);
-    proto_contact.set_trusted(true);
-    proto_contact
-}
-
 #[get("/contacts/<user_id>")]
 fn get_contacts_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<GetContactsResponse> {
     let db_connection = pool.get()
@@ -219,32 +186,13 @@ fn get_contacts_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<GetConta
 
     let contacts = results
         .into_iter()
-        .map(|(contact, user)| protoize_contact(contact, user.username))
+        .map(|(contact, user)| protoize::contact(contact, user.username))
         .collect();
 
     let mut response = GetContactsResponse::new();
     response.set_contacts(contacts);
 
     Ok(Proto(response))
-}
-
-fn protoize_transaction(
-    transaction: models::Transaction,
-    user: models::User,
-    transaction_type: protos::models::Transaction_Type,
-) -> protos::models::Transaction {
-    let mut proto_transaction = protos::models::Transaction::new();
-    let mut profile = protos::models::Profile::new();
-    profile.set_uid(user.uid);
-    profile.set_username(user.username);
-    proto_transaction.set_profile(profile);
-    proto_transaction.set_transaction_type(transaction_type);
-    proto_transaction.set_amount(transaction.amount);
-    let mut timestamp = ::protobuf::well_known_types::Timestamp::new();
-    timestamp.set_seconds(transaction.created_at.timestamp());
-    timestamp.set_nanos(transaction.created_at.timestamp_subsec_nanos() as i32);
-    proto_transaction.set_timestamp(timestamp);
-    proto_transaction
 }
 
 #[get("/transactions/<user_id>")]
@@ -282,7 +230,13 @@ fn get_transactions_route(
         .load::<(Transaction, User)>(&db_connection)
         .chain_err(|| "Transactions not found")?
         .into_iter()
-        .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::FROM));
+        .map(|(t, u)| {
+            protoize::transaction(
+                t,
+                models::AccountHolder::User(u),
+                protos::models::Transaction_Type::FROM,
+            )
+        });
 
     let to_results = transactions::table
         .filter(transactions::uid.eq_any(to_tids))
@@ -290,7 +244,13 @@ fn get_transactions_route(
         .load::<(Transaction, User)>(&db_connection)
         .chain_err(|| "Transactions not found")?
         .into_iter()
-        .map(|(t, u)| protoize_transaction(t, u, protos::models::Transaction_Type::TO));
+        .map(|(t, u)| {
+            protoize::transaction(
+                t,
+                models::AccountHolder::User(u),
+                protos::models::Transaction_Type::TO,
+            )
+        });
 
     let mut transactions = from_results.chain(to_results).collect::<Vec<_>>();
     transactions.sort_by(|a, b| {
@@ -323,7 +283,7 @@ fn get_user_route(pool: State<PgPool>, user_id: i32) -> ProtoResult<protos::mode
         .first::<(User, Account)>(&db_connection)
         .chain_err(|| "User not found")?;
 
-    Ok(Proto(protoize_user(user, account.balance)))
+    Ok(Proto(protoize::user(user, account.balance)))
 }
 
 fn transaction_helper(
@@ -356,7 +316,7 @@ fn transaction_helper(
     )?;
 
     let payer_username = payer.username.clone();
-    let payer = protoize_user(payer, account.balance);
+    let payer = protoize::user(payer, account.balance);
     let mut response = TransactionResponse::new();
     response.set_user(payer);
     response.set_transaction_id(transaction.uid);
@@ -435,7 +395,7 @@ fn topup_route(pool: State<PgPool>, request: Proto<TopupRequest>) -> ProtoResult
         .first::<Account>(&db_connection)
         .chain_err(|| "User does not have an account after transaction")?;
 
-    let user = protoize_user(user, user_account.balance);
+    let user = protoize::user(user, user_account.balance);
 
     let mut response = TopupResponse::new();
     response.set_user(user);
@@ -482,7 +442,7 @@ fn register_route(
         .get_result::<User>(&db_connection)
         .chain_err(|| "Error inserting new user")?;
 
-    let user = protoize_user(user, 0);
+    let user = protoize::user(user, 0);
 
     let mut response = RegisterResponse::new();
     response.set_user(user);
@@ -539,7 +499,7 @@ fn login_route(
 
     let mut response = LoginResponse::new();
     if user.password == password {
-        let user = protoize_user(user, account.balance);
+        let user = protoize::user(user, account.balance);
         cookies.add_private(Cookie::new("credentials", format!("{}", user.uid)));
         response.set_user(user);
         response.set_successful(true);
@@ -651,7 +611,7 @@ fn create_claim_route(
 
     let mut response = CreateClaimResponse::new();
     response.set_successful(true);
-    response.set_claim(protoize_claim(claim, owner, None, account_balance));
+    response.set_claim(protoize::claim(claim, owner, None, account_balance));
     Ok(Proto(response))
 }
 
@@ -813,7 +773,7 @@ fn accept_claim(
         .first::<User>(db_connection)
         .chain_err(|| "Unable to find claim owner")?;
 
-    let claim = protoize_claim(claim, owner, Some(receiver), balance);
+    let claim = protoize::claim(claim, owner, Some(receiver), balance);
     Ok(claim)
 }
 

@@ -133,28 +133,28 @@ fn test_get_contacts() {
     contacts_response
         .get_contacts()
         .iter()
-        .for_each(|contact| println!("{}", contact.get_uid()));
+        .for_each(|contact| println!("{}", contact.get_profile().get_uid()));
 
     assert_eq!(contacts_response.get_contacts().len(), 2);
     assert_eq!(
         contacts_response
             .get_contacts()
             .iter()
-            .any(|contact| contact.get_uid() == dan.get_user().get_uid()),
+            .any(|contact| contact.get_profile().get_uid() == dan.get_user().get_uid()),
         true
     );
     assert_eq!(
         contacts_response
             .get_contacts()
             .iter()
-            .any(|contact| contact.get_uid() == andrew.get_user().get_uid()),
+            .any(|contact| contact.get_profile().get_uid() == andrew.get_user().get_uid()),
         true
     );
     assert_eq!(
         contacts_response
             .get_contacts()
             .iter()
-            .any(|contact| contact.get_uid() == franklin.get_user().get_uid()),
+            .any(|contact| contact.get_profile().get_uid() == franklin.get_user().get_uid()),
         false
     )
 }

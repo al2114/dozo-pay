@@ -5,27 +5,22 @@ import "google/protobuf/timestamp.proto";
 
 message User {
   int32 uid = 1;
-  string phone_no = 2;
-  string picture_url = 3;
-  int32 balance = 4;
-  string username = 5;
-}
-
-message Profile {
-  int32 uid = 1;
   string username = 2;
+  string phone_no = 3;
+  string picture_url = 4;
+  int32 balance = 5;
 }
 
 message Claim {
   int32 uid = 1;
   int32 amount = 2;
-  User owner = 3;
-  User receiver = 4;
+  Profile owner = 3;
+  Profile receiver = 4;
 }
 
 message Room {
   int32 uid = 1;
-  User owner = 2;
+  Profile owner = 2;
   string name = 3;
   repeated RoomItem item = 4;
   repeated User invited = 5;
@@ -39,18 +34,31 @@ message RoomItem {
 }
 
 message Contact {
-  int32 uid = 1;
-  string username = 2;
-  bool trusted = 3;
+  Profile profile = 1;
+  bool trusted = 2;
 }
 
 message Transaction {
-  Profile profile = 1;
-  int32 amount = 2;
+  AccountHolderType account_holder_type = 1;
+  Profile user_account_holder = 2;
+  Claim claim_account_holder = 3;
+  Room room_account_holder = 4;
+  int32 amount = 5;
   enum Type {
     FROM = 0;
     TO = 1;
   }
-  Type transaction_type = 3;
-  google.protobuf.Timestamp timestamp = 4;
+  Type transaction_type = 6;
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+message Profile {
+  int32 uid = 1;
+  string username = 2;
+}
+
+enum AccountHolderType {
+  USER = 0;
+  CLAIM = 1;
+  ROOM = 2;
 }

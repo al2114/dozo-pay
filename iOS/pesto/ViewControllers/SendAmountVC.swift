@@ -168,7 +168,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     let amount = Util.currencyStringToAmount(amountField.text!)
     API.createClaim(for: amount) { claim in
       let activityViewController = UIActivityViewController(
-        activityItems: ["Claim \(Locale.defaultCurrencySymbol)\(claim.amount) from @\(claim.owner.username)", "https://pesto-pay.com/claims/\(claim.uid)"],
+        activityItems: ["https://pesto-pay.com/claims/\(claim.uid)"],
         applicationActivities: nil)
       self.present(activityViewController, animated: true, completion: nil)
     }

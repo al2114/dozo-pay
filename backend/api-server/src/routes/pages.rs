@@ -3,9 +3,9 @@ use contexts::*;
 use diesel::prelude::*;
 use errors::*;
 use pg_pool::{PgPool, PgPooledConnection};
-use rocket::State;
 use rocket::http::Cookies;
 use rocket::response::NamedFile;
+use rocket::State;
 use rocket_contrib::Template;
 
 use std::path::{Path, PathBuf};

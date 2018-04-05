@@ -1,10 +1,10 @@
 use protobuf::core::{Message, MessageStatic};
 use protobuf::{CodedInputStream, CodedOutputStream};
-use rocket::Outcome;
 use rocket::data::{self, Data, FromData};
 use rocket::http::Status;
 use rocket::request::Request;
 use rocket::response::{self, Responder, Response};
+use rocket::Outcome;
 
 use std::io::Cursor;
 use std::ops::Deref;

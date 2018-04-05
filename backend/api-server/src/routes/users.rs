@@ -8,8 +8,8 @@ use protoize;
 use protos;
 use protos::user_messages::{LoginRequest, LoginResponse, NoResponse, RegisterDeviceTokenRequest,
                             RegisterRequest, RegisterResponse};
-use rocket::State;
 use rocket::http::{Cookie, Cookies};
+use rocket::State;
 use serde_rocket_protobuf::{Proto, ProtoResult};
 use sql_functions;
 

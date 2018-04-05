@@ -6,6 +6,7 @@
 //  Copyright © 2018 Pesto Techonologies Ltd. All rights reserved.
 //
 
+<<<<<<< HEAD
 //import UIKit
 //
 //class ClaimCell: UITableViewCell {
@@ -226,3 +227,6 @@
 //    present(alert, animated: true)
 //  }
 //}
+=======
+import Foundation
+>>>>>>> Introduce AccountHolder enum for transactions with claims, and isolate protoize into its own module

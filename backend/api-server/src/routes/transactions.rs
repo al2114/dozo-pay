@@ -1,7 +1,3 @@
-#[cfg(feature = "notifications")]
-use APNsClient;
-#[cfg(feature = "notifications")]
-use Notification;
 use diesel;
 use diesel::prelude::*;
 use errors::*;
@@ -13,6 +9,10 @@ use protos::user_messages::{GetTransactionsResponse, TopupRequest, TopupResponse
                             TransactionRequest, TransactionResponse};
 use rocket::State;
 use serde_rocket_protobuf::{Proto, ProtoResult};
+#[cfg(feature = "notifications")]
+use APNsClient;
+#[cfg(feature = "notifications")]
+use Notification;
 
 #[cfg(not(feature = "notifications"))]
 #[post("/pay", data = "<request>")]

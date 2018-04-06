@@ -239,6 +239,14 @@ extension CreateClaimRequest: RequestResponsePair {
   typealias ResponseType = CreateClaimResponse
 }
 
+extension AcceptClaimRequest: RequestResponsePair {
+  typealias ResponseType = AcceptClaimResponse
+}
+
+extension RevokeClaimRequest: RequestResponsePair {
+  typealias ResponseType = AcceptClaimResponse
+}
+
 extension UIViewController {
   var topAnchor: NSLayoutYAxisAnchor {
     if #available(iOS 11.0, *) {

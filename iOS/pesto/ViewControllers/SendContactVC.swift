@@ -181,7 +181,7 @@ extension SendContactVC: UITableViewDataSource {
     let contact = contacts[indexPath.section][indexPath.row]
 
     let contactCell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
-    contactCell.nameLabel.text = "@\(contact.username)"
+    contactCell.nameLabel.text = "@\(contact.profile.username)"
     let image = #imageLiteral(resourceName: "logo").withRenderingMode(.alwaysTemplate)
     contactCell.profileImageView.image = image
     contactCell.profileImageView.tintColor = .pestoGreen
@@ -208,11 +208,11 @@ extension SendContactVC: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let contact = contacts[indexPath.section][indexPath.row]
     let amountString = Util.amountToCurrencyString(amount)
-    let alert = UIAlertController(title: "Confirm", message: "Send \(amountString) to @\(contact.username)?", preferredStyle: .alert)
+    let alert = UIAlertController(title: "Confirm", message: "Send \(amountString) to @\(contact.profile.username)?", preferredStyle: .alert)
     let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in }
     let confirmAction = UIAlertAction(title: "Confirm", style: .default) { _ in
       let intAmount = Int32(self.amount * 100)
-      API.payUser(withId: contact.uid, amount: intAmount) { success in
+      API.payUser(withId: contact.profile.uid, amount: intAmount) { success in
         if success {
           let confirmationVC = ConfirmationVC()
           confirmationVC.willDismiss = {
@@ -220,7 +220,7 @@ extension SendContactVC: UITableViewDelegate {
           }
           confirmationVC.descriptionText = "Payment sent"
           confirmationVC.amount = self.amount
-          confirmationVC.username = contact.username
+          confirmationVC.username = contact.profile.username
           self.present(confirmationVC, animated: true)
         }
       }

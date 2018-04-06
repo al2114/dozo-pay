@@ -6,12 +6,31 @@
 //  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
 //
 
+typealias AcceptClaimRequest = Pesto_UserMessages_AcceptClaimRequest
+typealias AcceptClaimResponse = Pesto_UserMessages_AcceptClaimResponse
 typealias CreateClaimRequest = Pesto_UserMessages_CreateClaimRequest
 typealias CreateClaimResponse = Pesto_UserMessages_CreateClaimResponse
+typealias RevokeClaimRequest = Pesto_UserMessages_RevokeClaimRequest
+typealias RevokeClaimResponse = Pesto_UserMessages_RevokeClaimResponse
 
 extension API {
-  static func accept(claim: Claim, completion: @escaping () -> Void) {
+  static func acceptClaim(withID claimID: Id, completion: (() -> Void)?) {
+    User.getMe { me in
+      var acceptClaimRequest = AcceptClaimRequest()
+      acceptClaimRequest.claimID = claimID
+      acceptClaimRequest.receiverID = me.uid
 
+      let route = "claims/accept"
+      Util.post(toRoute: route, withProtoMessage: acceptClaimRequest) {
+        result in
+        if case let .ok(acceptClaimResponse)? = result, acceptClaimResponse.successful {
+          var me = me
+          me.balance += acceptClaimResponse.claim.amount
+          User.updateMe(withUser: me)
+          completion?()
+        }
+      }
+    }
   }
 
   static func confirm(claim: Claim, completion: @escaping () -> Void) {
@@ -38,6 +57,20 @@ extension API {
   }
 
   static func revoke(claim: Claim, completion: @escaping () -> Void) {
+    var revokeClaimRequest = RevokeClaimRequest()
+    revokeClaimRequest.claimID = claim.uid
 
+    let route = "claims/revoke"
+    Util.post(toRoute: route, withProtoMessage: revokeClaimRequest) {
+      result in
+      if case let .ok(acceptClaimResponse)? = result {
+        User.getMe { me in
+          var me = me
+          me.balance += acceptClaimResponse.claim.amount
+          User.updateMe(withUser: me)
+        }
+        completion()
+      }
+    }
   }
 }

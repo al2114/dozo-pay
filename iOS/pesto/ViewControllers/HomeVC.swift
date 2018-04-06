@@ -374,7 +374,25 @@ extension HomeVC: UITableViewDataSource {
     }
 
     transactionCell.dateLabel.text = Util.dateStringFromProtoTimestamp(transaction.timestamp).uppercased()
-    transactionCell.userLabel.text = "@\(transaction.profile.username)"
+    switch transaction.accountHolderType {
+    case .claim:
+      //TODO
+      switch transaction.transactionType {
+      case .from:
+        transactionCell.userLabel.text = "Claim (from @\(transaction.claimAccountHolder.owner.username))"
+      case .to:
+        if transaction.claimAccountHolder.hasReceiver {
+          transactionCell.userLabel.text = "Claim (received by @\(transaction.claimAccountHolder.receiver.username))"
+        } else {
+          transactionCell.userLabel.text = "Open Claim"
+        }
+      default: break
+      }
+    case .user:
+      transactionCell.userLabel.text = "@\(transaction.userAccountHolder.username)"
+    default: break
+    }
+
 
     return transactionCell
   }

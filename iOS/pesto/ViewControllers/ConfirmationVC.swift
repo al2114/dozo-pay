@@ -87,8 +87,7 @@ class ConfirmationVC: UIViewController {
     doneButton.setTitle("Done", for: .normal)
     if successful {
       doneButton.tintColor = .secondaryTitle
-    }
-    else {
+    } else {
       doneButton.tintColor = .text
     }
     doneButton.addTarget(self, action: #selector(home), for: .touchUpInside)
@@ -143,6 +142,20 @@ class ConfirmationVC: UIViewController {
       lowerSeparator.widthAnchor.constraint(equalTo: balanceView.widthAnchor, multiplier: 0.8),
       lowerSeparator.heightAnchor.constraint(equalToConstant: 1)
       ])
+
+    let closeButton = UIButton(type: .system)
+    closeButton.translatesAutoresizingMaskIntoConstraints = false
+    closeButton.setImage(#imageLiteral(resourceName: "crossIcon").withRenderingMode(.alwaysTemplate), for: .normal)
+    closeButton.tintColor = .text
+    closeButton.addTarget(self, action: #selector(home), for: .touchUpInside)
+    view.addSubview(closeButton)
+    NSLayoutConstraint.activate([
+      closeButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+      closeButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 40),
+      closeButton.widthAnchor.constraint(equalToConstant: 24),
+      closeButton.heightAnchor.constraint(equalTo: closeButton.widthAnchor)
+      ])
+
   }
 
   @objc func home() {

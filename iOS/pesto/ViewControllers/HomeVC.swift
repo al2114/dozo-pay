@@ -379,11 +379,14 @@ extension HomeVC: UITableViewDataSource {
       //TODO
       switch transaction.transactionType {
       case .from:
-        transactionCell.userLabel.text = "Claim (from @\(transaction.claimAccountHolder.owner.username))"
+        transactionCell.titleLabel.text = "FROM (via claim)"
+        transactionCell.userLabel.text = "@\(transaction.claimAccountHolder.owner.username)"
       case .to:
         if transaction.claimAccountHolder.hasReceiver {
-          transactionCell.userLabel.text = "Claim (received by @\(transaction.claimAccountHolder.receiver.username))"
+          transactionCell.titleLabel.text = "TO (via claim)"
+          transactionCell.userLabel.text = "@\(transaction.claimAccountHolder.receiver.username)"
         } else {
+          transactionCell.titleLabel.text = ""
           transactionCell.userLabel.text = "Open Claim"
         }
       default: break

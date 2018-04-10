@@ -1,10 +1,13 @@
 all: login debug
 
-login: src/login.js src/protos.js
+login: install src/login.js src/protos.js
 	browserify src/login.js -o ../static/scripts/login.bundle.js
 
-debug: src/debug.js src/protos.js
+debug: install src/debug.js src/protos.js
 	browserify src/debug.js -o ../static/scripts/debug.bundle.js
+
+install:
+	npm install
 
 clean:
 	rm ../static/scripts/*.bundle.js

@@ -13043,7 +13043,6 @@ $("#login-form").submit(function() {
     request.onload = function(e){
         try{
             let response = LoginResponse.decode(new Uint8Array(request.response));
-            console.log(response);
             if(response.successful){
                 let redirect = getURLParameter("redirect");
                 if(redirect != null){
@@ -13054,9 +13053,6 @@ $("#login-form").submit(function() {
                 return;
             }
         } catch(e) {}
-        console.log("Something went wrong!");
-        console.log(e);
-        console.log(request.response);
         $(".hidden").removeClass("hidden");
     };
 
@@ -13368,6 +13364,22 @@ $root.pesto = (function() {
             };
 
             return User;
+        })();
+
+        /**
+         * ClaimStatus enum.
+         * @name pesto.models.ClaimStatus
+         * @enum {string}
+         * @property {number} UNCLAIMED=0 UNCLAIMED value
+         * @property {number} CLAIMED=1 CLAIMED value
+         * @property {number} REVOKED=2 REVOKED value
+         */
+        models.ClaimStatus = (function() {
+            var valuesById = {}, values = Object.create(valuesById);
+            values[valuesById[0] = "UNCLAIMED"] = 0;
+            values[valuesById[1] = "CLAIMED"] = 1;
+            values[valuesById[2] = "REVOKED"] = 2;
+            return values;
         })();
 
         models.Claim = (function() {
@@ -19474,6 +19486,239 @@ $root.pesto = (function() {
             };
 
             return RevokeClaimResponse;
+        })();
+
+        user_messages.ClaimInfoResponse = (function() {
+
+            /**
+             * Properties of a ClaimInfoResponse.
+             * @memberof pesto.user_messages
+             * @interface IClaimInfoResponse
+             * @property {pesto.models.IClaim|null} [claim] ClaimInfoResponse claim
+             * @property {pesto.models.ClaimStatus|null} [status] ClaimInfoResponse status
+             */
+
+            /**
+             * Constructs a new ClaimInfoResponse.
+             * @memberof pesto.user_messages
+             * @classdesc Represents a ClaimInfoResponse.
+             * @implements IClaimInfoResponse
+             * @constructor
+             * @param {pesto.user_messages.IClaimInfoResponse=} [properties] Properties to set
+             */
+            function ClaimInfoResponse(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * ClaimInfoResponse claim.
+             * @member {pesto.models.IClaim|null|undefined} claim
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @instance
+             */
+            ClaimInfoResponse.prototype.claim = null;
+
+            /**
+             * ClaimInfoResponse status.
+             * @member {pesto.models.ClaimStatus} status
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @instance
+             */
+            ClaimInfoResponse.prototype.status = 0;
+
+            /**
+             * Creates a new ClaimInfoResponse instance using the specified properties.
+             * @function create
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @static
+             * @param {pesto.user_messages.IClaimInfoResponse=} [properties] Properties to set
+             * @returns {pesto.user_messages.ClaimInfoResponse} ClaimInfoResponse instance
+             */
+            ClaimInfoResponse.create = function create(properties) {
+                return new ClaimInfoResponse(properties);
+            };
+
+            /**
+             * Encodes the specified ClaimInfoResponse message. Does not implicitly {@link pesto.user_messages.ClaimInfoResponse.verify|verify} messages.
+             * @function encode
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @static
+             * @param {pesto.user_messages.IClaimInfoResponse} message ClaimInfoResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ClaimInfoResponse.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.claim != null && message.hasOwnProperty("claim"))
+                    $root.pesto.models.Claim.encode(message.claim, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.status != null && message.hasOwnProperty("status"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.status);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified ClaimInfoResponse message, length delimited. Does not implicitly {@link pesto.user_messages.ClaimInfoResponse.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @static
+             * @param {pesto.user_messages.IClaimInfoResponse} message ClaimInfoResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ClaimInfoResponse.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a ClaimInfoResponse message from the specified reader or buffer.
+             * @function decode
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {pesto.user_messages.ClaimInfoResponse} ClaimInfoResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ClaimInfoResponse.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pesto.user_messages.ClaimInfoResponse();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.claim = $root.pesto.models.Claim.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.status = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a ClaimInfoResponse message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {pesto.user_messages.ClaimInfoResponse} ClaimInfoResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ClaimInfoResponse.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a ClaimInfoResponse message.
+             * @function verify
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ClaimInfoResponse.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.claim != null && message.hasOwnProperty("claim")) {
+                    var error = $root.pesto.models.Claim.verify(message.claim);
+                    if (error)
+                        return "claim." + error;
+                }
+                if (message.status != null && message.hasOwnProperty("status"))
+                    switch (message.status) {
+                    default:
+                        return "status: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
+                return null;
+            };
+
+            /**
+             * Creates a ClaimInfoResponse message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {pesto.user_messages.ClaimInfoResponse} ClaimInfoResponse
+             */
+            ClaimInfoResponse.fromObject = function fromObject(object) {
+                if (object instanceof $root.pesto.user_messages.ClaimInfoResponse)
+                    return object;
+                var message = new $root.pesto.user_messages.ClaimInfoResponse();
+                if (object.claim != null) {
+                    if (typeof object.claim !== "object")
+                        throw TypeError(".pesto.user_messages.ClaimInfoResponse.claim: object expected");
+                    message.claim = $root.pesto.models.Claim.fromObject(object.claim);
+                }
+                switch (object.status) {
+                case "UNCLAIMED":
+                case 0:
+                    message.status = 0;
+                    break;
+                case "CLAIMED":
+                case 1:
+                    message.status = 1;
+                    break;
+                case "REVOKED":
+                case 2:
+                    message.status = 2;
+                    break;
+                }
+                return message;
+            };
+
+            /**
+             * Creates a plain object from a ClaimInfoResponse message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @static
+             * @param {pesto.user_messages.ClaimInfoResponse} message ClaimInfoResponse
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            ClaimInfoResponse.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                var object = {};
+                if (options.defaults) {
+                    object.claim = null;
+                    object.status = options.enums === String ? "UNCLAIMED" : 0;
+                }
+                if (message.claim != null && message.hasOwnProperty("claim"))
+                    object.claim = $root.pesto.models.Claim.toObject(message.claim, options);
+                if (message.status != null && message.hasOwnProperty("status"))
+                    object.status = options.enums === String ? $root.pesto.models.ClaimStatus[message.status] : message.status;
+                return object;
+            };
+
+            /**
+             * Converts this ClaimInfoResponse to JSON.
+             * @function toJSON
+             * @memberof pesto.user_messages.ClaimInfoResponse
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            ClaimInfoResponse.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return ClaimInfoResponse;
         })();
 
         user_messages.NoResponse = (function() {

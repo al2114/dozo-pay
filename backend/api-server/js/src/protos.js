@@ -34,10 +34,10 @@ $root.pesto = (function() {
              * @memberof pesto.models
              * @interface IUser
              * @property {number|null} [uid] User uid
+             * @property {string|null} [username] User username
              * @property {string|null} [phoneNo] User phoneNo
              * @property {string|null} [pictureUrl] User pictureUrl
              * @property {number|null} [balance] User balance
-             * @property {string|null} [username] User username
              */
 
             /**
@@ -64,6 +64,14 @@ $root.pesto = (function() {
             User.prototype.uid = 0;
 
             /**
+             * User username.
+             * @member {string} username
+             * @memberof pesto.models.User
+             * @instance
+             */
+            User.prototype.username = "";
+
+            /**
              * User phoneNo.
              * @member {string} phoneNo
              * @memberof pesto.models.User
@@ -86,14 +94,6 @@ $root.pesto = (function() {
              * @instance
              */
             User.prototype.balance = 0;
-
-            /**
-             * User username.
-             * @member {string} username
-             * @memberof pesto.models.User
-             * @instance
-             */
-            User.prototype.username = "";
 
             /**
              * Creates a new User instance using the specified properties.
@@ -121,14 +121,14 @@ $root.pesto = (function() {
                     writer = $Writer.create();
                 if (message.uid != null && message.hasOwnProperty("uid"))
                     writer.uint32(/* id 1, wireType 0 =*/8).int32(message.uid);
-                if (message.phoneNo != null && message.hasOwnProperty("phoneNo"))
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.phoneNo);
-                if (message.pictureUrl != null && message.hasOwnProperty("pictureUrl"))
-                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.pictureUrl);
-                if (message.balance != null && message.hasOwnProperty("balance"))
-                    writer.uint32(/* id 4, wireType 0 =*/32).int32(message.balance);
                 if (message.username != null && message.hasOwnProperty("username"))
-                    writer.uint32(/* id 5, wireType 2 =*/42).string(message.username);
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.username);
+                if (message.phoneNo != null && message.hasOwnProperty("phoneNo"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.phoneNo);
+                if (message.pictureUrl != null && message.hasOwnProperty("pictureUrl"))
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.pictureUrl);
+                if (message.balance != null && message.hasOwnProperty("balance"))
+                    writer.uint32(/* id 5, wireType 0 =*/40).int32(message.balance);
                 return writer;
             };
 
@@ -167,16 +167,16 @@ $root.pesto = (function() {
                         message.uid = reader.int32();
                         break;
                     case 2:
-                        message.phoneNo = reader.string();
+                        message.username = reader.string();
                         break;
                     case 3:
-                        message.pictureUrl = reader.string();
+                        message.phoneNo = reader.string();
                         break;
                     case 4:
-                        message.balance = reader.int32();
+                        message.pictureUrl = reader.string();
                         break;
                     case 5:
-                        message.username = reader.string();
+                        message.balance = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -216,6 +216,9 @@ $root.pesto = (function() {
                 if (message.uid != null && message.hasOwnProperty("uid"))
                     if (!$util.isInteger(message.uid))
                         return "uid: integer expected";
+                if (message.username != null && message.hasOwnProperty("username"))
+                    if (!$util.isString(message.username))
+                        return "username: string expected";
                 if (message.phoneNo != null && message.hasOwnProperty("phoneNo"))
                     if (!$util.isString(message.phoneNo))
                         return "phoneNo: string expected";
@@ -225,9 +228,6 @@ $root.pesto = (function() {
                 if (message.balance != null && message.hasOwnProperty("balance"))
                     if (!$util.isInteger(message.balance))
                         return "balance: integer expected";
-                if (message.username != null && message.hasOwnProperty("username"))
-                    if (!$util.isString(message.username))
-                        return "username: string expected";
                 return null;
             };
 
@@ -245,14 +245,14 @@ $root.pesto = (function() {
                 var message = new $root.pesto.models.User();
                 if (object.uid != null)
                     message.uid = object.uid | 0;
+                if (object.username != null)
+                    message.username = String(object.username);
                 if (object.phoneNo != null)
                     message.phoneNo = String(object.phoneNo);
                 if (object.pictureUrl != null)
                     message.pictureUrl = String(object.pictureUrl);
                 if (object.balance != null)
                     message.balance = object.balance | 0;
-                if (object.username != null)
-                    message.username = String(object.username);
                 return message;
             };
 
@@ -271,21 +271,21 @@ $root.pesto = (function() {
                 var object = {};
                 if (options.defaults) {
                     object.uid = 0;
+                    object.username = "";
                     object.phoneNo = "";
                     object.pictureUrl = "";
                     object.balance = 0;
-                    object.username = "";
                 }
                 if (message.uid != null && message.hasOwnProperty("uid"))
                     object.uid = message.uid;
+                if (message.username != null && message.hasOwnProperty("username"))
+                    object.username = message.username;
                 if (message.phoneNo != null && message.hasOwnProperty("phoneNo"))
                     object.phoneNo = message.phoneNo;
                 if (message.pictureUrl != null && message.hasOwnProperty("pictureUrl"))
                     object.pictureUrl = message.pictureUrl;
                 if (message.balance != null && message.hasOwnProperty("balance"))
                     object.balance = message.balance;
-                if (message.username != null && message.hasOwnProperty("username"))
-                    object.username = message.username;
                 return object;
             };
 
@@ -303,216 +303,6 @@ $root.pesto = (function() {
             return User;
         })();
 
-        models.Profile = (function() {
-
-            /**
-             * Properties of a Profile.
-             * @memberof pesto.models
-             * @interface IProfile
-             * @property {number|null} [uid] Profile uid
-             * @property {string|null} [username] Profile username
-             */
-
-            /**
-             * Constructs a new Profile.
-             * @memberof pesto.models
-             * @classdesc Represents a Profile.
-             * @implements IProfile
-             * @constructor
-             * @param {pesto.models.IProfile=} [properties] Properties to set
-             */
-            function Profile(properties) {
-                if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
-            }
-
-            /**
-             * Profile uid.
-             * @member {number} uid
-             * @memberof pesto.models.Profile
-             * @instance
-             */
-            Profile.prototype.uid = 0;
-
-            /**
-             * Profile username.
-             * @member {string} username
-             * @memberof pesto.models.Profile
-             * @instance
-             */
-            Profile.prototype.username = "";
-
-            /**
-             * Creates a new Profile instance using the specified properties.
-             * @function create
-             * @memberof pesto.models.Profile
-             * @static
-             * @param {pesto.models.IProfile=} [properties] Properties to set
-             * @returns {pesto.models.Profile} Profile instance
-             */
-            Profile.create = function create(properties) {
-                return new Profile(properties);
-            };
-
-            /**
-             * Encodes the specified Profile message. Does not implicitly {@link pesto.models.Profile.verify|verify} messages.
-             * @function encode
-             * @memberof pesto.models.Profile
-             * @static
-             * @param {pesto.models.IProfile} message Profile message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            Profile.encode = function encode(message, writer) {
-                if (!writer)
-                    writer = $Writer.create();
-                if (message.uid != null && message.hasOwnProperty("uid"))
-                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.uid);
-                if (message.username != null && message.hasOwnProperty("username"))
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.username);
-                return writer;
-            };
-
-            /**
-             * Encodes the specified Profile message, length delimited. Does not implicitly {@link pesto.models.Profile.verify|verify} messages.
-             * @function encodeDelimited
-             * @memberof pesto.models.Profile
-             * @static
-             * @param {pesto.models.IProfile} message Profile message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            Profile.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
-            };
-
-            /**
-             * Decodes a Profile message from the specified reader or buffer.
-             * @function decode
-             * @memberof pesto.models.Profile
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @param {number} [length] Message length if known beforehand
-             * @returns {pesto.models.Profile} Profile
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            Profile.decode = function decode(reader, length) {
-                if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pesto.models.Profile();
-                while (reader.pos < end) {
-                    var tag = reader.uint32();
-                    switch (tag >>> 3) {
-                    case 1:
-                        message.uid = reader.int32();
-                        break;
-                    case 2:
-                        message.username = reader.string();
-                        break;
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Decodes a Profile message from the specified reader or buffer, length delimited.
-             * @function decodeDelimited
-             * @memberof pesto.models.Profile
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {pesto.models.Profile} Profile
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            Profile.decodeDelimited = function decodeDelimited(reader) {
-                if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
-                return this.decode(reader, reader.uint32());
-            };
-
-            /**
-             * Verifies a Profile message.
-             * @function verify
-             * @memberof pesto.models.Profile
-             * @static
-             * @param {Object.<string,*>} message Plain object to verify
-             * @returns {string|null} `null` if valid, otherwise the reason why it is not
-             */
-            Profile.verify = function verify(message) {
-                if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.uid != null && message.hasOwnProperty("uid"))
-                    if (!$util.isInteger(message.uid))
-                        return "uid: integer expected";
-                if (message.username != null && message.hasOwnProperty("username"))
-                    if (!$util.isString(message.username))
-                        return "username: string expected";
-                return null;
-            };
-
-            /**
-             * Creates a Profile message from a plain object. Also converts values to their respective internal types.
-             * @function fromObject
-             * @memberof pesto.models.Profile
-             * @static
-             * @param {Object.<string,*>} object Plain object
-             * @returns {pesto.models.Profile} Profile
-             */
-            Profile.fromObject = function fromObject(object) {
-                if (object instanceof $root.pesto.models.Profile)
-                    return object;
-                var message = new $root.pesto.models.Profile();
-                if (object.uid != null)
-                    message.uid = object.uid | 0;
-                if (object.username != null)
-                    message.username = String(object.username);
-                return message;
-            };
-
-            /**
-             * Creates a plain object from a Profile message. Also converts values to other types if specified.
-             * @function toObject
-             * @memberof pesto.models.Profile
-             * @static
-             * @param {pesto.models.Profile} message Profile
-             * @param {$protobuf.IConversionOptions} [options] Conversion options
-             * @returns {Object.<string,*>} Plain object
-             */
-            Profile.toObject = function toObject(message, options) {
-                if (!options)
-                    options = {};
-                var object = {};
-                if (options.defaults) {
-                    object.uid = 0;
-                    object.username = "";
-                }
-                if (message.uid != null && message.hasOwnProperty("uid"))
-                    object.uid = message.uid;
-                if (message.username != null && message.hasOwnProperty("username"))
-                    object.username = message.username;
-                return object;
-            };
-
-            /**
-             * Converts this Profile to JSON.
-             * @function toJSON
-             * @memberof pesto.models.Profile
-             * @instance
-             * @returns {Object.<string,*>} JSON object
-             */
-            Profile.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-            };
-
-            return Profile;
-        })();
-
         models.Claim = (function() {
 
             /**
@@ -521,8 +311,8 @@ $root.pesto = (function() {
              * @interface IClaim
              * @property {number|null} [uid] Claim uid
              * @property {number|null} [amount] Claim amount
-             * @property {pesto.models.IUser|null} [owner] Claim owner
-             * @property {pesto.models.IUser|null} [receiver] Claim receiver
+             * @property {pesto.models.IProfile|null} [owner] Claim owner
+             * @property {pesto.models.IProfile|null} [receiver] Claim receiver
              */
 
             /**
@@ -558,7 +348,7 @@ $root.pesto = (function() {
 
             /**
              * Claim owner.
-             * @member {pesto.models.IUser|null|undefined} owner
+             * @member {pesto.models.IProfile|null|undefined} owner
              * @memberof pesto.models.Claim
              * @instance
              */
@@ -566,7 +356,7 @@ $root.pesto = (function() {
 
             /**
              * Claim receiver.
-             * @member {pesto.models.IUser|null|undefined} receiver
+             * @member {pesto.models.IProfile|null|undefined} receiver
              * @memberof pesto.models.Claim
              * @instance
              */
@@ -601,9 +391,9 @@ $root.pesto = (function() {
                 if (message.amount != null && message.hasOwnProperty("amount"))
                     writer.uint32(/* id 2, wireType 0 =*/16).int32(message.amount);
                 if (message.owner != null && message.hasOwnProperty("owner"))
-                    $root.pesto.models.User.encode(message.owner, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    $root.pesto.models.Profile.encode(message.owner, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                 if (message.receiver != null && message.hasOwnProperty("receiver"))
-                    $root.pesto.models.User.encode(message.receiver, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    $root.pesto.models.Profile.encode(message.receiver, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 return writer;
             };
 
@@ -645,10 +435,10 @@ $root.pesto = (function() {
                         message.amount = reader.int32();
                         break;
                     case 3:
-                        message.owner = $root.pesto.models.User.decode(reader, reader.uint32());
+                        message.owner = $root.pesto.models.Profile.decode(reader, reader.uint32());
                         break;
                     case 4:
-                        message.receiver = $root.pesto.models.User.decode(reader, reader.uint32());
+                        message.receiver = $root.pesto.models.Profile.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -692,12 +482,12 @@ $root.pesto = (function() {
                     if (!$util.isInteger(message.amount))
                         return "amount: integer expected";
                 if (message.owner != null && message.hasOwnProperty("owner")) {
-                    var error = $root.pesto.models.User.verify(message.owner);
+                    var error = $root.pesto.models.Profile.verify(message.owner);
                     if (error)
                         return "owner." + error;
                 }
                 if (message.receiver != null && message.hasOwnProperty("receiver")) {
-                    var error = $root.pesto.models.User.verify(message.receiver);
+                    var error = $root.pesto.models.Profile.verify(message.receiver);
                     if (error)
                         return "receiver." + error;
                 }
@@ -723,12 +513,12 @@ $root.pesto = (function() {
                 if (object.owner != null) {
                     if (typeof object.owner !== "object")
                         throw TypeError(".pesto.models.Claim.owner: object expected");
-                    message.owner = $root.pesto.models.User.fromObject(object.owner);
+                    message.owner = $root.pesto.models.Profile.fromObject(object.owner);
                 }
                 if (object.receiver != null) {
                     if (typeof object.receiver !== "object")
                         throw TypeError(".pesto.models.Claim.receiver: object expected");
-                    message.receiver = $root.pesto.models.User.fromObject(object.receiver);
+                    message.receiver = $root.pesto.models.Profile.fromObject(object.receiver);
                 }
                 return message;
             };
@@ -757,9 +547,9 @@ $root.pesto = (function() {
                 if (message.amount != null && message.hasOwnProperty("amount"))
                     object.amount = message.amount;
                 if (message.owner != null && message.hasOwnProperty("owner"))
-                    object.owner = $root.pesto.models.User.toObject(message.owner, options);
+                    object.owner = $root.pesto.models.Profile.toObject(message.owner, options);
                 if (message.receiver != null && message.hasOwnProperty("receiver"))
-                    object.receiver = $root.pesto.models.User.toObject(message.receiver, options);
+                    object.receiver = $root.pesto.models.Profile.toObject(message.receiver, options);
                 return object;
             };
 
@@ -784,7 +574,7 @@ $root.pesto = (function() {
              * @memberof pesto.models
              * @interface IRoom
              * @property {number|null} [uid] Room uid
-             * @property {pesto.models.IUser|null} [owner] Room owner
+             * @property {pesto.models.IProfile|null} [owner] Room owner
              * @property {string|null} [name] Room name
              * @property {Array.<pesto.models.IRoomItem>|null} [item] Room item
              * @property {Array.<pesto.models.IUser>|null} [invited] Room invited
@@ -817,7 +607,7 @@ $root.pesto = (function() {
 
             /**
              * Room owner.
-             * @member {pesto.models.IUser|null|undefined} owner
+             * @member {pesto.models.IProfile|null|undefined} owner
              * @memberof pesto.models.Room
              * @instance
              */
@@ -874,7 +664,7 @@ $root.pesto = (function() {
                 if (message.uid != null && message.hasOwnProperty("uid"))
                     writer.uint32(/* id 1, wireType 0 =*/8).int32(message.uid);
                 if (message.owner != null && message.hasOwnProperty("owner"))
-                    $root.pesto.models.User.encode(message.owner, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    $root.pesto.models.Profile.encode(message.owner, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 if (message.name != null && message.hasOwnProperty("name"))
                     writer.uint32(/* id 3, wireType 2 =*/26).string(message.name);
                 if (message.item != null && message.item.length)
@@ -921,7 +711,7 @@ $root.pesto = (function() {
                         message.uid = reader.int32();
                         break;
                     case 2:
-                        message.owner = $root.pesto.models.User.decode(reader, reader.uint32());
+                        message.owner = $root.pesto.models.Profile.decode(reader, reader.uint32());
                         break;
                     case 3:
                         message.name = reader.string();
@@ -975,7 +765,7 @@ $root.pesto = (function() {
                     if (!$util.isInteger(message.uid))
                         return "uid: integer expected";
                 if (message.owner != null && message.hasOwnProperty("owner")) {
-                    var error = $root.pesto.models.User.verify(message.owner);
+                    var error = $root.pesto.models.Profile.verify(message.owner);
                     if (error)
                         return "owner." + error;
                 }
@@ -1020,7 +810,7 @@ $root.pesto = (function() {
                 if (object.owner != null) {
                     if (typeof object.owner !== "object")
                         throw TypeError(".pesto.models.Room.owner: object expected");
-                    message.owner = $root.pesto.models.User.fromObject(object.owner);
+                    message.owner = $root.pesto.models.Profile.fromObject(object.owner);
                 }
                 if (object.name != null)
                     message.name = String(object.name);
@@ -1072,7 +862,7 @@ $root.pesto = (function() {
                 if (message.uid != null && message.hasOwnProperty("uid"))
                     object.uid = message.uid;
                 if (message.owner != null && message.hasOwnProperty("owner"))
-                    object.owner = $root.pesto.models.User.toObject(message.owner, options);
+                    object.owner = $root.pesto.models.Profile.toObject(message.owner, options);
                 if (message.name != null && message.hasOwnProperty("name"))
                     object.name = message.name;
                 if (message.item && message.item.length) {
@@ -1367,8 +1157,7 @@ $root.pesto = (function() {
              * Properties of a Contact.
              * @memberof pesto.models
              * @interface IContact
-             * @property {number|null} [uid] Contact uid
-             * @property {string|null} [username] Contact username
+             * @property {pesto.models.IProfile|null} [profile] Contact profile
              * @property {boolean|null} [trusted] Contact trusted
              */
 
@@ -1388,20 +1177,12 @@ $root.pesto = (function() {
             }
 
             /**
-             * Contact uid.
-             * @member {number} uid
+             * Contact profile.
+             * @member {pesto.models.IProfile|null|undefined} profile
              * @memberof pesto.models.Contact
              * @instance
              */
-            Contact.prototype.uid = 0;
-
-            /**
-             * Contact username.
-             * @member {string} username
-             * @memberof pesto.models.Contact
-             * @instance
-             */
-            Contact.prototype.username = "";
+            Contact.prototype.profile = null;
 
             /**
              * Contact trusted.
@@ -1435,12 +1216,10 @@ $root.pesto = (function() {
             Contact.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.uid != null && message.hasOwnProperty("uid"))
-                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.uid);
-                if (message.username != null && message.hasOwnProperty("username"))
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.username);
+                if (message.profile != null && message.hasOwnProperty("profile"))
+                    $root.pesto.models.Profile.encode(message.profile, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                 if (message.trusted != null && message.hasOwnProperty("trusted"))
-                    writer.uint32(/* id 3, wireType 0 =*/24).bool(message.trusted);
+                    writer.uint32(/* id 2, wireType 0 =*/16).bool(message.trusted);
                 return writer;
             };
 
@@ -1476,12 +1255,9 @@ $root.pesto = (function() {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.uid = reader.int32();
+                        message.profile = $root.pesto.models.Profile.decode(reader, reader.uint32());
                         break;
                     case 2:
-                        message.username = reader.string();
-                        break;
-                    case 3:
                         message.trusted = reader.bool();
                         break;
                     default:
@@ -1519,12 +1295,11 @@ $root.pesto = (function() {
             Contact.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                if (message.uid != null && message.hasOwnProperty("uid"))
-                    if (!$util.isInteger(message.uid))
-                        return "uid: integer expected";
-                if (message.username != null && message.hasOwnProperty("username"))
-                    if (!$util.isString(message.username))
-                        return "username: string expected";
+                if (message.profile != null && message.hasOwnProperty("profile")) {
+                    var error = $root.pesto.models.Profile.verify(message.profile);
+                    if (error)
+                        return "profile." + error;
+                }
                 if (message.trusted != null && message.hasOwnProperty("trusted"))
                     if (typeof message.trusted !== "boolean")
                         return "trusted: boolean expected";
@@ -1543,10 +1318,11 @@ $root.pesto = (function() {
                 if (object instanceof $root.pesto.models.Contact)
                     return object;
                 var message = new $root.pesto.models.Contact();
-                if (object.uid != null)
-                    message.uid = object.uid | 0;
-                if (object.username != null)
-                    message.username = String(object.username);
+                if (object.profile != null) {
+                    if (typeof object.profile !== "object")
+                        throw TypeError(".pesto.models.Contact.profile: object expected");
+                    message.profile = $root.pesto.models.Profile.fromObject(object.profile);
+                }
                 if (object.trusted != null)
                     message.trusted = Boolean(object.trusted);
                 return message;
@@ -1566,14 +1342,11 @@ $root.pesto = (function() {
                     options = {};
                 var object = {};
                 if (options.defaults) {
-                    object.uid = 0;
-                    object.username = "";
+                    object.profile = null;
                     object.trusted = false;
                 }
-                if (message.uid != null && message.hasOwnProperty("uid"))
-                    object.uid = message.uid;
-                if (message.username != null && message.hasOwnProperty("username"))
-                    object.username = message.username;
+                if (message.profile != null && message.hasOwnProperty("profile"))
+                    object.profile = $root.pesto.models.Profile.toObject(message.profile, options);
                 if (message.trusted != null && message.hasOwnProperty("trusted"))
                     object.trusted = message.trusted;
                 return object;
@@ -1599,7 +1372,10 @@ $root.pesto = (function() {
              * Properties of a Transaction.
              * @memberof pesto.models
              * @interface ITransaction
-             * @property {pesto.models.IProfile|null} [profile] Transaction profile
+             * @property {pesto.models.AccountHolderType|null} [accountHolderType] Transaction accountHolderType
+             * @property {pesto.models.IProfile|null} [userAccountHolder] Transaction userAccountHolder
+             * @property {pesto.models.IClaim|null} [claimAccountHolder] Transaction claimAccountHolder
+             * @property {pesto.models.IRoom|null} [roomAccountHolder] Transaction roomAccountHolder
              * @property {number|null} [amount] Transaction amount
              * @property {pesto.models.Transaction.Type|null} [transactionType] Transaction transactionType
              * @property {google.protobuf.ITimestamp|null} [timestamp] Transaction timestamp
@@ -1621,12 +1397,36 @@ $root.pesto = (function() {
             }
 
             /**
-             * Transaction profile.
-             * @member {pesto.models.IProfile|null|undefined} profile
+             * Transaction accountHolderType.
+             * @member {pesto.models.AccountHolderType} accountHolderType
              * @memberof pesto.models.Transaction
              * @instance
              */
-            Transaction.prototype.profile = null;
+            Transaction.prototype.accountHolderType = 0;
+
+            /**
+             * Transaction userAccountHolder.
+             * @member {pesto.models.IProfile|null|undefined} userAccountHolder
+             * @memberof pesto.models.Transaction
+             * @instance
+             */
+            Transaction.prototype.userAccountHolder = null;
+
+            /**
+             * Transaction claimAccountHolder.
+             * @member {pesto.models.IClaim|null|undefined} claimAccountHolder
+             * @memberof pesto.models.Transaction
+             * @instance
+             */
+            Transaction.prototype.claimAccountHolder = null;
+
+            /**
+             * Transaction roomAccountHolder.
+             * @member {pesto.models.IRoom|null|undefined} roomAccountHolder
+             * @memberof pesto.models.Transaction
+             * @instance
+             */
+            Transaction.prototype.roomAccountHolder = null;
 
             /**
              * Transaction amount.
@@ -1676,14 +1476,20 @@ $root.pesto = (function() {
             Transaction.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.profile != null && message.hasOwnProperty("profile"))
-                    $root.pesto.models.Profile.encode(message.profile, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.accountHolderType != null && message.hasOwnProperty("accountHolderType"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.accountHolderType);
+                if (message.userAccountHolder != null && message.hasOwnProperty("userAccountHolder"))
+                    $root.pesto.models.Profile.encode(message.userAccountHolder, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.claimAccountHolder != null && message.hasOwnProperty("claimAccountHolder"))
+                    $root.pesto.models.Claim.encode(message.claimAccountHolder, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.roomAccountHolder != null && message.hasOwnProperty("roomAccountHolder"))
+                    $root.pesto.models.Room.encode(message.roomAccountHolder, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 if (message.amount != null && message.hasOwnProperty("amount"))
-                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.amount);
+                    writer.uint32(/* id 5, wireType 0 =*/40).int32(message.amount);
                 if (message.transactionType != null && message.hasOwnProperty("transactionType"))
-                    writer.uint32(/* id 3, wireType 0 =*/24).int32(message.transactionType);
+                    writer.uint32(/* id 6, wireType 0 =*/48).int32(message.transactionType);
                 if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-                    $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                 return writer;
             };
 
@@ -1719,15 +1525,24 @@ $root.pesto = (function() {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.profile = $root.pesto.models.Profile.decode(reader, reader.uint32());
+                        message.accountHolderType = reader.int32();
                         break;
                     case 2:
-                        message.amount = reader.int32();
+                        message.userAccountHolder = $root.pesto.models.Profile.decode(reader, reader.uint32());
                         break;
                     case 3:
-                        message.transactionType = reader.int32();
+                        message.claimAccountHolder = $root.pesto.models.Claim.decode(reader, reader.uint32());
                         break;
                     case 4:
+                        message.roomAccountHolder = $root.pesto.models.Room.decode(reader, reader.uint32());
+                        break;
+                    case 5:
+                        message.amount = reader.int32();
+                        break;
+                    case 6:
+                        message.transactionType = reader.int32();
+                        break;
+                    case 7:
                         message.timestamp = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
                         break;
                     default:
@@ -1765,10 +1580,29 @@ $root.pesto = (function() {
             Transaction.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                if (message.profile != null && message.hasOwnProperty("profile")) {
-                    var error = $root.pesto.models.Profile.verify(message.profile);
+                if (message.accountHolderType != null && message.hasOwnProperty("accountHolderType"))
+                    switch (message.accountHolderType) {
+                    default:
+                        return "accountHolderType: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
+                if (message.userAccountHolder != null && message.hasOwnProperty("userAccountHolder")) {
+                    var error = $root.pesto.models.Profile.verify(message.userAccountHolder);
                     if (error)
-                        return "profile." + error;
+                        return "userAccountHolder." + error;
+                }
+                if (message.claimAccountHolder != null && message.hasOwnProperty("claimAccountHolder")) {
+                    var error = $root.pesto.models.Claim.verify(message.claimAccountHolder);
+                    if (error)
+                        return "claimAccountHolder." + error;
+                }
+                if (message.roomAccountHolder != null && message.hasOwnProperty("roomAccountHolder")) {
+                    var error = $root.pesto.models.Room.verify(message.roomAccountHolder);
+                    if (error)
+                        return "roomAccountHolder." + error;
                 }
                 if (message.amount != null && message.hasOwnProperty("amount"))
                     if (!$util.isInteger(message.amount))
@@ -1801,10 +1635,34 @@ $root.pesto = (function() {
                 if (object instanceof $root.pesto.models.Transaction)
                     return object;
                 var message = new $root.pesto.models.Transaction();
-                if (object.profile != null) {
-                    if (typeof object.profile !== "object")
-                        throw TypeError(".pesto.models.Transaction.profile: object expected");
-                    message.profile = $root.pesto.models.Profile.fromObject(object.profile);
+                switch (object.accountHolderType) {
+                case "USER":
+                case 0:
+                    message.accountHolderType = 0;
+                    break;
+                case "CLAIM":
+                case 1:
+                    message.accountHolderType = 1;
+                    break;
+                case "ROOM":
+                case 2:
+                    message.accountHolderType = 2;
+                    break;
+                }
+                if (object.userAccountHolder != null) {
+                    if (typeof object.userAccountHolder !== "object")
+                        throw TypeError(".pesto.models.Transaction.userAccountHolder: object expected");
+                    message.userAccountHolder = $root.pesto.models.Profile.fromObject(object.userAccountHolder);
+                }
+                if (object.claimAccountHolder != null) {
+                    if (typeof object.claimAccountHolder !== "object")
+                        throw TypeError(".pesto.models.Transaction.claimAccountHolder: object expected");
+                    message.claimAccountHolder = $root.pesto.models.Claim.fromObject(object.claimAccountHolder);
+                }
+                if (object.roomAccountHolder != null) {
+                    if (typeof object.roomAccountHolder !== "object")
+                        throw TypeError(".pesto.models.Transaction.roomAccountHolder: object expected");
+                    message.roomAccountHolder = $root.pesto.models.Room.fromObject(object.roomAccountHolder);
                 }
                 if (object.amount != null)
                     message.amount = object.amount | 0;
@@ -1840,13 +1698,22 @@ $root.pesto = (function() {
                     options = {};
                 var object = {};
                 if (options.defaults) {
-                    object.profile = null;
+                    object.accountHolderType = options.enums === String ? "USER" : 0;
+                    object.userAccountHolder = null;
+                    object.claimAccountHolder = null;
+                    object.roomAccountHolder = null;
                     object.amount = 0;
                     object.transactionType = options.enums === String ? "FROM" : 0;
                     object.timestamp = null;
                 }
-                if (message.profile != null && message.hasOwnProperty("profile"))
-                    object.profile = $root.pesto.models.Profile.toObject(message.profile, options);
+                if (message.accountHolderType != null && message.hasOwnProperty("accountHolderType"))
+                    object.accountHolderType = options.enums === String ? $root.pesto.models.AccountHolderType[message.accountHolderType] : message.accountHolderType;
+                if (message.userAccountHolder != null && message.hasOwnProperty("userAccountHolder"))
+                    object.userAccountHolder = $root.pesto.models.Profile.toObject(message.userAccountHolder, options);
+                if (message.claimAccountHolder != null && message.hasOwnProperty("claimAccountHolder"))
+                    object.claimAccountHolder = $root.pesto.models.Claim.toObject(message.claimAccountHolder, options);
+                if (message.roomAccountHolder != null && message.hasOwnProperty("roomAccountHolder"))
+                    object.roomAccountHolder = $root.pesto.models.Room.toObject(message.roomAccountHolder, options);
                 if (message.amount != null && message.hasOwnProperty("amount"))
                     object.amount = message.amount;
                 if (message.transactionType != null && message.hasOwnProperty("transactionType"))
@@ -1882,6 +1749,232 @@ $root.pesto = (function() {
             })();
 
             return Transaction;
+        })();
+
+        models.Profile = (function() {
+
+            /**
+             * Properties of a Profile.
+             * @memberof pesto.models
+             * @interface IProfile
+             * @property {number|null} [uid] Profile uid
+             * @property {string|null} [username] Profile username
+             */
+
+            /**
+             * Constructs a new Profile.
+             * @memberof pesto.models
+             * @classdesc Represents a Profile.
+             * @implements IProfile
+             * @constructor
+             * @param {pesto.models.IProfile=} [properties] Properties to set
+             */
+            function Profile(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Profile uid.
+             * @member {number} uid
+             * @memberof pesto.models.Profile
+             * @instance
+             */
+            Profile.prototype.uid = 0;
+
+            /**
+             * Profile username.
+             * @member {string} username
+             * @memberof pesto.models.Profile
+             * @instance
+             */
+            Profile.prototype.username = "";
+
+            /**
+             * Creates a new Profile instance using the specified properties.
+             * @function create
+             * @memberof pesto.models.Profile
+             * @static
+             * @param {pesto.models.IProfile=} [properties] Properties to set
+             * @returns {pesto.models.Profile} Profile instance
+             */
+            Profile.create = function create(properties) {
+                return new Profile(properties);
+            };
+
+            /**
+             * Encodes the specified Profile message. Does not implicitly {@link pesto.models.Profile.verify|verify} messages.
+             * @function encode
+             * @memberof pesto.models.Profile
+             * @static
+             * @param {pesto.models.IProfile} message Profile message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Profile.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.uid != null && message.hasOwnProperty("uid"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.uid);
+                if (message.username != null && message.hasOwnProperty("username"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.username);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified Profile message, length delimited. Does not implicitly {@link pesto.models.Profile.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof pesto.models.Profile
+             * @static
+             * @param {pesto.models.IProfile} message Profile message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Profile.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a Profile message from the specified reader or buffer.
+             * @function decode
+             * @memberof pesto.models.Profile
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {pesto.models.Profile} Profile
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Profile.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pesto.models.Profile();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.uid = reader.int32();
+                        break;
+                    case 2:
+                        message.username = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a Profile message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof pesto.models.Profile
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {pesto.models.Profile} Profile
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Profile.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a Profile message.
+             * @function verify
+             * @memberof pesto.models.Profile
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Profile.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.uid != null && message.hasOwnProperty("uid"))
+                    if (!$util.isInteger(message.uid))
+                        return "uid: integer expected";
+                if (message.username != null && message.hasOwnProperty("username"))
+                    if (!$util.isString(message.username))
+                        return "username: string expected";
+                return null;
+            };
+
+            /**
+             * Creates a Profile message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof pesto.models.Profile
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {pesto.models.Profile} Profile
+             */
+            Profile.fromObject = function fromObject(object) {
+                if (object instanceof $root.pesto.models.Profile)
+                    return object;
+                var message = new $root.pesto.models.Profile();
+                if (object.uid != null)
+                    message.uid = object.uid | 0;
+                if (object.username != null)
+                    message.username = String(object.username);
+                return message;
+            };
+
+            /**
+             * Creates a plain object from a Profile message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof pesto.models.Profile
+             * @static
+             * @param {pesto.models.Profile} message Profile
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            Profile.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                var object = {};
+                if (options.defaults) {
+                    object.uid = 0;
+                    object.username = "";
+                }
+                if (message.uid != null && message.hasOwnProperty("uid"))
+                    object.uid = message.uid;
+                if (message.username != null && message.hasOwnProperty("username"))
+                    object.username = message.username;
+                return object;
+            };
+
+            /**
+             * Converts this Profile to JSON.
+             * @function toJSON
+             * @memberof pesto.models.Profile
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            Profile.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return Profile;
+        })();
+
+        /**
+         * AccountHolderType enum.
+         * @name pesto.models.AccountHolderType
+         * @enum {string}
+         * @property {number} USER=0 USER value
+         * @property {number} CLAIM=1 CLAIM value
+         * @property {number} ROOM=2 ROOM value
+         */
+        models.AccountHolderType = (function() {
+            var valuesById = {}, values = Object.create(valuesById);
+            values[valuesById[0] = "USER"] = 0;
+            values[valuesById[1] = "CLAIM"] = 1;
+            values[valuesById[2] = "ROOM"] = 2;
+            return values;
         })();
 
         return models;
@@ -2341,6 +2434,216 @@ $root.pesto = (function() {
             };
 
             return RegisterResponse;
+        })();
+
+        user_messages.RegisterDeviceTokenRequest = (function() {
+
+            /**
+             * Properties of a RegisterDeviceTokenRequest.
+             * @memberof pesto.user_messages
+             * @interface IRegisterDeviceTokenRequest
+             * @property {number|null} [userId] RegisterDeviceTokenRequest userId
+             * @property {string|null} [deviceToken] RegisterDeviceTokenRequest deviceToken
+             */
+
+            /**
+             * Constructs a new RegisterDeviceTokenRequest.
+             * @memberof pesto.user_messages
+             * @classdesc Represents a RegisterDeviceTokenRequest.
+             * @implements IRegisterDeviceTokenRequest
+             * @constructor
+             * @param {pesto.user_messages.IRegisterDeviceTokenRequest=} [properties] Properties to set
+             */
+            function RegisterDeviceTokenRequest(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * RegisterDeviceTokenRequest userId.
+             * @member {number} userId
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @instance
+             */
+            RegisterDeviceTokenRequest.prototype.userId = 0;
+
+            /**
+             * RegisterDeviceTokenRequest deviceToken.
+             * @member {string} deviceToken
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @instance
+             */
+            RegisterDeviceTokenRequest.prototype.deviceToken = "";
+
+            /**
+             * Creates a new RegisterDeviceTokenRequest instance using the specified properties.
+             * @function create
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @static
+             * @param {pesto.user_messages.IRegisterDeviceTokenRequest=} [properties] Properties to set
+             * @returns {pesto.user_messages.RegisterDeviceTokenRequest} RegisterDeviceTokenRequest instance
+             */
+            RegisterDeviceTokenRequest.create = function create(properties) {
+                return new RegisterDeviceTokenRequest(properties);
+            };
+
+            /**
+             * Encodes the specified RegisterDeviceTokenRequest message. Does not implicitly {@link pesto.user_messages.RegisterDeviceTokenRequest.verify|verify} messages.
+             * @function encode
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @static
+             * @param {pesto.user_messages.IRegisterDeviceTokenRequest} message RegisterDeviceTokenRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            RegisterDeviceTokenRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.userId != null && message.hasOwnProperty("userId"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.userId);
+                if (message.deviceToken != null && message.hasOwnProperty("deviceToken"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.deviceToken);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified RegisterDeviceTokenRequest message, length delimited. Does not implicitly {@link pesto.user_messages.RegisterDeviceTokenRequest.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @static
+             * @param {pesto.user_messages.IRegisterDeviceTokenRequest} message RegisterDeviceTokenRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            RegisterDeviceTokenRequest.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a RegisterDeviceTokenRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {pesto.user_messages.RegisterDeviceTokenRequest} RegisterDeviceTokenRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            RegisterDeviceTokenRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pesto.user_messages.RegisterDeviceTokenRequest();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.userId = reader.int32();
+                        break;
+                    case 2:
+                        message.deviceToken = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a RegisterDeviceTokenRequest message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {pesto.user_messages.RegisterDeviceTokenRequest} RegisterDeviceTokenRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            RegisterDeviceTokenRequest.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a RegisterDeviceTokenRequest message.
+             * @function verify
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            RegisterDeviceTokenRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.userId != null && message.hasOwnProperty("userId"))
+                    if (!$util.isInteger(message.userId))
+                        return "userId: integer expected";
+                if (message.deviceToken != null && message.hasOwnProperty("deviceToken"))
+                    if (!$util.isString(message.deviceToken))
+                        return "deviceToken: string expected";
+                return null;
+            };
+
+            /**
+             * Creates a RegisterDeviceTokenRequest message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {pesto.user_messages.RegisterDeviceTokenRequest} RegisterDeviceTokenRequest
+             */
+            RegisterDeviceTokenRequest.fromObject = function fromObject(object) {
+                if (object instanceof $root.pesto.user_messages.RegisterDeviceTokenRequest)
+                    return object;
+                var message = new $root.pesto.user_messages.RegisterDeviceTokenRequest();
+                if (object.userId != null)
+                    message.userId = object.userId | 0;
+                if (object.deviceToken != null)
+                    message.deviceToken = String(object.deviceToken);
+                return message;
+            };
+
+            /**
+             * Creates a plain object from a RegisterDeviceTokenRequest message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @static
+             * @param {pesto.user_messages.RegisterDeviceTokenRequest} message RegisterDeviceTokenRequest
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            RegisterDeviceTokenRequest.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                var object = {};
+                if (options.defaults) {
+                    object.userId = 0;
+                    object.deviceToken = "";
+                }
+                if (message.userId != null && message.hasOwnProperty("userId"))
+                    object.userId = message.userId;
+                if (message.deviceToken != null && message.hasOwnProperty("deviceToken"))
+                    object.deviceToken = message.deviceToken;
+                return object;
+            };
+
+            /**
+             * Converts this RegisterDeviceTokenRequest to JSON.
+             * @function toJSON
+             * @memberof pesto.user_messages.RegisterDeviceTokenRequest
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            RegisterDeviceTokenRequest.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return RegisterDeviceTokenRequest;
         })();
 
         user_messages.LoginRequest = (function() {
@@ -3872,24 +4175,24 @@ $root.pesto = (function() {
             return AddContactRequest;
         })();
 
-        user_messages.AddContactResponse = (function() {
+        user_messages.SuccessResponse = (function() {
 
             /**
-             * Properties of an AddContactResponse.
+             * Properties of a SuccessResponse.
              * @memberof pesto.user_messages
-             * @interface IAddContactResponse
-             * @property {boolean|null} [successful] AddContactResponse successful
+             * @interface ISuccessResponse
+             * @property {boolean|null} [successful] SuccessResponse successful
              */
 
             /**
-             * Constructs a new AddContactResponse.
+             * Constructs a new SuccessResponse.
              * @memberof pesto.user_messages
-             * @classdesc Represents an AddContactResponse.
-             * @implements IAddContactResponse
+             * @classdesc Represents a SuccessResponse.
+             * @implements ISuccessResponse
              * @constructor
-             * @param {pesto.user_messages.IAddContactResponse=} [properties] Properties to set
+             * @param {pesto.user_messages.ISuccessResponse=} [properties] Properties to set
              */
-            function AddContactResponse(properties) {
+            function SuccessResponse(properties) {
                 if (properties)
                     for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
@@ -3897,35 +4200,35 @@ $root.pesto = (function() {
             }
 
             /**
-             * AddContactResponse successful.
+             * SuccessResponse successful.
              * @member {boolean} successful
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @instance
              */
-            AddContactResponse.prototype.successful = false;
+            SuccessResponse.prototype.successful = false;
 
             /**
-             * Creates a new AddContactResponse instance using the specified properties.
+             * Creates a new SuccessResponse instance using the specified properties.
              * @function create
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @static
-             * @param {pesto.user_messages.IAddContactResponse=} [properties] Properties to set
-             * @returns {pesto.user_messages.AddContactResponse} AddContactResponse instance
+             * @param {pesto.user_messages.ISuccessResponse=} [properties] Properties to set
+             * @returns {pesto.user_messages.SuccessResponse} SuccessResponse instance
              */
-            AddContactResponse.create = function create(properties) {
-                return new AddContactResponse(properties);
+            SuccessResponse.create = function create(properties) {
+                return new SuccessResponse(properties);
             };
 
             /**
-             * Encodes the specified AddContactResponse message. Does not implicitly {@link pesto.user_messages.AddContactResponse.verify|verify} messages.
+             * Encodes the specified SuccessResponse message. Does not implicitly {@link pesto.user_messages.SuccessResponse.verify|verify} messages.
              * @function encode
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @static
-             * @param {pesto.user_messages.IAddContactResponse} message AddContactResponse message or plain object to encode
+             * @param {pesto.user_messages.ISuccessResponse} message SuccessResponse message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
-            AddContactResponse.encode = function encode(message, writer) {
+            SuccessResponse.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
                 if (message.successful != null && message.hasOwnProperty("successful"))
@@ -3934,33 +4237,33 @@ $root.pesto = (function() {
             };
 
             /**
-             * Encodes the specified AddContactResponse message, length delimited. Does not implicitly {@link pesto.user_messages.AddContactResponse.verify|verify} messages.
+             * Encodes the specified SuccessResponse message, length delimited. Does not implicitly {@link pesto.user_messages.SuccessResponse.verify|verify} messages.
              * @function encodeDelimited
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @static
-             * @param {pesto.user_messages.IAddContactResponse} message AddContactResponse message or plain object to encode
+             * @param {pesto.user_messages.ISuccessResponse} message SuccessResponse message or plain object to encode
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
-            AddContactResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            SuccessResponse.encodeDelimited = function encodeDelimited(message, writer) {
                 return this.encode(message, writer).ldelim();
             };
 
             /**
-             * Decodes an AddContactResponse message from the specified reader or buffer.
+             * Decodes a SuccessResponse message from the specified reader or buffer.
              * @function decode
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
              * @param {number} [length] Message length if known beforehand
-             * @returns {pesto.user_messages.AddContactResponse} AddContactResponse
+             * @returns {pesto.user_messages.SuccessResponse} SuccessResponse
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            AddContactResponse.decode = function decode(reader, length) {
+            SuccessResponse.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pesto.user_messages.AddContactResponse();
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pesto.user_messages.SuccessResponse();
                 while (reader.pos < end) {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
@@ -3976,30 +4279,30 @@ $root.pesto = (function() {
             };
 
             /**
-             * Decodes an AddContactResponse message from the specified reader or buffer, length delimited.
+             * Decodes a SuccessResponse message from the specified reader or buffer, length delimited.
              * @function decodeDelimited
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @static
              * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {pesto.user_messages.AddContactResponse} AddContactResponse
+             * @returns {pesto.user_messages.SuccessResponse} SuccessResponse
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            AddContactResponse.decodeDelimited = function decodeDelimited(reader) {
+            SuccessResponse.decodeDelimited = function decodeDelimited(reader) {
                 if (!(reader instanceof $Reader))
                     reader = new $Reader(reader);
                 return this.decode(reader, reader.uint32());
             };
 
             /**
-             * Verifies an AddContactResponse message.
+             * Verifies a SuccessResponse message.
              * @function verify
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @static
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            AddContactResponse.verify = function verify(message) {
+            SuccessResponse.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
                 if (message.successful != null && message.hasOwnProperty("successful"))
@@ -4009,32 +4312,32 @@ $root.pesto = (function() {
             };
 
             /**
-             * Creates an AddContactResponse message from a plain object. Also converts values to their respective internal types.
+             * Creates a SuccessResponse message from a plain object. Also converts values to their respective internal types.
              * @function fromObject
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @static
              * @param {Object.<string,*>} object Plain object
-             * @returns {pesto.user_messages.AddContactResponse} AddContactResponse
+             * @returns {pesto.user_messages.SuccessResponse} SuccessResponse
              */
-            AddContactResponse.fromObject = function fromObject(object) {
-                if (object instanceof $root.pesto.user_messages.AddContactResponse)
+            SuccessResponse.fromObject = function fromObject(object) {
+                if (object instanceof $root.pesto.user_messages.SuccessResponse)
                     return object;
-                var message = new $root.pesto.user_messages.AddContactResponse();
+                var message = new $root.pesto.user_messages.SuccessResponse();
                 if (object.successful != null)
                     message.successful = Boolean(object.successful);
                 return message;
             };
 
             /**
-             * Creates a plain object from an AddContactResponse message. Also converts values to other types if specified.
+             * Creates a plain object from a SuccessResponse message. Also converts values to other types if specified.
              * @function toObject
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @static
-             * @param {pesto.user_messages.AddContactResponse} message AddContactResponse
+             * @param {pesto.user_messages.SuccessResponse} message SuccessResponse
              * @param {$protobuf.IConversionOptions} [options] Conversion options
              * @returns {Object.<string,*>} Plain object
              */
-            AddContactResponse.toObject = function toObject(message, options) {
+            SuccessResponse.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
                 var object = {};
@@ -4046,17 +4349,17 @@ $root.pesto = (function() {
             };
 
             /**
-             * Converts this AddContactResponse to JSON.
+             * Converts this SuccessResponse to JSON.
              * @function toJSON
-             * @memberof pesto.user_messages.AddContactResponse
+             * @memberof pesto.user_messages.SuccessResponse
              * @instance
              * @returns {Object.<string,*>} JSON object
              */
-            AddContactResponse.prototype.toJSON = function toJSON() {
+            SuccessResponse.prototype.toJSON = function toJSON() {
                 return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
             };
 
-            return AddContactResponse;
+            return SuccessResponse;
         })();
 
         user_messages.GetContactsResponse = (function() {
@@ -4473,6 +4776,193 @@ $root.pesto = (function() {
             };
 
             return GetTransactionsResponse;
+        })();
+
+        user_messages.CheckPasscodeRequest = (function() {
+
+            /**
+             * Properties of a CheckPasscodeRequest.
+             * @memberof pesto.user_messages
+             * @interface ICheckPasscodeRequest
+             * @property {string|null} [passcode] CheckPasscodeRequest passcode
+             */
+
+            /**
+             * Constructs a new CheckPasscodeRequest.
+             * @memberof pesto.user_messages
+             * @classdesc Represents a CheckPasscodeRequest.
+             * @implements ICheckPasscodeRequest
+             * @constructor
+             * @param {pesto.user_messages.ICheckPasscodeRequest=} [properties] Properties to set
+             */
+            function CheckPasscodeRequest(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * CheckPasscodeRequest passcode.
+             * @member {string} passcode
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @instance
+             */
+            CheckPasscodeRequest.prototype.passcode = "";
+
+            /**
+             * Creates a new CheckPasscodeRequest instance using the specified properties.
+             * @function create
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @static
+             * @param {pesto.user_messages.ICheckPasscodeRequest=} [properties] Properties to set
+             * @returns {pesto.user_messages.CheckPasscodeRequest} CheckPasscodeRequest instance
+             */
+            CheckPasscodeRequest.create = function create(properties) {
+                return new CheckPasscodeRequest(properties);
+            };
+
+            /**
+             * Encodes the specified CheckPasscodeRequest message. Does not implicitly {@link pesto.user_messages.CheckPasscodeRequest.verify|verify} messages.
+             * @function encode
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @static
+             * @param {pesto.user_messages.ICheckPasscodeRequest} message CheckPasscodeRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            CheckPasscodeRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.passcode != null && message.hasOwnProperty("passcode"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.passcode);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified CheckPasscodeRequest message, length delimited. Does not implicitly {@link pesto.user_messages.CheckPasscodeRequest.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @static
+             * @param {pesto.user_messages.ICheckPasscodeRequest} message CheckPasscodeRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            CheckPasscodeRequest.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a CheckPasscodeRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {pesto.user_messages.CheckPasscodeRequest} CheckPasscodeRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            CheckPasscodeRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pesto.user_messages.CheckPasscodeRequest();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.passcode = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a CheckPasscodeRequest message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {pesto.user_messages.CheckPasscodeRequest} CheckPasscodeRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            CheckPasscodeRequest.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a CheckPasscodeRequest message.
+             * @function verify
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            CheckPasscodeRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.passcode != null && message.hasOwnProperty("passcode"))
+                    if (!$util.isString(message.passcode))
+                        return "passcode: string expected";
+                return null;
+            };
+
+            /**
+             * Creates a CheckPasscodeRequest message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {pesto.user_messages.CheckPasscodeRequest} CheckPasscodeRequest
+             */
+            CheckPasscodeRequest.fromObject = function fromObject(object) {
+                if (object instanceof $root.pesto.user_messages.CheckPasscodeRequest)
+                    return object;
+                var message = new $root.pesto.user_messages.CheckPasscodeRequest();
+                if (object.passcode != null)
+                    message.passcode = String(object.passcode);
+                return message;
+            };
+
+            /**
+             * Creates a plain object from a CheckPasscodeRequest message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @static
+             * @param {pesto.user_messages.CheckPasscodeRequest} message CheckPasscodeRequest
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            CheckPasscodeRequest.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                var object = {};
+                if (options.defaults)
+                    object.passcode = "";
+                if (message.passcode != null && message.hasOwnProperty("passcode"))
+                    object.passcode = message.passcode;
+                return object;
+            };
+
+            /**
+             * Converts this CheckPasscodeRequest to JSON.
+             * @function toJSON
+             * @memberof pesto.user_messages.CheckPasscodeRequest
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            CheckPasscodeRequest.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return CheckPasscodeRequest;
         })();
 
         user_messages.CreateClaimRequest = (function() {
@@ -5917,6 +6407,166 @@ $root.pesto = (function() {
             };
 
             return RevokeClaimResponse;
+        })();
+
+        user_messages.NoResponse = (function() {
+
+            /**
+             * Properties of a NoResponse.
+             * @memberof pesto.user_messages
+             * @interface INoResponse
+             */
+
+            /**
+             * Constructs a new NoResponse.
+             * @memberof pesto.user_messages
+             * @classdesc Represents a NoResponse.
+             * @implements INoResponse
+             * @constructor
+             * @param {pesto.user_messages.INoResponse=} [properties] Properties to set
+             */
+            function NoResponse(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new NoResponse instance using the specified properties.
+             * @function create
+             * @memberof pesto.user_messages.NoResponse
+             * @static
+             * @param {pesto.user_messages.INoResponse=} [properties] Properties to set
+             * @returns {pesto.user_messages.NoResponse} NoResponse instance
+             */
+            NoResponse.create = function create(properties) {
+                return new NoResponse(properties);
+            };
+
+            /**
+             * Encodes the specified NoResponse message. Does not implicitly {@link pesto.user_messages.NoResponse.verify|verify} messages.
+             * @function encode
+             * @memberof pesto.user_messages.NoResponse
+             * @static
+             * @param {pesto.user_messages.INoResponse} message NoResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NoResponse.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Encodes the specified NoResponse message, length delimited. Does not implicitly {@link pesto.user_messages.NoResponse.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof pesto.user_messages.NoResponse
+             * @static
+             * @param {pesto.user_messages.INoResponse} message NoResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NoResponse.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a NoResponse message from the specified reader or buffer.
+             * @function decode
+             * @memberof pesto.user_messages.NoResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {pesto.user_messages.NoResponse} NoResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NoResponse.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pesto.user_messages.NoResponse();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a NoResponse message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof pesto.user_messages.NoResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {pesto.user_messages.NoResponse} NoResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NoResponse.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a NoResponse message.
+             * @function verify
+             * @memberof pesto.user_messages.NoResponse
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NoResponse.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            /**
+             * Creates a NoResponse message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof pesto.user_messages.NoResponse
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {pesto.user_messages.NoResponse} NoResponse
+             */
+            NoResponse.fromObject = function fromObject(object) {
+                if (object instanceof $root.pesto.user_messages.NoResponse)
+                    return object;
+                return new $root.pesto.user_messages.NoResponse();
+            };
+
+            /**
+             * Creates a plain object from a NoResponse message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof pesto.user_messages.NoResponse
+             * @static
+             * @param {pesto.user_messages.NoResponse} message NoResponse
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            NoResponse.toObject = function toObject() {
+                return {};
+            };
+
+            /**
+             * Converts this NoResponse to JSON.
+             * @function toJSON
+             * @memberof pesto.user_messages.NoResponse
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            NoResponse.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            return NoResponse;
         })();
 
         return user_messages;

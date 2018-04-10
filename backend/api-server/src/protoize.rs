@@ -26,6 +26,19 @@ pub fn claim(
     proto_claim
 }
 
+pub fn get_claim_status(claim: &models::Claim) -> protos::models::ClaimStatus {
+    use protos::models::ClaimStatus;
+    if let Some(receiver_id) = claim.receiver_id {
+        if claim.owner_id == receiver_id {
+            return ClaimStatus::REVOKED;
+        } else {
+            return ClaimStatus::CLAIMED;
+        }
+    } else {
+        return ClaimStatus::UNCLAIMED;
+    }
+}
+
 pub fn contact(contact: models::Contact, username: String) -> protos::models::Contact {
     let mut proto_contact = protos::models::Contact::new();
     let mut profile = protos::models::Profile::new();

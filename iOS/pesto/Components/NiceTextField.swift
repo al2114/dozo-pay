@@ -28,7 +28,7 @@ class NiceTextField: UIView {
     super.init(frame: .zero)
 
     textField.textColor = textColor
-    textField.font = UIFont.regular.withSize(fontSize)
+    textField.font = UIFont.light.withSize(fontSize)
     textField.translatesAutoresizingMaskIntoConstraints = false
     addSubview(textField)
     NSLayoutConstraint.activate([
@@ -49,7 +49,7 @@ class NiceTextField: UIView {
       ])
 
     placeholderLabel.textColor = normalColor
-    placeholderLabel.font = UIFont.regular.withSize(fontSize)
+    placeholderLabel.font = UIFont.light.withSize(fontSize)
     placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
     addSubview(placeholderLabel)
     NSLayoutConstraint.activate([

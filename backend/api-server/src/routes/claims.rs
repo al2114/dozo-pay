@@ -28,6 +28,7 @@ fn claim_info_route(claim_id: i32, pool: State<PgPool>) -> ProtoResult<ClaimInfo
         .chain_err(|| "Error finding claim")?;
 
     let mut response = ClaimInfoResponse::new();
+    response.set_status(protoize::get_claim_status(&claim));
     response.set_claim(protoize::claim(claim, owner, None));
     Ok(Proto(response))
 }

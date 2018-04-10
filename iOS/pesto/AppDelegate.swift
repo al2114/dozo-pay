@@ -25,8 +25,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
 //    let passcodeVC = PasscodeVC()
 //    Util.switchTo(viewController: passcodeVC, window: window)
-    let loginVC = LoginVC()
-    Util.switchTo(viewController: loginVC, window: window)
+    let initVC = LoginVC()
+    Util.switchTo(viewController: initVC, window: window)
+
     window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()
 

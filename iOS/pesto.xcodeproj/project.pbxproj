@@ -46,7 +46,7 @@
 		CB450895205D826600129603 /* TopupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB450894205D826600129603 /* TopupVC.swift */; };
 		CB45F10E2069774400351E8D /* TransactionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB45F10D2069774400351E8D /* TransactionCell.swift */; };
 		CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB49D95520472B6E00A33C4A /* Preferences.swift */; };
-		CBCCE3DD2079AC6000CFF670 /* ClaimVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBCCE3DC2079AC6000CFF670 /* ClaimVC.swift */; };
+		CB96BC67207CB02B00BB2F8D /* ClaimDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB96BC66207CB02B00BB2F8D /* ClaimDialog.swift */; };
 		CBD9EE01205CBBFF0080427E /* InclusiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD9EE00205CBBFF0080427E /* InclusiveView.swift */; };
 		CBD9EE03205CF3100080427E /* ProtectedTextfield.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */; };
 		CBE78F46202A8A8F00AE1EA5 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */; };
@@ -100,7 +100,7 @@
 		CB450894205D826600129603 /* TopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopupVC.swift; sourceTree = "<group>"; };
 		CB45F10D2069774400351E8D /* TransactionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCell.swift; sourceTree = "<group>"; };
 		CB49D95520472B6E00A33C4A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
-		CBCCE3DC2079AC6000CFF670 /* ClaimVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimVC.swift; sourceTree = "<group>"; };
+		CB96BC66207CB02B00BB2F8D /* ClaimDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimDialog.swift; sourceTree = "<group>"; };
 		CBD9EE00205CBBFF0080427E /* InclusiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InclusiveView.swift; sourceTree = "<group>"; };
 		CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedTextfield.swift; sourceTree = "<group>"; };
 		CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -207,6 +207,7 @@
 				CBD9EE00205CBBFF0080427E /* InclusiveView.swift */,
 				CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */,
 				CB45F10D2069774400351E8D /* TransactionCell.swift */,
+				CB96BC66207CB02B00BB2F8D /* ClaimDialog.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -228,7 +229,6 @@
 				2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */,
 				2B525C602073641500BE296C /* PasscodeVC.swift */,
 				2BCAAFA820760AF200945315 /* ClaimsVC.swift */,
-				CBCCE3DC2079AC6000CFF670 /* ClaimVC.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -347,10 +347,12 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/CustomIOSAlertView/CustomIOSAlertView.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftProtobuf/SwiftProtobuf.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CustomIOSAlertView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftProtobuf.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -387,7 +389,6 @@
 				CB046909204349C100DF284F /* CircleButton.swift in Sources */,
 				2B4777B1202A32040077415A /* CameraVC.swift in Sources */,
 				2B525C5E206D646600BE296C /* Notifications.swift in Sources */,
-				CBCCE3DD2079AC6000CFF670 /* ClaimVC.swift in Sources */,
 				2B4CE3BD2034FDCC006408DC /* User.swift in Sources */,
 				2B4CE3B32033ACFC006408DC /* API.swift in Sources */,
 				CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */,
@@ -417,6 +418,7 @@
 				2B6250ED2055D2B80054D0C5 /* user_messages.pb.swift in Sources */,
 				2B4CE3B52034F907006408DC /* models.pb.swift in Sources */,
 				2B7FD7FC203CE9F40076EB74 /* LoginVC.swift in Sources */,
+				CB96BC67207CB02B00BB2F8D /* ClaimDialog.swift in Sources */,
 				2B7FD7FE203CEA090076EB74 /* RegisterNumberVC.swift in Sources */,
 				2B84DFDE204AFFF200691EAA /* RoomVC.swift in Sources */,
 				2BCAAFA920760AF200945315 /* ClaimsVC.swift in Sources */,

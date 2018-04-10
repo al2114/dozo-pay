@@ -11,6 +11,12 @@ message User {
   int32 balance = 5;
 }
 
+enum ClaimStatus {
+  UNCLAIMED = 0;
+  CLAIMED = 1;
+  REVOKED = 2;
+}
+
 message Claim {
   int32 uid = 1;
   int32 amount = 2;

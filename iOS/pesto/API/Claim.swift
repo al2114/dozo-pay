@@ -6,8 +6,6 @@
 //  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
 //
 
-typealias Claim = Pesto_Models_Claim
-
 typealias AcceptClaimRequest = Pesto_UserMessages_AcceptClaimRequest
 typealias AcceptClaimResponse = Pesto_UserMessages_AcceptClaimResponse
 typealias CreateClaimRequest = Pesto_UserMessages_CreateClaimRequest
@@ -18,18 +16,16 @@ typealias ClaimInfoResponse = Pesto_UserMessages_ClaimInfoResponse
 
 extension API {
 
-  static func getClaim(withID claimID: Id, completion: @escaping (Claim) -> Void) {
-    let route = "claims/info/\(claimID)"
+  static func getClaim(withId claimId: Id, completion: @escaping (Claim,ClaimStatus) -> Void) {
+    let route = "claims/info/\(claimId)"
     Util.get(toRoute: route) { (result: Result<ClaimInfoResponse>?) in
       if case let .ok(ClaimInfoResponse)? = result {
-        completion(ClaimInfoResponse.claim)
-      } else {
-        completion([])
+        completion(ClaimInfoResponse.claim,ClaimInfoResponse.status)
       }
     }
   }
 
-  static func acceptClaim(withID claimID: Id, completion: (() -> Void)?) {
+  static func acceptClaim(withID claimID: Id, completion: ((Bool) -> Void)?) {
     User.getMe { me in
       var acceptClaimRequest = AcceptClaimRequest()
       acceptClaimRequest.claimID = claimID
@@ -42,7 +38,9 @@ extension API {
           var me = me
           me.balance += acceptClaimResponse.claim.amount
           User.updateMe(withUser: me)
-          completion?()
+          completion?(acceptClaimResponse.successful)
+        } else {
+          completion?(false)
         }
       }
     }

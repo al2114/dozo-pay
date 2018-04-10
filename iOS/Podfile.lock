@@ -1,12 +1,15 @@
 PODS:
+  - CustomIOSAlertView (0.9.5)
   - SwiftProtobuf (1.0.3)
 
 DEPENDENCIES:
+  - CustomIOSAlertView (~> 0.9.5)
   - SwiftProtobuf (~> 1.0.2)
 
 SPEC CHECKSUMS:
+  CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
   SwiftProtobuf: 5ccc0e4054e37c75800e5744acb2aa80bb72b39c
 
-PODFILE CHECKSUM: 8542cdc5e2a64a370f53d0b852fb61f41a77f1fb
+PODFILE CHECKSUM: 6745fa3c74750a914d64dc605b6b2b67624b9673
 
 COCOAPODS: 1.4.0

@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import CustomIOSAlertView
 
-class HomeVC: UIViewController {
+class HomeVC: UIViewController, CustomIOSAlertViewDelegate {
   var balanceView: UIView!
   var imageContainer: UIView!
   var sendButton: UIButton!
@@ -249,6 +250,43 @@ class HomeVC: UIViewController {
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(true)
     navigationController?.setNavigationBarHidden(false, animated: true)
+  }
+
+
+  func customIOS7dialogButtonTouchUp(inside alertView: Any!, clickedButtonAt buttonIndex: Int) {
+    if (alertView as! CustomIOSAlertView).tag == 0 {
+      switch buttonIndex {
+      case 0:
+        (alertView as! CustomIOSAlertView).close()
+      case 1:
+        let claim = (alertView as! ClaimDialog).claim
+        API.acceptClaim(withID: (claim?.uid)!) { success in
+          if(success) {
+            let confirmationVC = ConfirmationVC()
+            confirmationVC.willDismiss = {
+              self.navigationController?.popToRootViewController(animated: true)
+              //      self.dismiss(animated: true, completion: nil)
+            }
+            confirmationVC.descriptionText = "Successful"
+            confirmationVC.amount = Double((claim?.amount)!)/100.0
+            confirmationVC.infoText = "transfered into your account"
+            (alertView as! CustomIOSAlertView).close()
+            self.present(confirmationVC, animated: true)
+          }
+        }
+      default:
+        break
+      }
+    }
+  }
+
+  func showClaimDialog(forId claimId: Id) {
+    API.getClaim(withId: claimId){ claim, status in
+      let claimDialog = ClaimDialog(withClaim: claim, withStatus: status)
+      claimDialog.tag = 0
+      claimDialog.delegate = self
+      claimDialog.show()
+    }
   }
 
   @objc func topup() {

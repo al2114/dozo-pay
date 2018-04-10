@@ -39,7 +39,6 @@
 		2B84DFDE204AFFF200691EAA /* RoomVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B84DFDD204AFFF200691EAA /* RoomVC.swift */; };
 		2B90927B203E349400077DC1 /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B90927A203E349400077DC1 /* Design.swift */; };
 		2B90929E203E50E400077DC1 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B90929D203E50E400077DC1 /* Configuration.swift */; };
-		2BCAAFA920760AF200945315 /* ClaimsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BCAAFA820760AF200945315 /* ClaimsVC.swift */; };
 		2BCBE3CF2041E87200AA7D30 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BCBE3CE2041E87200AA7D30 /* Security.framework */; };
 		3787C5763444638857844FD6 /* Pods_Pesto_Pay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */; };
 		CB046909204349C100DF284F /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB046908204349C100DF284F /* CircleButton.swift */; };
@@ -92,7 +91,6 @@
 		2B84DFDD204AFFF200691EAA /* RoomVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomVC.swift; sourceTree = "<group>"; };
 		2B90927A203E349400077DC1 /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
 		2B90929D203E50E400077DC1 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
-		2BCAAFA820760AF200945315 /* ClaimsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimsVC.swift; sourceTree = "<group>"; };
 		2BCBE3CE2041E87200AA7D30 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		39B21EBB56EB792421D7B33A /* Pods-Pesto Pay.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pesto Pay.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay.release.xcconfig"; sourceTree = "<group>"; };
 		B12B30A09783C312507EE4E2 /* Pods_Pesto_Pay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pesto_Pay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,6 +99,7 @@
 		CB45F10D2069774400351E8D /* TransactionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCell.swift; sourceTree = "<group>"; };
 		CB49D95520472B6E00A33C4A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		CB96BC66207CB02B00BB2F8D /* ClaimDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimDialog.swift; sourceTree = "<group>"; };
+		CBCCE3DC2079AC6000CFF670 /* ClaimVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimVC.swift; sourceTree = "<group>"; };
 		CBD9EE00205CBBFF0080427E /* InclusiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InclusiveView.swift; sourceTree = "<group>"; };
 		CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedTextfield.swift; sourceTree = "<group>"; };
 		CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -228,7 +227,7 @@
 				2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */,
 				2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */,
 				2B525C602073641500BE296C /* PasscodeVC.swift */,
-				2BCAAFA820760AF200945315 /* ClaimsVC.swift */,
+				CBCCE3DC2079AC6000CFF670 /* ClaimVC.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -421,7 +420,6 @@
 				CB96BC67207CB02B00BB2F8D /* ClaimDialog.swift in Sources */,
 				2B7FD7FE203CEA090076EB74 /* RegisterNumberVC.swift in Sources */,
 				2B84DFDE204AFFF200691EAA /* RoomVC.swift in Sources */,
-				2BCAAFA920760AF200945315 /* ClaimsVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,14 +6,29 @@
 //  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
 //
 
+typealias Claim = Pesto_Models_Claim
+
 typealias AcceptClaimRequest = Pesto_UserMessages_AcceptClaimRequest
 typealias AcceptClaimResponse = Pesto_UserMessages_AcceptClaimResponse
 typealias CreateClaimRequest = Pesto_UserMessages_CreateClaimRequest
 typealias CreateClaimResponse = Pesto_UserMessages_CreateClaimResponse
 typealias RevokeClaimRequest = Pesto_UserMessages_RevokeClaimRequest
 typealias RevokeClaimResponse = Pesto_UserMessages_RevokeClaimResponse
+typealias ClaimInfoResponse = Pesto_UserMessages_ClaimInfoResponse
 
 extension API {
+
+  static func getClaim(withID claimID: Id, completion: @escaping (Claim) -> Void) {
+    let route = "claims/info/\(claimID)"
+    Util.get(toRoute: route) { (result: Result<ClaimInfoResponse>?) in
+      if case let .ok(ClaimInfoResponse)? = result {
+        completion(ClaimInfoResponse.claim)
+      } else {
+        completion([])
+      }
+    }
+  }
+
   static func acceptClaim(withID claimID: Id, completion: (() -> Void)?) {
     User.getMe { me in
       var acceptClaimRequest = AcceptClaimRequest()

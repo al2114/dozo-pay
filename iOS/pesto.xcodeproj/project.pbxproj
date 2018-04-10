@@ -99,7 +99,6 @@
 		CB45F10D2069774400351E8D /* TransactionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCell.swift; sourceTree = "<group>"; };
 		CB49D95520472B6E00A33C4A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		CB96BC66207CB02B00BB2F8D /* ClaimDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimDialog.swift; sourceTree = "<group>"; };
-		CBCCE3DC2079AC6000CFF670 /* ClaimVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimVC.swift; sourceTree = "<group>"; };
 		CBD9EE00205CBBFF0080427E /* InclusiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InclusiveView.swift; sourceTree = "<group>"; };
 		CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedTextfield.swift; sourceTree = "<group>"; };
 		CBE78F45202A8A8F00AE1EA5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -227,7 +226,6 @@
 				2B7FD7FF203CEA180076EB74 /* VerifyNumberVC.swift */,
 				2B7FD803203CEA5D0076EB74 /* RegisterPasswordVC.swift */,
 				2B525C602073641500BE296C /* PasscodeVC.swift */,
-				CBCCE3DC2079AC6000CFF670 /* ClaimVC.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";

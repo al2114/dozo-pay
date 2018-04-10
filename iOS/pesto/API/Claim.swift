@@ -6,8 +6,6 @@
 //  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
 //
 
-typealias Claim = Pesto_Models_Claim
-
 typealias AcceptClaimRequest = Pesto_UserMessages_AcceptClaimRequest
 typealias AcceptClaimResponse = Pesto_UserMessages_AcceptClaimResponse
 typealias CreateClaimRequest = Pesto_UserMessages_CreateClaimRequest

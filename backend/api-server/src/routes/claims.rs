@@ -5,10 +5,32 @@ use models;
 use pg_pool::{PgPool, PgPooledConnection};
 use protoize;
 use protos;
-use protos::user_messages::{AcceptClaimRequest, AcceptClaimResponse, CreateClaimRequest,
-                            CreateClaimResponse, RevokeClaimRequest};
+use protos::user_messages::{AcceptClaimRequest, AcceptClaimResponse, ClaimInfoResponse,
+                            CreateClaimRequest, CreateClaimResponse, RevokeClaimRequest};
 use rocket::State;
 use serde_rocket_protobuf::{Proto, ProtoResult};
+
+#[get("/claims/info/<claim_id>")]
+fn claim_info_route(claim_id: i32, pool: State<PgPool>) -> ProtoResult<ClaimInfoResponse> {
+    let db_connection = pool.get()
+        .chain_err(|| "failed to obtain database connection")?;
+
+    use models::Claim;
+    use models::User;
+    use schema::claims;
+    use schema::claims::dsl::claims as claims_sql;
+    use schema::users;
+
+    let (claim, owner) = claims_sql
+        .find(claim_id)
+        .inner_join(users::table.on(users::uid.eq(claims::owner_id)))
+        .first::<(Claim, User)>(&db_connection)
+        .chain_err(|| "Error finding claim")?;
+
+    let mut response = ClaimInfoResponse::new();
+    response.set_claim(protoize::claim(claim, owner, None));
+    Ok(Proto(response))
+}
 
 #[post("/claims/create", data = "<request>")]
 fn create_claim_route(

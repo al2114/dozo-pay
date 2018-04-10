@@ -19,6 +19,7 @@ pub fn all_routes() -> Vec<Route> {
         transactions::topup_route,
         transactions::transaction_route,
         transactions::get_transactions_route,
+        claims::claim_info_route,
         claims::accept_claim_route,
         claims::create_claim_route,
         claims::revoke_claim_route,

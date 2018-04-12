@@ -21,7 +21,6 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
   var amountField: AmountField!
   var separatorView: UIView!
   var sendButton: UIButton!
-  var shareButton: UIButton!
   var payee: User? = nil
 
   override func viewDidLoad() {
@@ -53,7 +52,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     view.addSubview(amountField)
     NSLayoutConstraint.activate([
       amountField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      amountField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+      amountField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
       amountField.centerYAnchor.constraint(equalTo: view.centerYAnchor)
       ])
 
@@ -93,25 +92,24 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
     sendButton.addTarget(self, action: #selector(send), for: .touchUpInside)
     view.addSubview(sendButton)
     NSLayoutConstraint.activate([
-      sendButton.leftAnchor.constraint(equalTo: view.centerXAnchor, constant: 40),
-      sendButton.topAnchor.constraint(equalTo: amountField.bottomAnchor, constant: 100),
+      sendButton.leftAnchor.constraint(equalTo: amountField.rightAnchor),
+      sendButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
       sendButton.widthAnchor.constraint(equalToConstant: 36),
       sendButton.heightAnchor.constraint(equalTo: sendButton.widthAnchor),
       ])
 
-    shareButton = UIButton(type: .system)
-    shareButton.translatesAutoresizingMaskIntoConstraints = false
-    shareButton.isEnabled = false
-    shareButton.tintColor = .white
-    shareButton.setImage(#imageLiteral(resourceName: "circleShare").withRenderingMode(.alwaysTemplate), for: .normal)
-    shareButton.addTarget(self, action: #selector(share), for: .touchUpInside)
-    view.addSubview(shareButton)
-    NSLayoutConstraint.activate([
-      shareButton.rightAnchor.constraint(equalTo: view.centerXAnchor, constant: -40),
-      shareButton.topAnchor.constraint(equalTo: amountField.bottomAnchor, constant: 100),
-      shareButton.widthAnchor.constraint(equalToConstant: 36),
-      shareButton.heightAnchor.constraint(equalTo: sendButton.widthAnchor),
-      ])
+    if payee == nil {
+      let shareButton = UIButton()
+      shareButton.setImage(#imageLiteral(resourceName: "shareIcon").withRenderingMode(.alwaysTemplate), for: .normal)
+      shareButton.addTarget(self, action: #selector(share), for: .touchUpInside)
+      let shareBarItem = UIBarButtonItem(customView: shareButton)
+      let width = shareBarItem.customView?.widthAnchor.constraint(equalToConstant: 24)
+      width?.isActive = true
+      let height = shareBarItem.customView?.heightAnchor.constraint(equalToConstant: 24)
+      height?.isActive = true
+      self.navigationItem.rightBarButtonItem = shareBarItem
+      self.navigationItem.rightBarButtonItem?.isEnabled = false
+    }
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -197,7 +195,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(0, 1))
       }
       sendButton.isEnabled = amount != 0
-      shareButton.isEnabled = amount != 0
+      self.navigationItem.rightBarButtonItem?.isEnabled = amount != 0
       if(amount == 0) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(1,(result.count)-1))
       }

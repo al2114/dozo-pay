@@ -30,6 +30,17 @@ class RegisterNumberVC: UIViewController {
       phoneField.centerYAnchor.constraint(equalTo: view.centerYAnchor)
       ])
 
+    let titleLabel = UILabel()
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.text = "enter phone number"
+    titleLabel.textColor = .primaryTitle
+    titleLabel.font = UIFont.light.withSize(28)
+    view.addSubview(titleLabel)
+    NSLayoutConstraint.activate([
+      titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -80)
+      ])
+
     nextButton = UIButton(type: .system)
     nextButton.translatesAutoresizingMaskIntoConstraints = false
     nextButton.titleLabel?.font = UIFont.regular.withSize(20)

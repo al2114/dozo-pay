@@ -106,4 +106,9 @@ message RevokeClaimResponse {
   models.Claim claim = 2;
 }
 
+message ClaimInfoResponse {
+  models.Claim claim = 1;
+  models.ClaimStatus status = 2;
+}
+
 message NoResponse {}

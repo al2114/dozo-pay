@@ -9,6 +9,7 @@
 typealias User = Pesto_Models_User
 typealias Room = Pesto_Models_Room
 typealias Claim = Pesto_Models_Claim
+typealias ClaimStatus = Pesto_Models_ClaimStatus
 typealias RoomItem = Pesto_Models_RoomItem
 typealias Contact = Pesto_Models_Contact
 typealias Profile = Pesto_Models_Profile

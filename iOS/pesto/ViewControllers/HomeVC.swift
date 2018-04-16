@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import CustomIOSAlertView
 
-class HomeVC: UIViewController {
+class HomeVC: UIViewController, CustomIOSAlertViewDelegate {
   var balanceView: UIView!
   var imageContainer: UIView!
   var sendButton: UIButton!
@@ -251,6 +252,43 @@ class HomeVC: UIViewController {
     navigationController?.setNavigationBarHidden(false, animated: true)
   }
 
+
+  func customIOS7dialogButtonTouchUp(inside alertView: Any!, clickedButtonAt buttonIndex: Int) {
+    if (alertView as! CustomIOSAlertView).tag == 0 {
+      switch buttonIndex {
+      case 0:
+        (alertView as! CustomIOSAlertView).close()
+      case 1:
+        let claim = (alertView as! ClaimDialog).claim
+        API.acceptClaim(withID: (claim?.uid)!) { success in
+          if(success) {
+            let confirmationVC = ConfirmationVC()
+            confirmationVC.willDismiss = {
+              self.navigationController?.popToRootViewController(animated: true)
+              //      self.dismiss(animated: true, completion: nil)
+            }
+            confirmationVC.descriptionText = "Successful"
+            confirmationVC.amount = Double((claim?.amount)!)/100.0
+            confirmationVC.infoText = "transfered into your account"
+            (alertView as! CustomIOSAlertView).close()
+            self.present(confirmationVC, animated: true)
+          }
+        }
+      default:
+        break
+      }
+    }
+  }
+
+  func showClaimDialog(forId claimId: Id) {
+    API.getClaim(withId: claimId){ claim, status in
+      let claimDialog = ClaimDialog(withClaim: claim, withStatus: status)
+      claimDialog.tag = 0
+      claimDialog.delegate = self
+      claimDialog.show()
+    }
+  }
+
   @objc func topup() {
     let topupVC = TopupVC()
     self.show(topupVC, sender: self)
@@ -374,7 +412,28 @@ extension HomeVC: UITableViewDataSource {
     }
 
     transactionCell.dateLabel.text = Util.dateStringFromProtoTimestamp(transaction.timestamp).uppercased()
-    transactionCell.userLabel.text = "@\(transaction.profile.username)"
+    switch transaction.accountHolderType {
+    case .claim:
+      //TODO
+      switch transaction.transactionType {
+      case .from:
+        transactionCell.titleLabel.text = "FROM (via claim)"
+        transactionCell.userLabel.text = "@\(transaction.claimAccountHolder.owner.username)"
+      case .to:
+        if transaction.claimAccountHolder.hasReceiver {
+          transactionCell.titleLabel.text = "TO (via claim)"
+          transactionCell.userLabel.text = "@\(transaction.claimAccountHolder.receiver.username)"
+        } else {
+          transactionCell.titleLabel.text = ""
+          transactionCell.userLabel.text = "Open Claim"
+        }
+      default: break
+      }
+    case .user:
+      transactionCell.userLabel.text = "@\(transaction.userAccountHolder.username)"
+    default: break
+    }
+
 
     return transactionCell
   }

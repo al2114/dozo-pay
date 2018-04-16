@@ -17,7 +17,11 @@ fn index_route() -> Result<NamedFile> {
 
 #[get("/<file..>", rank = 2)]
 fn file_route(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/").join(file)).ok()
+    let mut path = Path::new("static/").join(file);
+    if path.extension().is_none() {
+        path = path.with_extension("html")
+    }
+    NamedFile::open(path).ok()
 }
 
 #[get("/login")]

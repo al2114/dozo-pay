@@ -117,6 +117,7 @@ pub fn get_transactions_route(
     let from_tids = users_sql
         .find(user_id)
         .inner_join(transactions::table.on(transactions::payee_id.eq(users::account_id)))
+        .filter(transactions::is_successful)
         .select(transactions::uid)
         .load::<i32>(&db_connection)
         .chain_err(|| "Transactions not found")?;
@@ -124,6 +125,7 @@ pub fn get_transactions_route(
     let to_tids = users_sql
         .find(user_id)
         .inner_join(transactions::table.on(transactions::payer_id.eq(users::account_id)))
+        .filter(transactions::is_successful)
         .select(transactions::uid)
         .load::<i32>(&db_connection)
         .chain_err(|| "Transactions not found")?;

@@ -121,7 +121,6 @@ class TopupVC: UIViewController, UITextFieldDelegate {
 
   @objc func topup() {
     let amount = Util.currencyStringToAmount(amountField.text!)
-//    let intAmount = Int32(amount * 100)
     API.topup(amount: amount) { success in
       if success {
         let confirmationVC = ConfirmationVC()

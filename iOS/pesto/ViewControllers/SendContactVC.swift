@@ -260,8 +260,7 @@ extension SendContactVC: UITableViewDelegate {
     let alert = UIAlertController(title: "Confirm", message: "Send \(amountString) to @\(contact.profile.username)?", preferredStyle: .alert)
     let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in }
     let confirmAction = UIAlertAction(title: "Confirm", style: .default) { _ in
-      let intAmount = Int32(self.amount * 100)
-      API.payUser(withId: contact.profile.uid, amount: intAmount) { success in
+      API.payUser(withId: contact.profile.uid, amount: self.amount) { success in
         if success {
           let confirmationVC = ConfirmationVC()
           confirmationVC.willDismiss = {

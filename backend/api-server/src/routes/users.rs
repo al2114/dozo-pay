@@ -11,7 +11,6 @@ use protos::user_messages::{LoginRequest, LoginResponse, NoResponse, RegisterDev
 use rocket::http::{Cookie, Cookies};
 use rocket::State;
 use serde_rocket_protobuf::{Proto, ProtoResult};
-use sql_functions;
 
 #[post("/register", data = "<request>")]
 fn register_route(
@@ -146,12 +145,15 @@ pub fn get_users(
     db_connection: &PgPooledConnection,
 ) -> Result<Vec<models::User>> {
     use models::User;
-    use schema::users;
-    users::table
-        .filter(users::uid.eq_any(user_ids.clone()))
-        .order(sql_functions::idx(user_ids, users::uid))
+    let query = format!(
+        "SELECT users.*
+        FROM unnest(ARRAY{:?}) user_id
+        INNER_JOIN users on users.uid = user_id",
+        user_ids
+    );
+    diesel::sql_query(query)
         .load::<User>(db_connection)
-        .chain_err(|| "Error loading users")
+        .chain_err(|| "Could not get users")
 }
 
 pub fn get_option_users(

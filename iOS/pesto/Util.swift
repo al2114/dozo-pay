@@ -39,7 +39,7 @@ extension Util {
     formatter.numberStyle = .currency
     formatter.maximumFractionDigits = 2
     formatter.locale = Locale.defaultLocale
-    return formatter.string(from: Double(amount) / 100 as NSNumber) ?? "\(Locale.defaultCurrencySymbol)0.00"
+    return formatter.string(from: NSNumber(value: Double(amount) / 100)) ?? "\(Locale.defaultCurrencySymbol)0.00"
   }
 
   static func currencyStringToAmount(_ string: String) -> Int32 {

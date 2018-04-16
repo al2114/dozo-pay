@@ -12,6 +12,11 @@ a:hover, .pesto:hover {
 	color: #267540;
 }
 
+i {
+	color: #16a747;
+	margin-right: 10px;
+}
+
 .light {
 	font-weight: 300;
 }

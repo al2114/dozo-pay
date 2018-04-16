@@ -95,7 +95,8 @@ fn receipt_page(pool: State<PgPool>, claim_id: i32, mut cookies: Cookies) -> Res
 
     // Next check if the recipient details are correct
     if let Some(uid) = uid {
-        let account_id = get_account_id_with_uid(&uid, &db_connection)?;
+        let account_id = get_account_id_with_uid(&uid, &db_connection)
+            .chain_err(|| "Could not get account id for user id")?;
 
         use schema::accounts;
         use schema::users;
@@ -108,8 +109,10 @@ fn receipt_page(pool: State<PgPool>, claim_id: i32, mut cookies: Cookies) -> Res
             .first::<(String, i32, i32)>(&db_connection)
             .chain_err(|| "Unable to find claim")?;
 
-        let _ = transactions::execute(&claim_account_id, &account_id, &amount, &db_connection)?;
-        super::claims::set_received(&claim_id, &uid, &db_connection)?;
+        let _ = transactions::execute(&claim_account_id, &account_id, &amount, &db_connection)
+            .chain_err(|| "Transaction execution failed")?;
+        super::claims::set_received(&claim_id, &uid, &db_connection)
+            .chain_err(|| "Could not set claim to received")?;
 
         use schema::accounts::dsl::accounts as accounts_sql;
 
@@ -119,7 +122,8 @@ fn receipt_page(pool: State<PgPool>, claim_id: i32, mut cookies: Cookies) -> Res
             .first::<i32>(&db_connection)
             .chain_err(|| "Unable to find account")?;
 
-        let receiver_name = get_username_with_uid(&uid, &db_connection)?;
+        let receiver_name = get_username_with_uid(&uid, &db_connection)
+            .chain_err(|| "Could not get username for user id")?;
 
         context.receipt_id = format!("{}", claim_id as i64 + 400000000000);
         context.sender = sender_name;

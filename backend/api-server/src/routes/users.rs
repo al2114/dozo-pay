@@ -77,7 +77,7 @@ fn register_device_token_route(
     diesel::update(users_sql.find(user_id))
         .set(users::device_token.eq(Some(device_token)))
         .execute(&db_connection)
-        .map_err(|_| "User not found")?;
+        .chain_err(|| "User not found")?;
 
     Ok(Proto(NoResponse::new()))
 }

@@ -75,7 +75,8 @@ fn create_claim_route(
         .get_result::<Claim>(&db_connection)
         .chain_err(|| "Error inserting new claim")?;
 
-    let _ = super::transactions::execute(&owner.account_id, &account.uid, &amount, &db_connection)?;
+    let _ = super::transactions::execute(&owner.account_id, &account.uid, &amount, &db_connection)
+        .chain_err(|| "Transaction execution failed")?;
 
     let mut response = CreateClaimResponse::new();
     response.set_successful(true);
@@ -92,8 +93,9 @@ fn accept_claim_route(
     let receiver_id = request.get_receiver_id();
 
     let db_connection = pool.get()
-        .chain_err(|| "failed to obtain database connection")?;
-    let claim = accept_claim(&db_connection, claim_id, receiver_id)?;
+        .chain_err(|| "Failed to obtain database connection")?;
+    let claim =
+        accept_claim(&db_connection, claim_id, receiver_id).chain_err(|| "Could not accept claim")?;
 
     let mut response = AcceptClaimResponse::new();
     response.set_claim(claim);
@@ -126,8 +128,10 @@ fn accept_claim(
         .chain_err(|| "Unable to find receiver account")?;
 
     let _ =
-        super::transactions::execute(&account_id, &receiver.account_id, &balance, &db_connection)?;
-    set_received(&claim_id, &receiver_id, &db_connection)?;
+        super::transactions::execute(&account_id, &receiver.account_id, &balance, &db_connection)
+            .chain_err(|| "Transaction execution failed")?;
+    set_received(&claim_id, &receiver_id, &db_connection)
+        .chain_err(|| "Failed to set claim to received")?;
 
     let claim = diesel::update(claims_sql.find(claim_id))
         .set((
@@ -165,7 +169,8 @@ fn revoke_claim_route(
         .first::<i32>(&db_connection)
         .chain_err(|| "Unable to find claim")?;
 
-    let claim = accept_claim(&db_connection, claim_id, owner_id)?;
+    let claim =
+        accept_claim(&db_connection, claim_id, owner_id).chain_err(|| "Failed to accept claim")?;
 
     let mut response = AcceptClaimResponse::new();
     response.set_claim(claim);

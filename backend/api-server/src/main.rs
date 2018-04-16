@@ -10,6 +10,7 @@ extern crate diesel;
 extern crate dotenv;
 #[macro_use]
 extern crate error_chain;
+extern crate failure;
 extern crate protobuf;
 extern crate r2d2;
 extern crate ring;
@@ -21,7 +22,6 @@ extern crate serde_derive;
 
 #[cfg(feature = "notifications")]
 use apns::{APNs, APNsClient, Notification};
-use dotenv::dotenv;
 use rocket_contrib::Template;
 
 use std::env;
@@ -57,15 +57,20 @@ fn spawn_notification_client() -> APNsClient {
     APNsClient {}
 }
 
+fn load_environment() {
+    env::var("ENV_FILENAME")
+        .map(|fname| dotenv::from_filename(&fname))
+        .unwrap_or_else(|_| dotenv::dotenv())
+        .ok();
+}
+
 fn main() {
-    dotenv().ok();
+    load_environment();
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let database_connection = pg_pool::init(&database_url);
 
     let notification_client = spawn_notification_client();
-    //let _ = add_contact_route;
-    //let _this = get_contacts_route;
 
     rocket::ignite()
         .manage(database_connection)

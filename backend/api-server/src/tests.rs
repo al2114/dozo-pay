@@ -1,4 +1,3 @@
-use dotenv::dotenv;
 use rocket;
 use rocket::http::ContentType;
 use rocket::local::Client;
@@ -10,7 +9,7 @@ use routes;
 use serde_rocket_protobuf::Proto;
 
 fn client() -> Client {
-    dotenv().ok();
+    super::load_environment();
 
     let builder = super::r2d2::Pool::builder().max_size(1);
 

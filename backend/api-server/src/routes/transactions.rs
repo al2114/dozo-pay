@@ -1,6 +1,8 @@
 use diesel;
 use diesel::prelude::*;
 use errors::*;
+#[cfg(feature = "notifications")]
+use failure::Fail;
 use models;
 use pg_pool::{PgPool, PgPooledConnection};
 use protoize;
@@ -43,7 +45,8 @@ fn transaction_route(
             .build();
         apns_client
             .send(notification)
-            .map_err(|_| "Notification send failed")?;
+            .map_err(|e| e.compat())
+            .chain_err(|| "Notification send failed")?;
     }
     Ok(response)
 }
@@ -78,7 +81,7 @@ fn topup_route(pool: State<PgPool>, request: Proto<TopupRequest>) -> ProtoResult
         &user_account.uid,
         &request.amount,
         &db_connection,
-    )?;
+    ).chain_err(|| "Transaction execution failed")?;
 
     user_account = accounts_sql
         .find(user.account_id)
@@ -248,7 +251,8 @@ pub fn execute(
             .get_result::<Transaction>(db_connection)
             .chain_err(|| "Error inserting new transaction")?;
 
-        let (success, account) = update_balances(&transaction, db_connection)?;
+        let (success, account) =
+            update_balances(&transaction, db_connection).chain_err(|| "Balance update failed")?;
 
         if success {
             use schema::transactions::dsl::transactions as transactions_sql;
@@ -317,7 +321,7 @@ fn transaction_helper(
         &payee.account_id,
         &request.amount,
         &db_connection,
-    )?;
+    ).chain_err(|| "Transaction execution failed")?;
 
     let payer_username = payer.username.clone();
     let payer = protoize::user(payer, account.balance);

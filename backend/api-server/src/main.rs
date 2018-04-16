@@ -10,6 +10,7 @@ extern crate diesel;
 extern crate dotenv;
 #[macro_use]
 extern crate error_chain;
+#[cfg(feature = "notifications")]
 extern crate failure;
 extern crate protobuf;
 extern crate r2d2;

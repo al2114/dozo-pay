@@ -1,6 +1,7 @@
 use diesel;
 use diesel::prelude::*;
 use errors::*;
+#[cfg(feature = "notifications")]
 use failure::Fail;
 use models;
 use pg_pool::{PgPool, PgPooledConnection};

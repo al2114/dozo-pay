@@ -66,7 +66,7 @@ class ClaimDialog: CustomIOSAlertView {
 
     let amountLabel = UILabel()
     amountLabel.translatesAutoresizingMaskIntoConstraints = false
-    amountLabel.text = Util.amountToCurrencyString(Double(claim.amount)/100.0)
+    amountLabel.text = Util.amountToCurrencyString(claim.amount)
     amountLabel.font = UIFont.regular.withSize(50)
     amountLabel.textColor = .text
     containerView.addSubview(amountLabel)

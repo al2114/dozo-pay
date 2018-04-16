@@ -252,7 +252,6 @@
 				2B477796202A0F0F0077415A /* Frameworks */,
 				2B477797202A0F0F0077415A /* Resources */,
 				59687C297C53CE36F0A12C88 /* [CP] Embed Pods Frameworks */,
-				BCF2EE85992639D14574541A /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -355,21 +354,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BCF2EE85992639D14574541A /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Pesto Pay/Pods-Pesto Pay-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

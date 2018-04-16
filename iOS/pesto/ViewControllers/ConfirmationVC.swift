@@ -9,7 +9,7 @@
 import UIKit
 
 class ConfirmationVC: UIViewController {
-  var amount: Double!
+  var amount: Amount!
   var username: String?
 
   var descriptionText: String!
@@ -110,7 +110,7 @@ class ConfirmationVC: UIViewController {
     let balanceLabel = UILabel()
     balanceLabel.translatesAutoresizingMaskIntoConstraints = false
     User.getMe { me in
-      let balance = Util.amountToCurrencyString(Double(me.balance) / 100)
+      let balance = Util.amountToCurrencyString(me.balance)
       balanceLabel.text = "Balance: \(balance)"
     }
     balanceLabel.textColor = .lightGray

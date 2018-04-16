@@ -9,7 +9,7 @@
 import UIKit
 import CustomIOSAlertView
 
-class HomeVC: UIViewController, CustomIOSAlertViewDelegate {
+class HomeVC: UIViewController {
   var balanceView: UIView!
   var imageContainer: UIView!
   var sendButton: UIButton!
@@ -243,41 +243,13 @@ class HomeVC: UIViewController, CustomIOSAlertViewDelegate {
 
   func makeUpdates(withUser user: User) {
     DispatchQueue.main.async {
-      self.balanceLabel.setTitle(Util.amountToCurrencyString(Double(user.balance) / 100), for: .normal)
+      self.balanceLabel.setTitle(Util.amountToCurrencyString(user.balance), for: .normal)
     }
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(true)
     navigationController?.setNavigationBarHidden(false, animated: true)
-  }
-
-
-  func customIOS7dialogButtonTouchUp(inside alertView: Any!, clickedButtonAt buttonIndex: Int) {
-    if (alertView as! CustomIOSAlertView).tag == 0 {
-      switch buttonIndex {
-      case 0:
-        (alertView as! CustomIOSAlertView).close()
-      case 1:
-        let claim = (alertView as! ClaimDialog).claim
-        API.acceptClaim(withID: (claim?.uid)!) { success in
-          if(success) {
-            let confirmationVC = ConfirmationVC()
-            confirmationVC.willDismiss = {
-              self.navigationController?.popToRootViewController(animated: true)
-              //      self.dismiss(animated: true, completion: nil)
-            }
-            confirmationVC.descriptionText = "Successful"
-            confirmationVC.amount = Double((claim?.amount)!)/100.0
-            confirmationVC.infoText = "transfered into your account"
-            (alertView as! CustomIOSAlertView).close()
-            self.present(confirmationVC, animated: true)
-          }
-        }
-      default:
-        break
-      }
-    }
   }
 
   func showClaimDialog(forId claimId: Id) {
@@ -403,10 +375,10 @@ extension HomeVC: UITableViewDataSource {
     transactionCell.titleLabel.text = transactionTypeToString(transaction.transactionType).uppercased()
     switch transaction.transactionType {
     case .from:
-      transactionCell.amountLabel.text = "+\(Util.amountToCurrencyString(Double(transaction.amount)/100))"
+      transactionCell.amountLabel.text = "+\(Util.amountToCurrencyString(transaction.amount))"
       transactionCell.amountLabel.textColor = .secondaryTitle
     case .to:
-      transactionCell.amountLabel.text = Util.amountToCurrencyString(Double(transaction.amount)/100)
+      transactionCell.amountLabel.text = Util.amountToCurrencyString(transaction.amount)
       transactionCell.amountLabel.textColor = .text
     default: break
     }
@@ -436,5 +408,34 @@ extension HomeVC: UITableViewDataSource {
 
 
     return transactionCell
+  }
+}
+
+extension HomeVC: CustomIOSAlertViewDelegate {
+  func customIOS7dialogButtonTouchUp(inside alertView: Any!, clickedButtonAt buttonIndex: Int) {
+    if (alertView as! CustomIOSAlertView).tag == 0 {
+      switch buttonIndex {
+      case 0:
+        (alertView as! CustomIOSAlertView).close()
+      case 1:
+        let claim: Claim! = (alertView as! ClaimDialog).claim
+        API.acceptClaim(withID: claim.uid) { success in
+          if(success) {
+            let confirmationVC = ConfirmationVC()
+            confirmationVC.willDismiss = {
+              self.navigationController?.popToRootViewController(animated: true)
+              //      self.dismiss(animated: true, completion: nil)
+            }
+            confirmationVC.descriptionText = "Successful"
+            confirmationVC.amount = claim.amount
+            confirmationVC.infoText = "transfered into your account"
+            (alertView as! CustomIOSAlertView).close()
+            self.present(confirmationVC, animated: true)
+          }
+        }
+      default:
+        break
+      }
+    }
   }
 }

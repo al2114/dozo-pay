@@ -34,12 +34,12 @@ struct Util {
 }
 
 extension Util {
-  static func amountToCurrencyString(_ amount: Double) -> String {
+  static func amountToCurrencyString(_ amount: Amount) -> String {
     let formatter = NumberFormatter()
     formatter.numberStyle = .currency
     formatter.maximumFractionDigits = 2
     formatter.locale = Locale.defaultLocale
-    return formatter.string(from: amount as NSNumber) ?? "\(Locale.defaultCurrencySymbol)0.00"
+    return formatter.string(from: NSNumber(value: Double(amount) / 100)) ?? "\(Locale.defaultCurrencySymbol)0.00"
   }
 
   static func currencyStringToAmount(_ string: String) -> Int32 {

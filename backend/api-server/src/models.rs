@@ -1,6 +1,8 @@
 use super::chrono::NaiveDateTime;
 use super::schema::users;
-#[derive(Queryable)]
+
+#[derive(Queryable, QueryableByName)]
+#[table_name = "users"]
 pub struct User {
     pub uid: i32,
     pub phone_no: String,

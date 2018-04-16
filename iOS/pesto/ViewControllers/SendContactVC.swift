@@ -8,6 +8,37 @@
 
 import UIKit
 
+class ShareCell: UITableViewCell {
+  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+    let shareLabel = UILabel()
+    shareLabel.translatesAutoresizingMaskIntoConstraints = false
+    shareLabel.font = .regular
+    shareLabel.text = "Share"
+    contentView.addSubview(shareLabel)
+    NSLayoutConstraint.activate([
+      shareLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 35),
+      shareLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      ])
+
+    let shareImageView = UIImageView()
+    shareImageView.translatesAutoresizingMaskIntoConstraints = false
+    shareImageView.image = #imageLiteral(resourceName: "shareIcon").withRenderingMode(.alwaysTemplate)
+    contentView.addSubview(shareImageView)
+    NSLayoutConstraint.activate([
+      shareImageView.leftAnchor.constraint(equalTo: shareLabel.rightAnchor, constant: 20),
+      shareImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      shareImageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.5),
+      shareImageView.widthAnchor.constraint(equalTo: shareImageView.heightAnchor)
+      ])
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+}
+
 class ContactCell: UITableViewCell {
   let profileImageView: CircularImageView
   let nameLabel: UILabel
@@ -58,7 +89,7 @@ class ContactCell: UITableViewCell {
 class SendContactVC: UIViewController {
   var searchController: UISearchController!
 
-  var amount: Double!
+  var amount: Amount!
   var contacts: [[Contact]] = []
 
   var tableView: UITableView!
@@ -120,6 +151,7 @@ class SendContactVC: UIViewController {
     tableView = UITableView()
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.register(ContactCell.self, forCellReuseIdentifier: "ContactCell")
+    tableView.register(ShareCell.self, forCellReuseIdentifier: "ShareCell")
     tableView.delegate = self
     tableView.dataSource = self
     tableView.separatorStyle = .none
@@ -162,30 +194,42 @@ class SendContactVC: UIViewController {
 
 extension SendContactVC: UITableViewDataSource {
   func numberOfSections(in tableView: UITableView) -> Int {
-    return contacts.count
+    return contacts.count + 1
   }
 
   func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    if section == 0 {
+    switch section {
+    case 0:
+      return nil
+    case 1:
       return "RECENT CONTACTS"
-    } else {
+    case 2:
       return "RECENTLY PAYED"
+    default:
+      return nil
     }
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return contacts[section].count
+    if section == 0 {
+      return 1
+    }
+    return contacts[section - 1].count
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let contact = contacts[indexPath.section][indexPath.row]
+    if indexPath.section == 0 {
+      return tableView.dequeueReusableCell(withIdentifier: "ShareCell")!
+    }
+
+    let contact = contacts[indexPath.section - 1][indexPath.row]
 
     let contactCell = tableView.dequeueReusableCell(withIdentifier: "ContactCell") as! ContactCell
     contactCell.nameLabel.text = "@\(contact.profile.username)"
     let image = #imageLiteral(resourceName: "logo").withRenderingMode(.alwaysTemplate)
     contactCell.profileImageView.image = image
     contactCell.profileImageView.tintColor = .pestoGreen
-    contactCell.separatorView.isHidden = indexPath.row == contacts[indexPath.section].count - 1
+    contactCell.separatorView.isHidden = indexPath.row == contacts[indexPath.section - 1].count - 1
     return contactCell
   }
 //
@@ -206,13 +250,17 @@ extension SendContactVC: UITableViewDelegate {
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let contact = contacts[indexPath.section][indexPath.row]
+    if indexPath.section == 0 {
+      share()
+      return
+    }
+
+    let contact = contacts[indexPath.section - 1][indexPath.row]
     let amountString = Util.amountToCurrencyString(amount)
     let alert = UIAlertController(title: "Confirm", message: "Send \(amountString) to @\(contact.profile.username)?", preferredStyle: .alert)
     let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in }
     let confirmAction = UIAlertAction(title: "Confirm", style: .default) { _ in
-      let intAmount = Int32(self.amount * 100)
-      API.payUser(withId: contact.profile.uid, amount: intAmount) { success in
+      API.payUser(withId: contact.profile.uid, amount: self.amount) { success in
         if success {
           let confirmationVC = ConfirmationVC()
           confirmationVC.willDismiss = {
@@ -229,6 +277,17 @@ extension SendContactVC: UITableViewDelegate {
     alert.addAction(confirmAction)
     tableView.deselectRow(at: indexPath, animated: true)
     present(alert, animated: true)
+  }
+
+  func share() {
+    //TODO: Generate claim only on selection of acitivity;
+    API.createClaim(for: amount) { claim in
+      print(claim)
+      let activityViewController = UIActivityViewController(
+        activityItems: ["https://pesto-pay.com/claims/\(claim.uid)"],
+        applicationActivities: nil)
+      self.present(activityViewController, animated: true, completion: nil)
+    }
   }
 }
 

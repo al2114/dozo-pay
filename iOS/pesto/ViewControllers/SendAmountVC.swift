@@ -149,14 +149,14 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
       API.payUser(withId: payee.uid, amount: amount) { success in
         if success {
           let confirmationVC = ConfirmationVC()
-          confirmationVC.amount = Double(amount)/100.0
+          confirmationVC.amount = amount
           confirmationVC.username = payee.username
           self.present(confirmationVC, animated: true)
         }
       }
     } else {
       let sendVC = SendContactVC()
-      sendVC.amount = Double(amount)/100.0
+      sendVC.amount = amount
       self.show(sendVC, sender: self)
     }
   }
@@ -178,14 +178,14 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
 
   @objc func textFieldDidChange(textField: UITextField) {
     if textField == amountField {
-      var amount: Double = 0
+      var amount: Amount = 0
       var filledLength = 0
       if let text = textField.text {
         var formattedText = text.replacingOccurrences(of: Locale.defaultCurrencySymbol, with: "").replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: "")
         let index = String.Index.init(encodedOffset: min(formattedText.count, 6))
         formattedText = String(formattedText[..<index])
-        if let val = Int(formattedText){
-          amount = Double(val)/100.0
+        if let val = Amount(formattedText) {
+          amount = val
           filledLength = String(val).count
         }
       }

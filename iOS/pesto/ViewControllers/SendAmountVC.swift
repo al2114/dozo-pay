@@ -144,7 +144,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
   }
 
   @objc func send() {
-    let amount = Util.currencyStringToAmount(amountField.text!)
+    let amount = Formatter.amount(fromCurrencyString: amountField.text!)
     if let payee = payee {
       API.payUser(withId: payee.uid, amount: amount) { success in
         if success {
@@ -163,7 +163,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
 
   @objc func share() {
     //TODO: Generate claim only on selection of acitivity;
-    let amount = Util.currencyStringToAmount(amountField.text!)
+    let amount = Formatter.amount(fromCurrencyString: amountField.text!)
     API.createClaim(for: amount) { claim in
       let activityViewController = UIActivityViewController(
         activityItems: ["https://pesto-pay.com/claims/\(claim.uid)"],
@@ -189,7 +189,7 @@ class SendAmountVC: UIViewController, UITextFieldDelegate {
           filledLength = String(val).count
         }
       }
-      let result = Util.amountToCurrencyString(amount)
+      let result = Formatter.currencyString(fromAmount: amount)
       let attributedResult: NSMutableAttributedString = NSMutableAttributedString(string: result)
       if(filledLength < 3) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(0, 1))

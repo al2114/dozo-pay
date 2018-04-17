@@ -120,7 +120,7 @@ class TopupVC: UIViewController, UITextFieldDelegate {
   }
 
   @objc func topup() {
-    let amount = Util.currencyStringToAmount(amountField.text!)
+    let amount = Formatter.amount(fromCurrencyString: amountField.text!)
     API.topup(amount: amount) { success in
       if success {
         let confirmationVC = ConfirmationVC()
@@ -153,7 +153,7 @@ class TopupVC: UIViewController, UITextFieldDelegate {
           filledLength = String(val).count
         }
       }
-      let result = Util.amountToCurrencyString(amount)
+      let result = Formatter.currencyString(fromAmount: amount)
       let attributedResult: NSMutableAttributedString = NSMutableAttributedString(string: result)
       if(filledLength < 3) {
         attributedResult.setAttributes([ NSAttributedStringKey.foregroundColor : UIColor.washed ], range: NSMakeRange(0, 1))

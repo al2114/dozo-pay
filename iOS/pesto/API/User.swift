@@ -6,25 +6,6 @@
 //  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
 //
 
-typealias User = Pesto_Models_User
-typealias Room = Pesto_Models_Room
-typealias Claim = Pesto_Models_Claim
-typealias ClaimStatus = Pesto_Models_ClaimStatus
-typealias RoomItem = Pesto_Models_RoomItem
-typealias Contact = Pesto_Models_Contact
-typealias Profile = Pesto_Models_Profile
-typealias Transaction = Pesto_Models_Transaction
-
-typealias RegisterRequest = Pesto_UserMessages_RegisterRequest
-typealias RegisterResponse = Pesto_UserMessages_RegisterResponse
-typealias LoginRequest = Pesto_UserMessages_LoginRequest
-typealias LoginResponse = Pesto_UserMessages_LoginResponse
-typealias LogoutRequest = Pesto_UserMessages_LogoutRequest
-typealias GetContactResponse = Pesto_UserMessages_GetContactsResponse
-typealias AddContactRequest = Pesto_UserMessages_AddContactRequest
-typealias GetTransactionsResponse = Pesto_UserMessages_GetTransactionsResponse
-typealias NoResponse = Pesto_UserMessages_NoResponse
-
 import Foundation
 
 extension API {
@@ -35,7 +16,7 @@ extension API {
     registerRequest.username = user.username
 
     let route = "register"
-    Util.post(toRoute: route, withProtoMessage: registerRequest) {
+    Requests.post(toRoute: route, withProtoMessage: registerRequest) {
       result in
       if case let .ok(registerResponse)? = result {
         completion(registerResponse.user)
@@ -56,7 +37,7 @@ extension API {
     }
 
     let route = "login"
-    Util.post(toRoute: route, withProtoMessage: loginRequest) {
+    Requests.post(toRoute: route, withProtoMessage: loginRequest) {
       result in
       if case let .ok(loginResponse)? = result {
         User.updateMe(withUser: loginResponse.user)
@@ -77,13 +58,13 @@ extension API {
       }
 
       let route = "logout"
-      Util.post(toRoute: route, withProtoMessage: logoutRequest) { _ in }
+      Requests.post(toRoute: route, withProtoMessage: logoutRequest) { _ in }
     }
   }
 
   static func getMe(withOldMe oldMe: User, completion: @escaping (User) -> Void) {
     let route = "users/\(oldMe.uid)"
-    Util.get(toRoute: route) { (result: Result<User>?) in
+    Requests.get(toRoute: route) { (result: Result<User>?) in
       if case let .ok(me)? = result {
         completion(me)
       } else {
@@ -98,7 +79,7 @@ extension API {
 
   static func getMe(withId id: Int32, completion: @escaping (User?) -> Void) {
     let route = "users/\(id)"
-    Util.get(toRoute: route) { (result: Result<User>?) in
+    Requests.get(toRoute: route) { (result: Result<User>?) in
       if case let .ok(me)? = result {
         completion(me)
       } else {
@@ -121,7 +102,7 @@ extension API {
   static func getContacts(completion: @escaping ([Contact]) -> Void) {
     User.getMe { me in
       let route = "contacts/\(me.uid)"
-      Util.get(toRoute: route) { (result: Result<GetContactResponse>?) in
+      Requests.get(toRoute: route) { (result: Result<GetContactResponse>?) in
         if case let .ok(getContactResponse)? = result {
           completion(getContactResponse.contacts)
         } else {
@@ -134,7 +115,7 @@ extension API {
   static func getTransactions(completion: @escaping ([Transaction]) -> Void) {
     User.getMe { me in
       let route = "transactions/\(me.uid)"
-      Util.get(toRoute: route) { (result: Result<GetTransactionsResponse>?) in
+      Requests.get(toRoute: route) { (result: Result<GetTransactionsResponse>?) in
         if case let .ok(getTransactionsResponse)? = result {
           completion(getTransactionsResponse.transactions)
         } else {
@@ -151,7 +132,7 @@ extension API {
       addContactRequest.userID = me.uid
 
       let route = "contacts"
-      Util.post(toRoute: route, withProtoMessage: addContactRequest) { result in
+      Requests.post(toRoute: route, withProtoMessage: addContactRequest) { result in
         if case let .ok(addContactResponse)? = result {
           completion(addContactResponse.successful)
         } else {

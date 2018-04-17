@@ -112,7 +112,7 @@ class HomeVC: UIViewController {
       ])
     let qrCodeWidth = view.bounds.width * 0.38
     User.getMe { me in
-      let qrImage = Util.qrCode(from: "pesto:\(me.username):\(me.uid)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
+      let qrImage = QR.generateCode(from: "pesto:\(me.username):\(me.uid)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
       qrCodeImageView.contentMode = .scaleAspectFit
       qrCodeImageView.image = qrImage
     }
@@ -248,7 +248,7 @@ class HomeVC: UIViewController {
   }
 
   func makeUpdates(withUser user: User) {
-    self.balanceLabel.setTitle(Util.amountToCurrencyString(user.balance), for: .normal)
+    self.balanceLabel.setTitle(Formatter.currencyString(fromAmount: user.balance), for: .normal)
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -379,15 +379,15 @@ extension HomeVC: UITableViewDataSource {
     transactionCell.titleLabel.text = transactionTypeToString(transaction.transactionType).uppercased()
     switch transaction.transactionType {
     case .from:
-      transactionCell.amountLabel.text = "+\(Util.amountToCurrencyString(transaction.amount))"
+      transactionCell.amountLabel.text = "+\(Formatter.currencyString(fromAmount: transaction.amount))"
       transactionCell.amountLabel.textColor = .secondaryTitle
     case .to:
-      transactionCell.amountLabel.text = Util.amountToCurrencyString(transaction.amount)
+      transactionCell.amountLabel.text = Formatter.currencyString(fromAmount: transaction.amount)
       transactionCell.amountLabel.textColor = .text
     default: break
     }
 
-    transactionCell.dateLabel.text = Util.dateStringFromProtoTimestamp(transaction.timestamp).uppercased()
+    transactionCell.dateLabel.text = Formatter.dateString(fromTimestamp: transaction.timestamp).uppercased()
     switch transaction.accountHolderType {
     case .claim:
       //TODO

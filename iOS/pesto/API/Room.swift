@@ -7,29 +7,27 @@
 //
 
 extension API {
-  struct room {
-    static func create(room: Room, completion: @escaping () -> Void) {
+  static func createRoom(_ room: Room, completion: @escaping () -> Void) {
 
-    }
+  }
 
-    static func join(room: Room, completion: @escaping () -> Void) {
+  static func joinRoom(_: Room, completion: @escaping () -> Void) {
 
-    }
+  }
 
-    static func addTo(room: Room, completion: @escaping () -> Void) {
+  static func addToRoom(_: Room, completion: @escaping () -> Void) {
 
-    }
+  }
 
-    static func cancel(room: Room, completion: @escaping () -> Void) {
+  static func cancelRoom(_: Room, completion: @escaping () -> Void) {
 
-    }
+  }
 
-    static func confirm(selection: [String], inRoom room: Room, completion: @escaping () -> Void) {
+  static func confirmSelection(_ selection: [String], inRoom room: Room, completion: @escaping () -> Void) {
 
-    }
+  }
 
-    static func complete(room: Room, completion: @escaping () -> Void) {
+  static func completeRoom(_: Room, completion: @escaping () -> Void) {
 
-    }
   }
 }

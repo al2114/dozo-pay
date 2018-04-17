@@ -256,7 +256,7 @@ extension SendContactVC: UITableViewDelegate {
     }
 
     let contact = contacts[indexPath.section - 1][indexPath.row]
-    let amountString = Util.amountToCurrencyString(amount)
+    let amountString = Formatter.currencyString(fromAmount: amount)
     let alert = UIAlertController(title: "Confirm", message: "Send \(amountString) to @\(contact.profile.username)?", preferredStyle: .alert)
     let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in }
     let confirmAction = UIAlertAction(title: "Confirm", style: .default) { _ in

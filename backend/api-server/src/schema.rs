@@ -47,8 +47,14 @@ table! {
         username -> Varchar,
         password -> Bpchar,
         created_at -> Timestamp,
-        device_token -> Nullable<Varchar>,
+        device_tokens -> Array<Text>,
     }
 }
 
-allow_tables_to_appear_in_same_query!(accounts, claims, contacts, transactions, users,);
+allow_tables_to_appear_in_same_query!(
+    accounts,
+    claims,
+    contacts,
+    transactions,
+    users,
+);

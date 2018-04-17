@@ -209,12 +209,12 @@ extension RegisterRequest: RequestResponsePair {
   typealias ResponseType = RegisterResponse
 }
 
-extension RegisterDeviceTokenRequest: RequestResponsePair {
-  typealias ResponseType = NoResponse
-}
-
 extension LoginRequest: RequestResponsePair {
   typealias ResponseType = LoginResponse
+}
+
+extension LogoutRequest: RequestResponsePair {
+  typealias ResponseType = NoResponse
 }
 
 extension TransactionRequest: RequestResponsePair {

@@ -6,11 +6,13 @@ use passwords::encrypt_password;
 use pg_pool::{PgPool, PgPooledConnection};
 use protoize;
 use protos;
-use protos::user_messages::{LoginRequest, LoginResponse, NoResponse, RegisterDeviceTokenRequest,
+use protos::user_messages::{LoginRequest, LoginResponse, LogoutRequest, NoResponse,
                             RegisterRequest, RegisterResponse};
 use rocket::http::{Cookie, Cookies};
 use rocket::State;
 use serde_rocket_protobuf::{Proto, ProtoResult};
+use sql_functions;
+use std::default::Default;
 
 #[post("/register", data = "<request>")]
 fn register_route(
@@ -40,7 +42,6 @@ fn register_route(
         account_id: &account.uid,
         username: username,
         password: password,
-        device_token: None,
     };
 
     use models::User;
@@ -57,28 +58,6 @@ fn register_route(
     response.set_user(user);
     response.set_successful(true);
     Ok(Proto(response))
-}
-
-#[post("/register/device_token", data = "<request>")]
-fn register_device_token_route(
-    pool: State<PgPool>,
-    request: Proto<RegisterDeviceTokenRequest>,
-) -> ProtoResult<NoResponse> {
-    let user_id = request.get_user_id();
-    let device_token = request.get_device_token();
-
-    let db_connection = pool.get()
-        .chain_err(|| "failed to obtain database connection")?;
-
-    use schema::users;
-    use schema::users::dsl::users as users_sql;
-
-    diesel::update(users_sql.find(user_id))
-        .set(users::device_token.eq(Some(device_token)))
-        .execute(&db_connection)
-        .chain_err(|| "User not found")?;
-
-    Ok(Proto(NoResponse::new()))
 }
 
 #[post("/login", data = "<request>")]
@@ -106,6 +85,19 @@ fn login_route(
         .first::<(User, Account)>(&db_connection)
         .chain_err(|| "User not found")?;
 
+    let device_token = request.get_device_token();
+    let default_device_token: &str = Default::default();
+    if device_token == default_device_token {
+        use schema::users::dsl::users as users_sql;
+        diesel::update(users_sql.find(&user.uid))
+            .set(users::device_tokens.eq(sql_functions::array_concat(
+                users::device_tokens,
+                vec![device_token],
+            )))
+            .execute(&db_connection)
+            .chain_err(|| "User device token concatenation failed")?;
+    }
+
     let mut response = LoginResponse::new();
     if user.password == password {
         let user = protoize::user(user, account.balance);
@@ -117,6 +109,30 @@ fn login_route(
     }
 
     Ok(Proto(response))
+}
+
+#[post("/logout", data = "<request>")]
+fn logout_route(pool: State<PgPool>, request: Proto<LogoutRequest>) -> ProtoResult<NoResponse> {
+    let user_id = request.get_user_id();
+
+    let device_token = request.get_device_token();
+    let default_device_token: &str = Default::default();
+    if device_token == default_device_token {
+        let db_connection = pool.get()
+            .chain_err(|| "failed to obtain database connection")?;
+
+        use schema::users;
+        use schema::users::dsl::users as users_sql;
+        diesel::update(users_sql.find(user_id))
+            .set(users::device_tokens.eq(sql_functions::array_remove(
+                users::device_tokens,
+                device_token,
+            )))
+            .execute(&db_connection)
+            .chain_err(|| "User device token removal failed")?;
+    }
+
+    Ok(Proto(NoResponse::new()))
 }
 
 #[get("/users/<user_id>")]

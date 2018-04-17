@@ -34,7 +34,7 @@ fn transaction_route(
     request: Proto<TransactionRequest>,
 ) -> ProtoResult<TransactionResponse> {
     let (response, (payee, payer_username, amount)) = transaction_helper(pool, request)?;
-    if let Some(device_token) = payee.device_token {
+    for device_token in payee.device_tokens {
         let notification = Notification::builder("pay.pesto.dozo".to_string(), device_token)
             .title("New Transaction")
             .body(format!(

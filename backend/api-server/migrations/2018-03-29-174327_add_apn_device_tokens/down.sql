@@ -1,1 +1,1 @@
-ALTER TABLE users DROP COLUMN device_token;
+ALTER TABLE users DROP COLUMN device_tokens;

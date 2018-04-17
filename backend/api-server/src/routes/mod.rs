@@ -11,8 +11,8 @@ pub fn all_routes() -> Vec<Route> {
     routes![
         lock::check_passcode_route,
         users::register_route,
-        users::register_device_token_route,
         users::login_route,
+        users::logout_route,
         users::get_user_route,
         contacts::add_contact_route,
         contacts::get_contacts_route,

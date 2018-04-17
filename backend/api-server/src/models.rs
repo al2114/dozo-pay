@@ -11,7 +11,7 @@ pub struct User {
     pub username: String,
     pub password: String,
     pub created_at: NaiveDateTime,
-    pub device_token: Option<String>,
+    pub device_tokens: Vec<String>,
 }
 
 #[derive(Insertable)]
@@ -22,7 +22,6 @@ pub struct NewUser<'a> {
     pub account_id: &'a i32,
     pub username: &'a str,
     pub password: &'a str,
-    pub device_token: Option<&'a str>,
 }
 
 use super::schema::accounts;

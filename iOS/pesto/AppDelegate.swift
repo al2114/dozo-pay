@@ -11,6 +11,10 @@ import UserNotifications
 
 typealias JSON = [String: Any]
 
+struct State {
+  static var deviceToken: String? = nil
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
@@ -32,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window?.makeKeyAndVisible()
 
     UNUserNotificationCenter.current().delegate = self
+    registerForPushNotifications(withApplication: application)
 
     return true
   }
@@ -72,12 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
   func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-    let deviceToken = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-
-    print(deviceToken)
-    User.getMe { user in
-      API.registerDeviceToken(deviceToken, to: user)
-    }
+    State.deviceToken = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
   }
 
   func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {

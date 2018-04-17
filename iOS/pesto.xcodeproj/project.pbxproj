@@ -52,6 +52,7 @@
 		CB450895205D826600129603 /* TopupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB450894205D826600129603 /* TopupVC.swift */; };
 		CB45F10E2069774400351E8D /* TransactionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB45F10D2069774400351E8D /* TransactionCell.swift */; };
 		CB49D95620472B6E00A33C4A /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB49D95520472B6E00A33C4A /* Preferences.swift */; };
+		CB60FCD0208639DD008F84FA /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB60FCCF208639DD008F84FA /* Toast.swift */; };
 		CB96BC67207CB02B00BB2F8D /* ClaimDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB96BC66207CB02B00BB2F8D /* ClaimDialog.swift */; };
 		CBD9EE01205CBBFF0080427E /* InclusiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD9EE00205CBBFF0080427E /* InclusiveView.swift */; };
 		CBD9EE03205CF3100080427E /* ProtectedTextfield.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */; };
@@ -112,6 +113,7 @@
 		CB450894205D826600129603 /* TopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopupVC.swift; sourceTree = "<group>"; };
 		CB45F10D2069774400351E8D /* TransactionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCell.swift; sourceTree = "<group>"; };
 		CB49D95520472B6E00A33C4A /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		CB60FCCF208639DD008F84FA /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		CB96BC66207CB02B00BB2F8D /* ClaimDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimDialog.swift; sourceTree = "<group>"; };
 		CBD9EE00205CBBFF0080427E /* InclusiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InclusiveView.swift; sourceTree = "<group>"; };
 		CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedTextfield.swift; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 				CBD9EE02205CF3100080427E /* ProtectedTextfield.swift */,
 				CB45F10D2069774400351E8D /* TransactionCell.swift */,
 				CB96BC66207CB02B00BB2F8D /* ClaimDialog.swift */,
+				CB60FCCF208639DD008F84FA /* Toast.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -400,6 +403,7 @@
 				2B4CE3B92034FD19006408DC /* Room.swift in Sources */,
 				2B47C5052086A59A00D0D045 /* UIViewController.swift in Sources */,
 				CB046909204349C100DF284F /* CircleButton.swift in Sources */,
+				CB60FCD0208639DD008F84FA /* Toast.swift in Sources */,
 				2B4777B1202A32040077415A /* CameraVC.swift in Sources */,
 				2B47C4F92086A2AE00D0D045 /* Result.swift in Sources */,
 				2B525C5E206D646600BE296C /* Notifications.swift in Sources */,

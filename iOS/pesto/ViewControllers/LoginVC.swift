@@ -136,6 +136,9 @@ class LoginVC: UIViewController {
           Util.switchTo(viewController: homeVC, presentingController: self)
         }
       }
+      else {
+        self.showToast(message: "Error logging in")
+      }
     }
   }
 

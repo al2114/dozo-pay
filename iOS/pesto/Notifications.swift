@@ -9,28 +9,25 @@
 import UIKit
 
 struct Notifications {
-  static var subscriber: UIViewController?
-  static var generalNotifications: [String: () -> Void] = [:]
-  static var subscribedNotifications: [String: () -> Void]? = nil
+  static private var subscriber: UIViewController?
+  static private var generalNotifications: [String: (JSON) -> Void] = [:]
+  static private var subscribedNotifications: [String: (JSON) -> Void]? = nil
 
-  static func subscribe(_ vc: UIViewController, to notifications: [String: () -> Void]) {
+  static func subscribe(_ vc: UIViewController, to notifications: [String: (JSON) -> Void]) {
     subscriber = vc
     subscribedNotifications = notifications
   }
 
   static func receiveNotification(aps: JSON, completion: () -> Void) {
-    if aps["content-available"] as? Int == 1 {
-      guard let label = aps["notificationsLabel"] as? String else {
-        completion()
-        return
-      }
-      if let notificationHandler = generalNotifications[label] ?? subscribedNotifications?[label] {
-        notificationHandler()
-      }
-    } else  {
-      print("Notification opened in foreground or background")
+    defer {
+      completion()
     }
-    completion()
+
+    guard let label = aps["notificationsLabel"] as? String else {
+      return
+    }
+
+    generalNotifications[label]?(aps)
+    subscribedNotifications?[label]?(aps)
   }
 }
-

@@ -172,8 +172,6 @@ extension Util {
 
     dateFormatter.dateFormat = "MM/dd/yy HH:mm"
 
-    print("Formatting \(dateFormatter.string(from: date))")
-
     var dateString = ""
 
     if dateComponents == todayComponents {

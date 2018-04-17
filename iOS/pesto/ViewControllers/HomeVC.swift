@@ -225,12 +225,19 @@ class HomeVC: UIViewController {
       cameraImageView.widthAnchor.constraint(equalToConstant: 36),
       cameraImageView.heightAnchor.constraint(equalTo: cameraImageView.widthAnchor),
       ])
+
+    Notifications.subscribe(self, to: ["receiveTransaction": { _ in self.reloadData() }])
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     UIApplication.shared.keyWindow?.backgroundColor = .primaryBackground
     UIApplication.shared.statusBarStyle = .lightContent
+    navigationController?.setNavigationBarHidden(true, animated: true)
+    reloadData()
+  }
+
+  func reloadData() {
     User.getMe{ me in
       self.makeUpdates(withUser: me)
     }
@@ -238,13 +245,10 @@ class HomeVC: UIViewController {
       self.transactions = transactions
       self.transactionView.reloadData()
     }
-    navigationController?.setNavigationBarHidden(true, animated: true)
   }
 
   func makeUpdates(withUser user: User) {
-    DispatchQueue.main.async {
-      self.balanceLabel.setTitle(Util.amountToCurrencyString(user.balance), for: .normal)
-    }
+    self.balanceLabel.setTitle(Util.amountToCurrencyString(user.balance), for: .normal)
   }
 
   override func viewWillDisappear(_ animated: Bool) {

@@ -42,6 +42,9 @@ fn transaction_route(
                 amount / 100,
                 payer_username
             ))
+            .data(json!({
+                "notificationIdentifier": "receiveTransaction",
+            }))
             .build();
         apns_client
             .send(notification)

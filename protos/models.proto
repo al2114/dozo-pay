@@ -66,5 +66,6 @@ message Profile {
 enum AccountHolderType {
   USER = 0;
   CLAIM = 1;
-  ROOM = 2;
+  MASTER = 2;
+  ROOM = 3;
 }

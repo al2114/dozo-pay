@@ -1,6 +1,8 @@
 use diesel;
 use diesel::prelude::*;
 use errors::*;
+#[cfg(feature = "notifications")]
+use failure::Fail;
 use models;
 use pg_pool::{PgPool, PgPooledConnection};
 use protoize;
@@ -9,6 +11,9 @@ use protos::user_messages::{AcceptClaimRequest, AcceptClaimResponse, ClaimInfoRe
                             CreateClaimRequest, CreateClaimResponse, RevokeClaimRequest};
 use rocket::State;
 use serde_rocket_protobuf::{Proto, ProtoResult};
+use APNsClient;
+#[cfg(feature = "notifications")]
+use Notification;
 
 #[get("/claims/info/<claim_id>")]
 fn claim_info_route(claim_id: i32, pool: State<PgPool>) -> ProtoResult<ClaimInfoResponse> {
@@ -87,6 +92,7 @@ fn create_claim_route(
 #[post("/claims/accept", data = "<request>")]
 fn accept_claim_route(
     pool: State<PgPool>,
+    apns_client: State<APNsClient>,
     request: Proto<AcceptClaimRequest>,
 ) -> ProtoResult<AcceptClaimResponse> {
     let claim_id = request.get_claim_id();
@@ -94,8 +100,20 @@ fn accept_claim_route(
 
     let db_connection = pool.get()
         .chain_err(|| "Failed to obtain database connection")?;
-    let claim =
+    let (claim, owner_username, receiver_device_tokens) =
         accept_claim(&db_connection, claim_id, receiver_id).chain_err(|| "Could not accept claim")?;
+
+    #[cfg(feature = "notifications")]
+    accept_claim_route_send_notification(
+        apns_client,
+        &claim,
+        owner_username,
+        receiver_device_tokens,
+    )?;
+    #[cfg(not(feature = "notifications"))]
+    let _ = apns_client;
+    let _ = owner_username;
+    let _ = receiver_device_tokens;
 
     let mut response = AcceptClaimResponse::new();
     response.set_claim(claim);
@@ -103,11 +121,41 @@ fn accept_claim_route(
     Ok(Proto(response))
 }
 
+#[cfg(feature = "notifications")]
+fn accept_claim_route_send_notification(
+    apns_client: State<APNsClient>,
+    claim: &protos::models::Claim,
+    owner_username: String,
+    receiver_device_tokens: Vec<String>,
+) -> Result<()> {
+    let amount = claim.amount;
+
+    for device_token in receiver_device_tokens {
+        let notification = Notification::builder("pay.pesto.dozo".to_string(), device_token)
+            .title("New Transaction")
+            .body(format!(
+                "Received £{:.*} (via claim) from @{}",
+                2,
+                amount as f64 / 100.0,
+                owner_username
+            ))
+            .data(json!({
+                "notificationIdentifier": "receiveTransaction",
+            }))
+            .build();
+        apns_client
+            .send(notification)
+            .map_err(|e| e.compat())
+            .chain_err(|| "Notification send failed")?;
+    }
+    Ok(())
+}
+
 fn accept_claim(
     db_connection: &PgPooledConnection,
     claim_id: i32,
     receiver_id: i32,
-) -> Result<protos::models::Claim> {
+) -> Result<(protos::models::Claim, String, Vec<String>)> {
     use models::Claim;
     use schema::accounts;
     use schema::claims;
@@ -146,8 +194,10 @@ fn accept_claim(
         .first::<User>(db_connection)
         .chain_err(|| "Unable to find claim owner")?;
 
+    let owner_username = owner.username.clone();
+    let receiver_device_tokens = receiver.device_tokens.clone();
     let claim = protoize::claim(claim, owner, Some(receiver));
-    Ok(claim)
+    Ok((claim, owner_username, receiver_device_tokens))
 }
 
 #[post("/claims/revoke", data = "<request>")]
@@ -169,7 +219,7 @@ fn revoke_claim_route(
         .first::<i32>(&db_connection)
         .chain_err(|| "Unable to find claim")?;
 
-    let claim =
+    let (claim, _, _) =
         accept_claim(&db_connection, claim_id, owner_id).chain_err(|| "Failed to accept claim")?;
 
     let mut response = AcceptClaimResponse::new();

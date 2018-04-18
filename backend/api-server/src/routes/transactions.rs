@@ -149,8 +149,9 @@ pub fn get_transactions_route(
         });
 
     let (from_claim_transactions, from_claims) = transactions::table
-        .filter(transactions::uid.eq_any(from_tids))
+        .filter(transactions::uid.eq_any(from_tids.clone()))
         .inner_join(claims::table.on(transactions::payer_id.eq(claims::account_id)))
+        .filter(claims::owner_id.nullable().ne(claims::receiver_id))
         .load::<(Transaction, Claim)>(&db_connection)
         .chain_err(|| "Transactions not found")?
         .into_iter()
@@ -177,6 +178,21 @@ pub fn get_transactions_route(
             )
         });
 
+    let master_id = 0;
+    let from_topups = transactions::table
+        .filter(transactions::uid.eq_any(from_tids))
+        .filter(transactions::payer_id.eq(master_id))
+        .load::<Transaction>(&db_connection)
+        .chain_err(|| "Transactions not found")?
+        .into_iter()
+        .map(|t| {
+            protoize::transaction(
+                t,
+                models::AccountHolder::Master,
+                protos::models::Transaction_Type::FROM,
+            )
+        });
+
     let to_users = transactions::table
         .filter(transactions::uid.eq_any(to_tids.clone()))
         .inner_join(users::table.on(transactions::payee_id.eq(users::account_id)))
@@ -194,6 +210,7 @@ pub fn get_transactions_route(
     let (to_claim_transactions, to_claims) = transactions::table
         .filter(transactions::uid.eq_any(to_tids))
         .inner_join(claims::table.on(transactions::payee_id.eq(claims::account_id)))
+        .filter(claims::owner_id.nullable().ne(claims::receiver_id))
         .load::<(Transaction, Claim)>(&db_connection)
         .chain_err(|| "Transactions not found")?
         .into_iter()
@@ -221,6 +238,7 @@ pub fn get_transactions_route(
 
     let mut transactions = from_users
         .chain(from_claims)
+        .chain(from_topups)
         .chain(to_users)
         .chain(to_claims)
         .collect::<Vec<_>>();

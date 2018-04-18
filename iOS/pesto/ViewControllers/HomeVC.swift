@@ -407,6 +407,9 @@ extension HomeVC: UITableViewDataSource {
       }
     case .user:
       transactionCell.userLabel.text = "@\(transaction.userAccountHolder.username)"
+    case .master:
+      transactionCell.titleLabel.text = ""
+      transactionCell.userLabel.text = "Topup"
     default: break
     }
 

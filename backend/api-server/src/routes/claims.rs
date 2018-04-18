@@ -46,47 +46,50 @@ fn create_claim_route(
     let amount = request.get_amount();
     let owner_id = request.get_owner_id();
 
-    let new_account = models::NewAccount { balance: &0 };
-
     let db_connection = pool.get()
         .chain_err(|| "failed to obtain database connection")?;
 
-    use models::Account;
-    use schema::accounts;
+    db_connection.transaction(|| {
+        let new_account = models::NewAccount { balance: &0 };
 
-    let account = diesel::insert_into(accounts::table)
-        .values(&new_account)
-        .get_result::<Account>(&db_connection)
-        .chain_err(|| "Error inserting new account")?;
+        use models::Account;
+        use schema::accounts;
 
-    let new_claim = models::NewClaim {
-        account_id: &account.uid,
-        owner_id: &owner_id,
-        amount: &amount,
-    };
+        let account = diesel::insert_into(accounts::table)
+            .values(&new_account)
+            .get_result::<Account>(&db_connection)
+            .chain_err(|| "Error inserting new account")?;
 
-    use models::Claim;
-    use schema::claims;
+        let new_claim = models::NewClaim {
+            account_id: &account.uid,
+            owner_id: &owner_id,
+            amount: &amount,
+        };
 
-    use models::User;
-    use schema::users::dsl::users as users_sql;
+        use models::Claim;
+        use schema::claims;
 
-    let owner = users_sql
-        .find(owner_id)
-        .first::<User>(&db_connection)
-        .chain_err(|| "Unable to find user")?;
-    let claim = diesel::insert_into(claims::table)
-        .values(&new_claim)
-        .get_result::<Claim>(&db_connection)
-        .chain_err(|| "Error inserting new claim")?;
+        use models::User;
+        use schema::users::dsl::users as users_sql;
 
-    let _ = super::transactions::execute(&owner.account_id, &account.uid, &amount, &db_connection)
-        .chain_err(|| "Transaction execution failed")?;
+        let owner = users_sql
+            .find(owner_id)
+            .first::<User>(&db_connection)
+            .chain_err(|| "Unable to find user")?;
+        let claim = diesel::insert_into(claims::table)
+            .values(&new_claim)
+            .get_result::<Claim>(&db_connection)
+            .chain_err(|| "Error inserting new claim")?;
 
-    let mut response = CreateClaimResponse::new();
-    response.set_successful(true);
-    response.set_claim(protoize::claim(claim, owner, None));
-    Ok(Proto(response))
+        let _ =
+            super::transactions::execute(&owner.account_id, &account.uid, &amount, &db_connection)
+                .chain_err(|| "Transaction execution failed")?;
+
+        let mut response = CreateClaimResponse::new();
+        response.set_successful(true);
+        response.set_claim(protoize::claim(claim, owner, None));
+        Ok(Proto(response))
+    })
 }
 
 #[post("/claims/accept", data = "<request>")]

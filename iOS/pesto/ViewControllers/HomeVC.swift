@@ -140,7 +140,7 @@ class HomeVC: UIViewController {
     balanceLabel = UIButton()
     balanceLabel.tintColor = .primaryTitle
     balanceLabel.titleLabel?.font = UIFont.regular.withSize(36)
-    balanceLabel.setTitle("£9.41", for: .normal)
+    balanceLabel.setTitle("£0.00", for: .normal)
     balanceLabel.isUserInteractionEnabled = true
     balanceLabel.translatesAutoresizingMaskIntoConstraints = false
     balanceLabel.addTarget(self, action: #selector(topup), for: .touchUpInside)
@@ -238,7 +238,7 @@ class HomeVC: UIViewController {
   }
 
   func reloadData() {
-    User.getMe{ me in
+    User.updateMeFromServer { me in
       self.makeUpdates(withUser: me)
     }
     API.getTransactions { transactions in
@@ -307,9 +307,7 @@ class HomeVC: UIViewController {
     case .ended:
       if shouldReload {
         shouldReload = false
-        User.updateMeFromServer { me in
-          self.makeUpdates(withUser: me)
-        }
+        reloadData()
       }
 
       if shouldCollapse || (isCollapsed && !shouldExpand) {
@@ -343,8 +341,10 @@ class HomeVC: UIViewController {
 
   @objc func menu() {
     // TODO: Change to proper menu action once implemented
-    let loginVC = LoginVC()
-    Util.switchTo(viewController: loginVC, presentingController: self)
+    API.logout {
+      let loginVC = LoginVC()
+      Util.switchTo(viewController: loginVC, presentingController: self)
+    }
   }
 
   @objc func send() {

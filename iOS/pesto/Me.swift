@@ -21,6 +21,7 @@ extension User {
       API.getMe(withOldMe: oldMe) {
         user in
         updateMe(withUser: user)
+        handler(user)
       }
     }
   }

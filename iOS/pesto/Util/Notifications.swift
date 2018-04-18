@@ -18,16 +18,16 @@ struct Notifications {
     subscribedNotifications = notifications
   }
 
-  static func receiveNotification(aps: JSON, completion: () -> Void) {
+  static func receiveNotification(info: JSON, completion: () -> Void) {
     defer {
       completion()
     }
 
-    guard let label = aps["notificationsLabel"] as? String else {
+    guard let label = info["notificationIdentifier"] as? String else {
       return
     }
 
-    generalNotifications[label]?(aps)
-    subscribedNotifications?[label]?(aps)
+    generalNotifications[label]?(info)
+    subscribedNotifications?[label]?(info)
   }
 }

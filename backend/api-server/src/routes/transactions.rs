@@ -38,8 +38,9 @@ fn transaction_route(
         let notification = Notification::builder("pay.pesto.dozo".to_string(), device_token)
             .title("New Transaction")
             .body(format!(
-                "Received £{} from @{}",
-                amount / 100,
+                "Received £{:.*} from @{}",
+                2,
+                amount as f64 / 100.0,
                 payer_username
             ))
             .data(json!({

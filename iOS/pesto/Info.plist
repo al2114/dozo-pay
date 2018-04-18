@@ -50,7 +50,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>arbitrary</key>
-	<string></string>
 </dict>
 </plist>

@@ -87,13 +87,15 @@ fn login_route(
 
     let device_token = request.get_device_token();
     let default_device_token: &str = Default::default();
-    if device_token == default_device_token {
+    if device_token != default_device_token {
+        let mut device_tokens = user.device_tokens.clone();
+        if let Err(pos) = device_tokens.binary_search(&device_token.to_string()) {
+            device_tokens.insert(pos, device_token.to_string());
+        }
+
         use schema::users::dsl::users as users_sql;
         diesel::update(users_sql.find(&user.uid))
-            .set(users::device_tokens.eq(sql_functions::array_concat(
-                users::device_tokens,
-                vec![device_token],
-            )))
+            .set(users::device_tokens.eq(device_tokens))
             .execute(&db_connection)
             .chain_err(|| "User device token concatenation failed")?;
     }
@@ -117,7 +119,7 @@ fn logout_route(pool: State<PgPool>, request: Proto<LogoutRequest>) -> ProtoResu
 
     let device_token = request.get_device_token();
     let default_device_token: &str = Default::default();
-    if device_token == default_device_token {
+    if device_token != default_device_token {
         let db_connection = pool.get()
             .chain_err(|| "failed to obtain database connection")?;
 
@@ -163,8 +165,8 @@ pub fn get_users(
     use models::User;
     let query = format!(
         "SELECT users.*
-        FROM unnest(ARRAY{:?}) user_id
-        INNER_JOIN users on users.uid = user_id",
+        FROM unnest(ARRAY{:?}::integer[]) user_id
+        INNER JOIN users on users.uid = user_id",
         user_ids
     );
     diesel::sql_query(query)

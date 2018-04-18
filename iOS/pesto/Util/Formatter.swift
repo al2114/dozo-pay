@@ -46,7 +46,6 @@ struct Formatter {
       dateFormatter.dateFormat = "MMM dd H:mm"
       dateString = dateFormatter.string(from: date)
     }
-    print("to \(dateString)")
 
     return dateString
   }

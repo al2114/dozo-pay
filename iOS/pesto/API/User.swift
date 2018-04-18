@@ -49,7 +49,7 @@ extension API {
     }
   }
 
-  static func logout() {
+  static func logout(completion: @escaping () -> Void) {
     User.getMe { me in
       var logoutRequest = LogoutRequest()
       logoutRequest.userID = me.uid
@@ -58,7 +58,7 @@ extension API {
       }
 
       let route = "logout"
-      Requests.post(toRoute: route, withProtoMessage: logoutRequest) { _ in }
+      Requests.post(toRoute: route, withProtoMessage: logoutRequest) { _ in completion() }
     }
   }
 

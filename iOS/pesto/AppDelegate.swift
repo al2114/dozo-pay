@@ -9,7 +9,11 @@
 import UIKit
 import UserNotifications
 
-typealias JSON = [String: Any]
+typealias JSON = [AnyHashable: Any]
+
+struct State {
+  static var deviceToken: String? = nil
+}
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window?.makeKeyAndVisible()
 
     UNUserNotificationCenter.current().delegate = self
+    registerForPushNotifications(withApplication: application)
 
     return true
   }
@@ -72,34 +77,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
   func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-    let deviceToken = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-
-    print(deviceToken)
-    User.getMe { user in
-      API.registerDeviceToken(deviceToken, to: user)
-    }
+    State.deviceToken = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
   }
 
   func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
     print("Failed to register: \(error)")
   }
 
-  func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-    print(userInfo)
-    let aps = userInfo["aps"] as! JSON
-    Notifications.receiveNotification(aps: aps) {
-      completionHandler(.newData)
-    }
-  }
-
   func userNotificationCenter(_ center: UNUserNotificationCenter,  willPresent notification: UNNotification, withCompletionHandler   completionHandler: @escaping (_ options:   UNNotificationPresentationOptions) -> Void) {
-    print("Handle push from foreground")
-    print("\(notification.request.content.userInfo)")
+    print("Notification from foreground")
+    Notifications.receiveNotification(info: notification.request.content.userInfo) {
+      completionHandler([.alert, .badge, .sound])
+    }
   }
 
   func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     // if you set a member variable in didReceiveRemoteNotification, you  will know if this is from closed or background
-    print("Closed or background")
-    print("\(response.notification.request.content.userInfo)")
+    print("Notification from closed or background")
+    Notifications.receiveNotification(info: response.notification.request.content.userInfo) {
+      completionHandler()
+    }
   }
 }

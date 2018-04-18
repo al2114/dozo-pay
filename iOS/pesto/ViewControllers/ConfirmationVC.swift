@@ -27,7 +27,7 @@ class ConfirmationVC: UIViewController {
 
     let amountLabel = UILabel()
     amountLabel.translatesAutoresizingMaskIntoConstraints = false
-    amountLabel.text = Util.amountToCurrencyString(amount)
+    amountLabel.text = Formatter.currencyString(fromAmount: amount)
     amountLabel.font = UIFont.regular.withSize(50)
     amountLabel.textColor = .text
     view.addSubview(amountLabel)
@@ -110,7 +110,7 @@ class ConfirmationVC: UIViewController {
     let balanceLabel = UILabel()
     balanceLabel.translatesAutoresizingMaskIntoConstraints = false
     User.getMe { me in
-      let balance = Util.amountToCurrencyString(me.balance)
+      let balance = Formatter.currencyString(fromAmount: me.balance)
       balanceLabel.text = "Balance: \(balance)"
     }
     balanceLabel.textColor = .lightGray

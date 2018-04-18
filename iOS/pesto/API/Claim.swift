@@ -6,19 +6,10 @@
 //  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
 //
 
-typealias AcceptClaimRequest = Pesto_UserMessages_AcceptClaimRequest
-typealias AcceptClaimResponse = Pesto_UserMessages_AcceptClaimResponse
-typealias CreateClaimRequest = Pesto_UserMessages_CreateClaimRequest
-typealias CreateClaimResponse = Pesto_UserMessages_CreateClaimResponse
-typealias RevokeClaimRequest = Pesto_UserMessages_RevokeClaimRequest
-typealias RevokeClaimResponse = Pesto_UserMessages_RevokeClaimResponse
-typealias ClaimInfoResponse = Pesto_UserMessages_ClaimInfoResponse
-
 extension API {
-
   static func getClaim(withId claimId: Id, completion: @escaping (Claim,ClaimStatus) -> Void) {
     let route = "claims/info/\(claimId)"
-    Util.get(toRoute: route) { (result: Result<ClaimInfoResponse>?) in
+    Requests.get(toRoute: route) { (result: Result<ClaimInfoResponse>?) in
       if case let .ok(ClaimInfoResponse)? = result {
         completion(ClaimInfoResponse.claim,ClaimInfoResponse.status)
       }
@@ -32,7 +23,7 @@ extension API {
       acceptClaimRequest.receiverID = me.uid
 
       let route = "claims/accept"
-      Util.post(toRoute: route, withProtoMessage: acceptClaimRequest) {
+      Requests.post(toRoute: route, withProtoMessage: acceptClaimRequest) {
         result in
         if case let .ok(acceptClaimResponse)? = result, acceptClaimResponse.successful {
           var me = me
@@ -58,7 +49,7 @@ extension API {
       createClaimRequest.ownerID = me.uid
 
       let route = "claims/create"
-      Util.post(toRoute: route, withProtoMessage: createClaimRequest) {
+      Requests.post(toRoute: route, withProtoMessage: createClaimRequest) {
         result in
         if case let .ok(createClaimResponse)? = result {
           let claim = createClaimResponse.claim
@@ -74,7 +65,7 @@ extension API {
     revokeClaimRequest.claimID = claim.uid
 
     let route = "claims/revoke"
-    Util.post(toRoute: route, withProtoMessage: revokeClaimRequest) {
+    Requests.post(toRoute: route, withProtoMessage: revokeClaimRequest) {
       result in
       if case let .ok(acceptClaimResponse)? = result {
         User.getMe { me in

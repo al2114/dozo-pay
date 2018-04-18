@@ -1,2 +1,2 @@
-//use diesel::sql_types::{Array, Integer};
-//sql_function!(idx, idx_t, (x: Array<Integer>, y: Integer) -> Integer);
+use diesel::sql_types::{Array, Text};
+sql_function!(array_remove, array_remove_t, (x: Array<Text>, y: Text) -> Array<Text>);

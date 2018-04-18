@@ -1,1 +1,1 @@
-ALTER TABLE users ADD COLUMN device_token VARCHAR;
+ALTER TABLE users ADD COLUMN device_tokens TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];

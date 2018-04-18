@@ -6,15 +6,6 @@
 //  Copyright © 2018 Pesto Technologies Ltd. All rights reserved.
 //
 
-typealias Id = Int32
-typealias Amount = Int32
-typealias TransactionRequest = Pesto_UserMessages_TransactionRequest
-typealias TransactionResponse = Pesto_UserMessages_TransactionResponse
-typealias TopupRequest = Pesto_UserMessages_TopupRequest
-typealias TopupResponse = Pesto_UserMessages_TopupResponse
-
-typealias CheckPasscodeRequest = Pesto_UserMessages_CheckPasscodeRequest
-typealias SuccessResponse = Pesto_UserMessages_SuccessResponse
 
 struct API {
   static func checkPasscode(_ passcode: String, completion: @escaping (Bool) -> Void) {
@@ -22,7 +13,7 @@ struct API {
     checkPasscodeRequest.passcode = passcode
 
     let route = "check-passcode"
-    Util.post(toRoute: route, withProtoMessage: checkPasscodeRequest) {
+    Requests.post(toRoute: route, withProtoMessage: checkPasscodeRequest) {
       result in
       if case let .ok(response)? = result {
         completion(response.successful)
@@ -40,7 +31,7 @@ struct API {
       transactionRequest.payeeID = payeeId
 
       let route = "pay"
-      Util.post(toRoute: route, withProtoMessage: transactionRequest) {
+      Requests.post(toRoute: route, withProtoMessage: transactionRequest) {
         result in
         if case let .ok(transactionResponse)? = result {
           User.updateMe(withUser: transactionResponse.user)
@@ -59,7 +50,7 @@ struct API {
       topupRequest.amount = amount
 
       let route = "topup"
-      Util.post(toRoute: route, withProtoMessage: topupRequest) {
+      Requests.post(toRoute: route, withProtoMessage: topupRequest) {
         result in
         if case let .ok(topupResponse)? = result {
           User.updateMe(withUser: topupResponse.user)

@@ -112,7 +112,7 @@ class HomeVC: UIViewController {
       ])
     let qrCodeWidth = view.bounds.width * 0.38
     User.getMe { me in
-      let qrImage = Util.qrCode(from: "pesto:\(me.username):\(me.uid)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
+      let qrImage = QR.generateCode(from: "pesto:\(me.username):\(me.uid)", withSize: CGSize(width: qrCodeWidth, height: qrCodeWidth))
       qrCodeImageView.contentMode = .scaleAspectFit
       qrCodeImageView.image = qrImage
     }
@@ -140,7 +140,7 @@ class HomeVC: UIViewController {
     balanceLabel = UIButton()
     balanceLabel.tintColor = .primaryTitle
     balanceLabel.titleLabel?.font = UIFont.regular.withSize(36)
-    balanceLabel.setTitle("£9.41", for: .normal)
+    balanceLabel.setTitle("£0.00", for: .normal)
     balanceLabel.isUserInteractionEnabled = true
     balanceLabel.translatesAutoresizingMaskIntoConstraints = false
     balanceLabel.addTarget(self, action: #selector(topup), for: .touchUpInside)
@@ -225,26 +225,30 @@ class HomeVC: UIViewController {
       cameraImageView.widthAnchor.constraint(equalToConstant: 36),
       cameraImageView.heightAnchor.constraint(equalTo: cameraImageView.widthAnchor),
       ])
+
+    Notifications.subscribe(self, to: ["receiveTransaction": { _ in self.reloadData() }])
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     UIApplication.shared.keyWindow?.backgroundColor = .primaryBackground
     UIApplication.shared.statusBarStyle = .lightContent
-    User.getMe{ me in
+    navigationController?.setNavigationBarHidden(true, animated: true)
+    reloadData()
+  }
+
+  func reloadData() {
+    User.updateMeFromServer { me in
       self.makeUpdates(withUser: me)
     }
     API.getTransactions { transactions in
       self.transactions = transactions
       self.transactionView.reloadData()
     }
-    navigationController?.setNavigationBarHidden(true, animated: true)
   }
 
   func makeUpdates(withUser user: User) {
-    DispatchQueue.main.async {
-      self.balanceLabel.setTitle(Util.amountToCurrencyString(user.balance), for: .normal)
-    }
+    self.balanceLabel.setTitle(Formatter.currencyString(fromAmount: user.balance), for: .normal)
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -303,9 +307,7 @@ class HomeVC: UIViewController {
     case .ended:
       if shouldReload {
         shouldReload = false
-        User.updateMeFromServer { me in
-          self.makeUpdates(withUser: me)
-        }
+        reloadData()
       }
 
       if shouldCollapse || (isCollapsed && !shouldExpand) {
@@ -339,8 +341,10 @@ class HomeVC: UIViewController {
 
   @objc func menu() {
     // TODO: Change to proper menu action once implemented
-    let loginVC = LoginVC()
-    Util.switchTo(viewController: loginVC, presentingController: self)
+    API.logout {
+      let loginVC = LoginVC()
+      Util.switchTo(viewController: loginVC, presentingController: self)
+    }
   }
 
   @objc func send() {
@@ -375,15 +379,15 @@ extension HomeVC: UITableViewDataSource {
     transactionCell.titleLabel.text = transactionTypeToString(transaction.transactionType).uppercased()
     switch transaction.transactionType {
     case .from:
-      transactionCell.amountLabel.text = "+\(Util.amountToCurrencyString(transaction.amount))"
+      transactionCell.amountLabel.text = "+\(Formatter.currencyString(fromAmount: transaction.amount))"
       transactionCell.amountLabel.textColor = .secondaryTitle
     case .to:
-      transactionCell.amountLabel.text = Util.amountToCurrencyString(transaction.amount)
+      transactionCell.amountLabel.text = Formatter.currencyString(fromAmount: transaction.amount)
       transactionCell.amountLabel.textColor = .text
     default: break
     }
 
-    transactionCell.dateLabel.text = Util.dateStringFromProtoTimestamp(transaction.timestamp).uppercased()
+    transactionCell.dateLabel.text = Formatter.dateString(fromTimestamp: transaction.timestamp).uppercased()
     switch transaction.accountHolderType {
     case .claim:
       //TODO

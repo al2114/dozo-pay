@@ -34,14 +34,18 @@ fn transaction_route(
     request: Proto<TransactionRequest>,
 ) -> ProtoResult<TransactionResponse> {
     let (response, (payee, payer_username, amount)) = transaction_helper(pool, request)?;
-    if let Some(device_token) = payee.device_token {
+    for device_token in payee.device_tokens {
         let notification = Notification::builder("pay.pesto.dozo".to_string(), device_token)
             .title("New Transaction")
             .body(format!(
-                "Received £{} from @{}",
-                amount / 100,
+                "Received £{:.*} from @{}",
+                2,
+                amount as f64 / 100.0,
                 payer_username
             ))
+            .data(json!({
+                "notificationIdentifier": "receiveTransaction",
+            }))
             .build();
         apns_client
             .send(notification)
@@ -117,6 +121,7 @@ pub fn get_transactions_route(
     let from_tids = users_sql
         .find(user_id)
         .inner_join(transactions::table.on(transactions::payee_id.eq(users::account_id)))
+        .filter(transactions::is_successful)
         .select(transactions::uid)
         .load::<i32>(&db_connection)
         .chain_err(|| "Transactions not found")?;
@@ -124,6 +129,7 @@ pub fn get_transactions_route(
     let to_tids = users_sql
         .find(user_id)
         .inner_join(transactions::table.on(transactions::payer_id.eq(users::account_id)))
+        .filter(transactions::is_successful)
         .select(transactions::uid)
         .load::<i32>(&db_connection)
         .chain_err(|| "Transactions not found")?;

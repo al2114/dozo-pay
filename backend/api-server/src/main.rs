@@ -20,6 +20,9 @@ extern crate rocket_contrib;
 extern crate rustc_serialize;
 #[macro_use]
 extern crate serde_derive;
+#[cfg(feature = "notifications")]
+#[macro_use]
+extern crate serde_json;
 
 #[cfg(feature = "notifications")]
 use apns::{APNs, APNsClient, Notification};

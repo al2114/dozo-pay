@@ -23,41 +23,42 @@ fn register_route(
     let password = request.get_password();
     let password = &encrypt_password(&username, &password);
 
-    let new_account = models::NewAccount { balance: &0 };
-
     let db_connection = pool.get()
         .chain_err(|| "failed to obtain database connection")?;
+    db_connection.transaction(|| {
+        let new_account = models::NewAccount { balance: &0 };
 
-    use models::Account;
-    use schema::accounts;
+        use models::Account;
+        use schema::accounts;
 
-    let account = diesel::insert_into(accounts::table)
-        .values(&new_account)
-        .get_result::<Account>(&db_connection)
-        .chain_err(|| "Error inserting new account")?;
+        let account = diesel::insert_into(accounts::table)
+            .values(&new_account)
+            .get_result::<Account>(&db_connection)
+            .chain_err(|| "Error inserting new account")?;
 
-    let new_user = models::NewUser {
-        phone_no: request.get_phone_no(),
-        picture_url: None,
-        account_id: &account.uid,
-        username: username,
-        password: password,
-    };
+        let new_user = models::NewUser {
+            phone_no: request.get_phone_no(),
+            picture_url: None,
+            account_id: &account.uid,
+            username: username,
+            password: password,
+        };
 
-    use models::User;
-    use schema::users;
+        use models::User;
+        use schema::users;
 
-    let user = diesel::insert_into(users::table)
-        .values(&new_user)
-        .get_result::<User>(&db_connection)
-        .chain_err(|| "Error inserting new user")?;
+        let user = diesel::insert_into(users::table)
+            .values(&new_user)
+            .get_result::<User>(&db_connection)
+            .chain_err(|| "Error inserting new user")?;
 
-    let user = protoize::user(user, 0);
+        let user = protoize::user(user, 0);
 
-    let mut response = RegisterResponse::new();
-    response.set_user(user);
-    response.set_successful(true);
-    Ok(Proto(response))
+        let mut response = RegisterResponse::new();
+        response.set_user(user);
+        response.set_successful(true);
+        Ok(Proto(response))
+    })
 }
 
 #[post("/login", data = "<request>")]

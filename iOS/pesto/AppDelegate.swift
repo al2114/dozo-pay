@@ -27,10 +27,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     UIApplication.shared.statusBarStyle = .lightContent
     window = UIWindow(frame: UIScreen.main.bounds)
-//    let passcodeVC = PasscodeVC()
-//    Util.switchTo(viewController: passcodeVC, window: window)
-    let initVC = LoginVC()
-    Util.switchTo(viewController: initVC, window: window)
+    let loginVC = LoginVC()
+    Util.switchTo(viewController: loginVC, window: window)
+
+    let userId = Id(UserDefaults.standard.integer(forKey: "user.uid"))
+    if userId != 0 {
+      API.getMe(withId: userId) { me in
+        if let me = me {
+          User.updateMe(withUser: me)
+          let homeVC = HomeVC()
+          Util.switchTo(viewController: homeVC, window: self.window)
+        }
+      }
+    }
 
     window?.backgroundColor = .primaryBackground
     window?.makeKeyAndVisible()

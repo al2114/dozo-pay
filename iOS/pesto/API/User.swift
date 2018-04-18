@@ -9,7 +9,7 @@
 import Foundation
 
 extension API {
-  static func register(user: User, withPassword password: String, completion: @escaping (User?) -> Void) {
+  static func register(user: User, withPassword password: String, completion: @escaping (Bool) -> Void) {
     var registerRequest = RegisterRequest()
     registerRequest.password = password
     registerRequest.phoneNo = user.phoneNo
@@ -19,13 +19,13 @@ extension API {
     Requests.post(toRoute: route, withProtoMessage: registerRequest) {
       result in
       if case let .ok(registerResponse)? = result {
-        completion(registerResponse.user)
+        User.updateMe(withUser: registerResponse.user)
+        UserDefaults.standard.set(registerResponse.user.uid, forKey: "user.uid")
+        completion(registerResponse.successful)
       } else {
-        completion(nil)
+        completion(false)
       }
     }
-
-    completion(user)
   }
 
   static func login(withUsername username: String, password: String, completion: @escaping (Bool) -> Void) {
@@ -41,7 +41,7 @@ extension API {
       result in
       if case let .ok(loginResponse)? = result {
         User.updateMe(withUser: loginResponse.user)
-        print(loginResponse.successful)
+        UserDefaults.standard.set(loginResponse.user.uid, forKey: "user.uid")
         completion(loginResponse.successful)
       } else {
         completion(false)
@@ -58,7 +58,10 @@ extension API {
       }
 
       let route = "logout"
-      Requests.post(toRoute: route, withProtoMessage: logoutRequest) { _ in completion() }
+      Requests.post(toRoute: route, withProtoMessage: logoutRequest) { _ in
+        UserDefaults.standard.removeObject(forKey: "user.uid")
+        completion()
+      }
     }
   }
 
@@ -77,7 +80,7 @@ extension API {
 //    completion(testUser)
   }
 
-  static func getMe(withId id: Int32, completion: @escaping (User?) -> Void) {
+  static func getMe(withId id: Id, completion: @escaping (User?) -> Void) {
     let route = "users/\(id)"
     Requests.get(toRoute: route) { (result: Result<User>?) in
       if case let .ok(me)? = result {

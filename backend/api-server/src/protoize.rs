@@ -68,6 +68,9 @@ pub fn transaction(
             ));
             proto_transaction.set_account_holder_type(protos::models::AccountHolderType::CLAIM);
         }
+        models::AccountHolder::Master => {
+            proto_transaction.set_account_holder_type(protos::models::AccountHolderType::MASTER);
+        }
     };
     proto_transaction.set_transaction_type(transaction_type);
     proto_transaction.set_amount(transaction.amount);

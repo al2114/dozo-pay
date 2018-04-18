@@ -151,6 +151,7 @@ pub fn get_transactions_route(
     let (from_claim_transactions, from_claims) = transactions::table
         .filter(transactions::uid.eq_any(from_tids))
         .inner_join(claims::table.on(transactions::payer_id.eq(claims::account_id)))
+        .filter(claims::owner_id.nullable().ne(claims::receiver_id))
         .load::<(Transaction, Claim)>(&db_connection)
         .chain_err(|| "Transactions not found")?
         .into_iter()
@@ -194,6 +195,7 @@ pub fn get_transactions_route(
     let (to_claim_transactions, to_claims) = transactions::table
         .filter(transactions::uid.eq_any(to_tids))
         .inner_join(claims::table.on(transactions::payee_id.eq(claims::account_id)))
+        .filter(claims::owner_id.nullable().ne(claims::receiver_id))
         .load::<(Transaction, Claim)>(&db_connection)
         .chain_err(|| "Transactions not found")?
         .into_iter()
